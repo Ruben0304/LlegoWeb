@@ -69,6 +69,13 @@
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
   }
 
+  function maskToken(token: string) {
+    if (token.length <= 12) {
+      return `${token.slice(0, 3)}...`;
+    }
+    return `${token.slice(0, 6)}...${token.slice(-6)}`;
+  }
+
   function clearAuth() {
     localStorage.removeItem(AUTH_TOKEN_KEY);
     localStorage.removeItem(AUTH_TOKEN_TYPE_KEY);
@@ -137,12 +144,22 @@
       const data = (await response.json().catch(() => null)) as AuthResponse | { error?: string } | null;
 
       if (!response.ok || !data || 'error' in data) {
+        console.error('Auth error:', {
+          endpoint,
+          status: response.status,
+          payload: data,
+        });
         errorMessage = (data && 'error' in data && data.error) || 'No se pudo autenticar.';
         return;
       }
 
       storeAuth(data);
       setAuthenticatedUser(data);
+      console.info('Auth success:', {
+        endpoint,
+        userId: data.user.id,
+        email: data.user.email,
+      });
       window.location.assign('/negocios');
     } catch (error) {
       console.error('Error en autenticacion social:', error);
@@ -158,6 +175,7 @@
       return;
     }
 
+    console.info('Google credential recibido:', maskToken(response.credential));
     await exchangeSocialToken('/api/auth/google', {
       idToken: response.credential,
     });
@@ -178,6 +196,7 @@
         return;
       }
 
+      console.info('Apple identity token recibido:', maskToken(authorization.id_token));
       await exchangeSocialToken('/api/auth/apple', {
         identityToken: authorization.id_token,
         authorizationCode: authorization.code,
