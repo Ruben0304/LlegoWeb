@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount } from "svelte";
 
   interface Feature {
     icon: string;
@@ -13,43 +13,47 @@
   const features: Feature[] = [
     {
       icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
-      title: 'Entregas ultra rápidas',
-      description: 'Tu pedido llega en minutos, no en horas. Optimizamos cada ruta con IA para que recibas todo fresco.',
-      stat: '~25',
-      statLabel: 'min promedio',
-      color: '#E1C78E'
+      title: "Entregas ultra rápidas",
+      description:
+        "Tu pedido llega en minutos, no en horas. Optimizamos cada ruta con IA para que recibas todo fresco.",
+      stat: "~25",
+      statLabel: "min promedio",
+      color: "#E1C78E",
     },
     {
       icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`,
-      title: 'Seguimiento en vivo',
-      description: 'Mira exactamente dónde está tu pedido en tiempo real. Sin sorpresas, sin esperas innecesarias.',
-      stat: 'GPS',
-      statLabel: 'tiempo real',
-      color: '#B2D69A'
+      title: "Seguimiento en vivo",
+      description:
+        "Mira exactamente dónde está tu pedido en tiempo real. Sin sorpresas, sin esperas innecesarias.",
+      stat: "GPS",
+      statLabel: "tiempo real",
+      color: "#B2D69A",
     },
     {
       icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
-      title: 'Miles de opciones',
-      description: 'Restaurantes, supermercados, tiendas de ropa y productos del campo. Todo en una sola app.',
-      stat: '1000+',
-      statLabel: 'comercios',
-      color: '#5A8467'
+      title: "Miles de opciones",
+      description:
+        "Restaurantes, supermercados, tiendas de ropa y productos del campo. Todo en una sola app.",
+      stat: "1000+",
+      statLabel: "comercios",
+      color: "#5A8467",
     },
     {
       icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>`,
-      title: 'Pagos seguros',
-      description: 'Paga como prefieras: tarjeta, transferencia o efectivo. Todas las transacciones están protegidas.',
-      stat: '100%',
-      statLabel: 'seguro',
-      color: '#7C412B'
-    }
+      title: "Pagos seguros",
+      description:
+        "Paga como prefieras: tarjeta, transferencia o efectivo. Todas las transacciones están protegidas.",
+      stat: "100%",
+      statLabel: "seguro",
+      color: "#7C412B",
+    },
   ];
 
   const stats = [
-    { value: '50K+', label: 'Pedidos entregados' },
-    { value: '4.9', label: 'Calificación promedio' },
-    { value: '15min', label: 'Entrega más rápida' },
-    { value: '24/7', label: 'Soporte disponible' }
+    { value: "50K+", label: "Pedidos entregados" },
+    { value: "4.9", label: "Calificación promedio" },
+    { value: "15min", label: "Entrega más rápida" },
+    { value: "24/7", label: "Soporte disponible" },
   ];
 
   let sectionElement: HTMLElement;
@@ -65,7 +69,7 @@
           }
         });
       },
-      { threshold: 0.2 }
+      { threshold: 0.2 },
     );
 
     if (sectionElement) {
@@ -91,24 +95,41 @@
     <div class="bg-pattern"></div>
     <div class="floating-icons">
       <div class="float-icon icon-1">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <rect x="1" y="3" width="15" height="13" rx="2"/>
-          <path d="M16 8h4l3 4v5h-7V8z"/>
-          <circle cx="5.5" cy="18.5" r="2.5"/>
-          <circle cx="18.5" cy="18.5" r="2.5"/>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <rect x="1" y="3" width="15" height="13" rx="2" />
+          <path d="M16 8h4l3 4v5h-7V8z" />
+          <circle cx="5.5" cy="18.5" r="2.5" />
+          <circle cx="18.5" cy="18.5" r="2.5" />
         </svg>
       </div>
       <div class="float-icon icon-2">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
-          <line x1="3" y1="6" x2="21" y2="6"/>
-          <path d="M16 10a4 4 0 01-8 0"/>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <path d="M16 10a4 4 0 01-8 0" />
         </svg>
       </div>
       <div class="float-icon icon-3">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
-          <path d="M12 6v6l4 2"/>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <path
+            d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
+          />
+          <path d="M12 6v6l4 2" />
         </svg>
       </div>
     </div>
@@ -118,260 +139,554 @@
     <!-- Header -->
     <div class="section-header" class:visible={isVisible}>
       <div class="header-badge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          width="16"
+          height="16"
+        >
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
         </svg>
         <span>Delivery inteligente</span>
       </div>
       <h2 class="headline">
-        Todo lo que amas,<br/>
+        Todo lo que amas,<br />
         <span class="gradient-text">en tu puerta.</span>
       </h2>
       <p class="subheadline">
         Combinamos tecnología de punta con logística eficiente para que recibas
-        tus pedidos más rápido que nunca. Como Glovo, Uber Eats o Rappi, pero mejor.
+        tus pedidos más rápido que nunca. Como Glovo, Uber Eats o Rappi, pero
+        mejor.
       </p>
     </div>
 
     <!-- Main content grid -->
     <div class="content-grid" class:visible={isVisible}>
-      <!-- Left: Route Animation -->
+      <!-- Left: Delivery Animation -->
       <div class="route-animation-side">
         <div class="route-container">
-          <svg class="route-canvas" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
+          <svg
+            class="route-canvas"
+            viewBox="0 0 400 400"
+            preserveAspectRatio="xMidYMid meet"
+          >
             <defs>
-              <!-- Gradients -->
-              <linearGradient id="routeGradient" x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#5A8467"/>
-                <stop offset="100%" stop-color="#E1C78E"/>
+              <linearGradient
+                id="roadGradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+              >
+                <stop offset="0%" stop-color="#333" />
+                <stop offset="100%" stop-color="#444" />
               </linearGradient>
-              <linearGradient id="routeTrailGradient" x1="0%" y1="100%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#5A8467" stop-opacity="0.8"/>
-                <stop offset="100%" stop-color="#B2D69A" stop-opacity="0.3"/>
-              </linearGradient>
-              <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#E1C78E"/>
-                <stop offset="100%" stop-color="#F5E6C3"/>
-              </linearGradient>
-
-              <!-- Filters -->
-              <filter id="routeGlow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="4" result="blur"/>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
                 <feMerge>
-                  <feMergeNode in="blur"/>
-                  <feMergeNode in="SourceGraphic"/>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
                 </feMerge>
               </filter>
-              <filter id="iconGlow" x="-100%" y="-100%" width="300%" height="300%">
-                <feGaussianBlur stdDeviation="6" result="blur"/>
-                <feMerge>
-                  <feMergeNode in="blur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-              <filter id="vehicleGlow" x="-150%" y="-150%" width="400%" height="400%">
-                <feGaussianBlur stdDeviation="3" result="blur"/>
-                <feMerge>
-                  <feMergeNode in="blur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-
-              <!-- Arrow marker for route end -->
-              <marker id="arrowHead" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto-start-reverse">
-                <path d="M 0 0 L 12 6 L 0 12 L 3 6 Z" fill="url(#arrowGradient)"/>
-              </marker>
             </defs>
 
-            <!-- Background route (gray base path) -->
-            <path
-              class="route-base"
-              d="M 65 335
-                 Q 65 280, 110 240
-                 Q 155 200, 200 200
-                 Q 245 200, 270 160
-                 Q 295 120, 335 70"
-              fill="none"
-              stroke="rgba(255,255,255,0.08)"
-              stroke-width="14"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
+            <!-- 1. SCENERY BACKGROUND -->
 
-            <!-- Route dashed pattern (like Google Maps) -->
+            <!-- Road -->
             <path
-              class="route-dashed"
-              d="M 65 335
-                 Q 65 280, 110 240
-                 Q 155 200, 200 200
-                 Q 245 200, 270 160
-                 Q 295 120, 335 70"
+              d="M 70 240 Q 200 320 350 240"
+              fill="none"
+              stroke="#2a2a2a"
+              stroke-width="40"
+              stroke-linecap="round"
+            />
+            <!-- Road markings -->
+            <path
+              id="deliveryPath"
+              d="M 70 240 Q 200 320 350 240"
               fill="none"
               stroke="rgba(255,255,255,0.15)"
-              stroke-width="10"
+              stroke-width="2"
+              stroke-dasharray="10 15"
               stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-dasharray="2 18"
             />
 
-            <!-- Animated route trail (follows the delivery) -->
-            <path
-              class="route-trail"
-              d="M 65 335
-                 Q 65 280, 110 240
-                 Q 155 200, 200 200
-                 Q 245 200, 270 160
-                 Q 295 120, 335 70"
-              fill="none"
-              stroke="url(#routeTrailGradient)"
-              stroke-width="6"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              filter="url(#routeGlow)"
-            />
-
-            <!-- Active route with arrow (the line being drawn with arrow head) -->
-            <path
-              class="route-active"
-              d="M 65 335
-                 Q 65 280, 110 240
-                 Q 155 200, 200 200
-                 Q 245 200, 270 160
-                 Q 295 120, 335 70"
-              fill="none"
-              stroke="url(#routeGradient)"
-              stroke-width="5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              marker-end="url(#arrowHead)"
-              filter="url(#routeGlow)"
-            />
-
-            <!-- Delivery vehicle (moto/scooter) traveling on route -->
-            <g class="delivery-vehicle" filter="url(#vehicleGlow)">
-              <animateMotion
-                dur="4s"
-                repeatCount="indefinite"
-                rotate="auto"
-                path="M 65 335
-                      Q 65 280, 110 240
-                      Q 155 200, 200 200
-                      Q 245 200, 270 160
-                      Q 295 120, 335 70"
-                keyPoints="0;1"
-                keyTimes="0;1"
-                calcMode="spline"
-                keySplines="0.25 0.1 0.25 1"
+            <!-- 2. RESTAURANT (Left) -->
+            <g class="restaurant-group" transform="translate(0, 160)">
+              <!-- Base -->
+              <rect x="0" y="40" width="80" height="70" fill="#2d2d2d" rx="2" />
+              <rect
+                x="5"
+                y="45"
+                width="70"
+                height="60"
+                fill="none"
+                stroke="rgba(255,255,255,0.1)"
+                stroke-width="1"
               />
 
-              <!-- Vehicle glow/trail effect -->
-              <ellipse rx="20" ry="8" fill="#E1C78E" opacity="0.15" transform="rotate(-45)">
-                <animate attributeName="opacity" values="0.2;0.08;0.2" dur="0.8s" repeatCount="indefinite"/>
-              </ellipse>
+              <!-- Awning (Red/White stripes) -->
+              <path d="M-5 40 L5 20 L75 20 L85 40" fill="#c0392b" />
+              <path
+                d="M-5 40 L5 20 L15 40 M15 20 L25 40 M35 20 L45 40 M55 20 L65 40 M75 20 L85 40"
+                stroke="rgba(255,255,255,0.9)"
+                stroke-width="2"
+                fill="none"
+              />
 
-              <!-- Scooter body -->
-              <g transform="rotate(-45)">
-                <!-- Main body -->
-                <ellipse cx="0" cy="0" rx="14" ry="10" fill="#E1C78E"/>
-                <ellipse cx="0" cy="0" rx="14" ry="10" fill="none" stroke="white" stroke-width="1.5" opacity="0.5"/>
+              <!-- Sign -->
+              <rect
+                x="10"
+                y="0"
+                width="60"
+                height="15"
+                rx="2"
+                fill="#1a1a1a"
+                stroke="#E1C78E"
+                stroke-width="1"
+              />
+              <text
+                x="40"
+                y="11"
+                text-anchor="middle"
+                fill="#E1C78E"
+                font-size="8"
+                font-family="serif"
+                font-weight="bold"
+                letter-spacing="1">PIZZERIA</text
+              >
 
-                <!-- Delivery box -->
-                <rect x="-8" y="-14" width="16" height="10" rx="2" fill="#5A8467"/>
-                <rect x="-8" y="-14" width="16" height="10" rx="2" fill="none" stroke="white" stroke-width="1" opacity="0.6"/>
-                <text x="0" y="-8" text-anchor="middle" fill="white" font-size="6" font-weight="bold">L</text>
+              <!-- Window & Door -->
+              <rect
+                x="10"
+                y="60"
+                width="25"
+                height="40"
+                fill="#3d2b1f"
+                rx="1"
+              />
+              <!-- Door -->
+              <rect
+                x="45"
+                y="60"
+                width="25"
+                height="25"
+                fill="#87CEEB"
+                opacity="0.3"
+              />
+              <!-- Window -->
+              <rect
+                x="45"
+                y="60"
+                width="25"
+                height="25"
+                fill="none"
+                stroke="#555"
+                stroke-width="1"
+              />
 
-                <!-- Wheels hint -->
-                <circle cx="-8" cy="8" r="4" fill="#333" stroke="white" stroke-width="1"/>
-                <circle cx="8" cy="8" r="4" fill="#333" stroke="white" stroke-width="1"/>
+              <!-- Chef at door handing pizza -->
+              <g transform="translate(30, 88)">
+                <!-- Chef hat -->
+                <rect x="-6" y="-26" width="12" height="6" rx="2" fill="#fff" />
+                <rect x="-8" y="-32" width="16" height="8" rx="3" fill="#fff" />
+                <!-- Head -->
+                <circle cx="0" cy="-16" r="5" fill="#f1c27d" />
+                <!-- Body -->
+                <rect
+                  x="-6"
+                  y="-10"
+                  width="12"
+                  height="16"
+                  rx="2"
+                  fill="#fff"
+                  stroke="rgba(0,0,0,0.1)"
+                  stroke-width="0.6"
+                />
+                <rect x="-5" y="-6" width="10" height="2" fill="#e74c3c" />
+                <rect x="-5" y="-2" width="10" height="2" fill="#e74c3c" />
 
-                <!-- Speed lines -->
-                <line x1="18" y1="-3" x2="28" y2="-3" stroke="white" stroke-width="1.5" opacity="0.6">
-                  <animate attributeName="opacity" values="0.6;0.2;0.6" dur="0.3s" repeatCount="indefinite"/>
-                </line>
-                <line x1="20" y1="0" x2="32" y2="0" stroke="white" stroke-width="1.5" opacity="0.4">
-                  <animate attributeName="opacity" values="0.4;0.1;0.4" dur="0.3s" repeatCount="indefinite" begin="0.1s"/>
-                </line>
-                <line x1="18" y1="3" x2="26" y2="3" stroke="white" stroke-width="1.5" opacity="0.5">
-                  <animate attributeName="opacity" values="0.5;0.15;0.5" dur="0.3s" repeatCount="indefinite" begin="0.2s"/>
-                </line>
+                <!-- Arm -->
+                <path
+                  d="M0 -2 L16 4"
+                  stroke="#f1c27d"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                >
+                  <animate
+                    attributeName="d"
+                    values="M0 -2 L12 2;M0 -2 L26 -4;M0 -2 L12 2"
+                    dur="6s"
+                    repeatCount="indefinite"
+                    keyTimes="0;0.12;1"
+                  />
+                </path>
+              </g>
+
+              <!-- Pizza Box (Handover animation) -->
+              <g>
+                <rect
+                  x="52"
+                  y="80"
+                  width="16"
+                  height="4"
+                  fill="#E1C78E"
+                  stroke="#8B4513"
+                  stroke-width="0.5"
+                >
+                  <!-- 0-1s: Wait, 1-1.5s: Move to Moto, 1.5-4.5s: Hide (in bag), 4.5s: Deliver -->
+                  <animate
+                    attributeName="opacity"
+                    values="1;1;0;0;0"
+                    dur="6s"
+                    repeatCount="indefinite"
+                    keyTimes="0;0.15;0.2;0.8;1"
+                  />
+                  <animate
+                    attributeName="x"
+                    values="52;52;78;78"
+                    dur="6s"
+                    repeatCount="indefinite"
+                    keyTimes="0;0.1;0.2;1"
+                  />
+                  <animate
+                    attributeName="y"
+                    values="80;80;98;98"
+                    dur="6s"
+                    repeatCount="indefinite"
+                    keyTimes="0;0.1;0.2;1"
+                  />
+                </rect>
+                <path
+                  d="M55 80 L60 76 L65 80"
+                  fill="none"
+                  stroke="#C88E44"
+                  stroke-width="0.8"
+                >
+                  <animate
+                    attributeName="opacity"
+                    values="0;0;1;0;0"
+                    dur="6s"
+                    repeatCount="indefinite"
+                    keyTimes="0;0.08;0.14;0.2;1"
+                  />
+                  <animate
+                    attributeName="transform"
+                    values="translate(0, 0); translate(0, 0); translate(20, 26); translate(20, 26); translate(20, 26)"
+                    dur="6s"
+                    repeatCount="indefinite"
+                    keyTimes="0;0.08;0.14;0.2;1"
+                  />
+                </path>
               </g>
             </g>
 
-            <!-- Progress checkpoints along route -->
-            <g class="checkpoints">
-              <!-- Checkpoint 1 -->
-              <circle cx="90" cy="260" r="4" fill="#5A8467" opacity="0.6">
-                <animate attributeName="opacity" values="0.3;0.8;0.3" dur="4s" repeatCount="indefinite" begin="1s"/>
-              </circle>
-              <!-- Checkpoint 2 -->
-              <circle cx="155" cy="220" r="4" fill="#7A9E6B" opacity="0.6">
-                <animate attributeName="opacity" values="0.3;0.8;0.3" dur="4s" repeatCount="indefinite" begin="2s"/>
-              </circle>
-              <!-- Checkpoint 3 -->
-              <circle cx="245" cy="180" r="4" fill="#B2D69A" opacity="0.6">
-                <animate attributeName="opacity" values="0.3;0.8;0.3" dur="4s" repeatCount="indefinite" begin="3s"/>
-              </circle>
-            </g>
+            <!-- 3. MOTO (Moving along path) -->
+            <g>
+              <animateMotion
+                dur="6s"
+                repeatCount="indefinite"
+                rotate="auto"
+                keyPoints="0;0;0.7;0.8;1"
+                keyTimes="0;0.25;0.6;0.8;1"
+                calcMode="linear"
+              >
+                <mpath href="#deliveryPath" />
+              </animateMotion>
 
-            <!-- Start point (Store/Restaurant) -->
-            <g class="start-point" filter="url(#iconGlow)">
-              <!-- Outer pulse -->
-              <circle cx="65" cy="335" r="48" fill="#5A8467" opacity="0.1">
-                <animate attributeName="r" values="44;55;44" dur="3s" repeatCount="indefinite"/>
-                <animate attributeName="opacity" values="0.15;0.05;0.15" dur="3s" repeatCount="indefinite"/>
-              </circle>
-              <!-- Main circle -->
-              <circle cx="65" cy="335" r="36" fill="#5A8467"/>
-              <circle cx="65" cy="335" r="36" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
-              <!-- Store icon -->
-              <g transform="translate(65, 335)">
-                <!-- Store roof with awning -->
-                <path d="M-16 -6 L-20 -14 L20 -14 L16 -6" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-                <!-- Store body -->
-                <rect x="-16" y="-6" width="32" height="18" rx="2" fill="none" stroke="white" stroke-width="2"/>
-                <!-- Door -->
-                <rect x="-5" y="2" width="10" height="10" rx="1" fill="none" stroke="white" stroke-width="1.5"/>
-                <!-- Windows -->
-                <rect x="-14" y="-2" width="6" height="6" rx="1" fill="none" stroke="white" stroke-width="1.5"/>
-                <rect x="8" y="-2" width="6" height="6" rx="1" fill="none" stroke="white" stroke-width="1.5"/>
+              <g transform="translate(0, -15)">
+                <!-- Adjust moto to sit ON the line -->
+
+                <!-- Moto Body -->
+                <path d="M-15 0 L15 0 L12 -12 L-10 -10 Z" fill="#E1C78E" />
+                <circle
+                  cx="-10"
+                  cy="0"
+                  r="6"
+                  fill="#1a1a1a"
+                  stroke="#555"
+                  stroke-width="2"
+                />
+                <circle
+                  cx="10"
+                  cy="0"
+                  r="6"
+                  fill="#1a1a1a"
+                  stroke="#555"
+                  stroke-width="2"
+                />
+
+                <!-- Seat & Handlebars -->
+                <path d="M-5 -10 L5 -10" stroke="#333" stroke-width="3" />
+                <path d="M12 -12 L14 -18" stroke="#ccc" stroke-width="2" />
+
+                <!-- Driver -->
+                <g transform="translate(0, -12)">
+                  <circle cx="0" cy="-8" r="6" fill="#333" />
+                  <!-- Helmet -->
+                  <path d="M-4 0 Q0 5 4 0" fill="#E1C78E" />
+                  <!-- Body -->
+                  <rect
+                    x="2"
+                    y="-10"
+                    width="4"
+                    height="3"
+                    fill="rgba(255,255,255,0.5)"
+                  />
+                  <!-- Visor -->
+                </g>
+
+                <!-- Llego Bag -->
+                <g transform="translate(-14, -18)">
+                  <rect
+                    x="0"
+                    y="0"
+                    width="14"
+                    height="12"
+                    rx="1"
+                    fill="#5A8467"
+                    stroke="#fff"
+                    stroke-width="0.5"
+                  />
+                  <rect
+                    x="2"
+                    y="5"
+                    width="10"
+                    height="3"
+                    fill="#E1C78E"
+                    stroke="#8B4513"
+                    stroke-width="0.4"
+                    opacity="0"
+                  >
+                    <animate
+                      attributeName="opacity"
+                      values="0;0;1;1;0"
+                      dur="6s"
+                      repeatCount="indefinite"
+                      keyTimes="0;0.2;0.25;0.8;1"
+                    />
+                  </rect>
+                  <text
+                    x="7"
+                    y="9"
+                    text-anchor="middle"
+                    fill="white"
+                    font-size="6"
+                    font-weight="900"
+                    font-family="sans-serif">L</text
+                  >
+                  <!-- Flap animation when pizza enters -->
+                  <rect x="0" y="0" width="14" height="4" fill="#4a6e56">
+                    <animate
+                      attributeName="height"
+                      values="4;0;4;4"
+                      dur="6s"
+                      repeatCount="indefinite"
+                      keyTimes="0;0.15;0.2;1"
+                    />
+                  </rect>
+                </g>
+
+                <g
+                  class="speed-lines"
+                  opacity="0.6"
+                  transform="translate(-25, 0)"
+                >
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="10"
+                    y2="0"
+                    stroke="#fff"
+                    stroke-width="1"
+                  >
+                    <animate
+                      attributeName="opacity"
+                      values="0;1;0"
+                      dur="0.2s"
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="x1"
+                      values="-5;0"
+                      dur="0.2s"
+                      repeatCount="indefinite"
+                    />
+                  </line>
+                </g>
               </g>
-              <!-- Label -->
-              <text x="65" y="385" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="10" font-weight="500">Tienda</text>
             </g>
 
-            <!-- End point (Customer/Home) -->
-            <g class="end-point" filter="url(#iconGlow)">
-              <!-- Outer pulse (more active to indicate destination) -->
-              <circle cx="335" cy="70" r="48" fill="#E1C78E" opacity="0.15">
-                <animate attributeName="r" values="44;60;44" dur="2s" repeatCount="indefinite"/>
-                <animate attributeName="opacity" values="0.2;0.05;0.2" dur="2s" repeatCount="indefinite"/>
-              </circle>
-              <!-- Main circle -->
-              <circle cx="335" cy="70" r="36" fill="#E1C78E"/>
-              <circle cx="335" cy="70" r="36" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
-              <!-- Home/Person icon -->
-              <g transform="translate(335, 70)">
-                <!-- House roof -->
-                <path d="M-16 -2 L0 -16 L16 -2" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-                <!-- House body -->
-                <rect x="-12" y="-2" width="24" height="16" rx="1" fill="none" stroke="white" stroke-width="2"/>
-                <!-- Door -->
-                <rect x="-4" y="4" width="8" height="10" rx="1" fill="none" stroke="white" stroke-width="1.5"/>
-                <!-- Window -->
-                <rect x="6" y="2" width="5" height="5" rx="1" fill="none" stroke="white" stroke-width="1.5"/>
+            <!-- 4. HOUSE / CUSTOMER (Right) -->
+            <g class="house-group" transform="translate(350, 150)">
+              <!-- House Base -->
+              <path
+                d="M-28 48 L0 22 L28 48 L28 120 L-28 120 Z"
+                fill="#2f2f2f"
+                stroke="rgba(255,255,255,0.1)"
+                stroke-width="1"
+              />
+              <rect x="-12" y="78" width="24" height="42" fill="#3d2b1f" />
+              <!-- Door -->
+              <circle cx="8" cy="100" r="1" fill="#cda434" />
+              <!-- Knob -->
+              <rect
+                x="-20"
+                y="60"
+                width="16"
+                height="12"
+                fill="#2b3b4a"
+                stroke="rgba(255,255,255,0.2)"
+                stroke-width="0.8"
+              />
+              <line
+                x1="-20"
+                y1="66"
+                x2="-4"
+                y2="66"
+                stroke="rgba(255,255,255,0.2)"
+                stroke-width="0.8"
+              />
+              <path d="M-30 48 L0 16 L30 48" fill="#1f1f1f" />
+
+              <!-- Customer -->
+              <g transform="translate(18, 98)">
+                <!-- Legs -->
+                <path
+                  d="M-4 20 L-6 34 M4 20 L6 34"
+                  stroke="#2b2b2b"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                />
+                <!-- Torso -->
+                <path
+                  d="M-7 18 L-5 0 L5 0 L7 18 Z"
+                  fill="#4a6e56"
+                  stroke="rgba(255,255,255,0.15)"
+                  stroke-width="1"
+                />
+                <circle cx="0" cy="-6" r="7" fill="#f1c27d" />
+                <!-- Hair -->
+                <path d="M-6 -6 Q0 -14 6 -6" fill="#2b2b2b" />
+                <!-- Face -->
+                <circle cx="-2" cy="-7" r="1" fill="#1a1a1a" />
+                <circle cx="2" cy="-7" r="1" fill="#1a1a1a" />
+                <path
+                  d="M-4 -2 Q0 3 4 -2"
+                  fill="none"
+                  stroke="#222"
+                  stroke-width="1"
+                  stroke-linecap="round"
+                />
+
+                <!-- Arms receiving / paying -->
+                <g>
+                  <path
+                    d="M-6 4 L-18 10"
+                    stroke="#f1c27d"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                  >
+                    <animate
+                      attributeName="d"
+                      values="M-6 4 L-14 6;M-6 4 L-20 0;M-6 4 L-10 8;M-6 4 L-14 6"
+                      dur="6s"
+                      repeatCount="indefinite"
+                      keyTimes="0;0.8;0.9;1"
+                    />
+                  </path>
+                  <path
+                    d="M6 4 L18 10"
+                    stroke="#f1c27d"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                  >
+                    <animate
+                      attributeName="d"
+                      values="M6 4 L14 6;M6 4 L20 0;M6 4 L12 10;M6 4 L14 6"
+                      dur="6s"
+                      repeatCount="indefinite"
+                      keyTimes="0;0.8;0.9;1"
+                    />
+                  </path>
+                </g>
               </g>
-              <!-- Label -->
-              <text x="335" y="120" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="10" font-weight="500">Cliente</text>
+
+              <!-- Delivered Pizza (Appears after moto arrives) -->
+              <g opacity="0">
+                <animate
+                  attributeName="opacity"
+                  values="0;0;1;1;0"
+                  dur="6s"
+                  repeatCount="indefinite"
+                  keyTimes="0;0.8;0.85;0.95;1"
+                />
+                <rect
+                  x="6"
+                  y="100"
+                  width="16"
+                  height="4"
+                  fill="#E1C78E"
+                  stroke="#8B4513"
+                  stroke-width="0.5"
+                />
+              </g>
+
+              <!-- REWARDS (Money & Stars) -->
+              <g transform="translate(0, 80)" opacity="0">
+                <animate
+                  attributeName="opacity"
+                  values="0;0;1;0"
+                  dur="6s"
+                  repeatCount="indefinite"
+                  keyTimes="0;0.85;0.9;1"
+                />
+                <animate
+                  attributeName="transform"
+                  values="translate(0, 80); translate(0, 80); translate(0, 52); translate(0, 40)"
+                  dur="6s"
+                  repeatCount="indefinite"
+                  keyTimes="0;0.85;0.95;1"
+                />
+
+                <text
+                  x="-20"
+                  y="0"
+                  fill="#85bb65"
+                  font-weight="bold"
+                  font-size="14">$</text
+                >
+                <text x="20" y="-10" fill="#FFD700" font-size="12">⭐</text>
+                <text x="0" y="-20" fill="#FFD700" font-size="10">⭐</text>
+                <text
+                  x="-10"
+                  y="-15"
+                  fill="#85bb65"
+                  font-weight="bold"
+                  font-size="10">$</text
+                >
+              </g>
             </g>
 
-            <!-- ETA indicator -->
-            <g class="eta-indicator">
-              <rect x="175" y="85" width="50" height="22" rx="11" fill="rgba(0,0,0,0.6)"/>
-              <rect x="175" y="85" width="50" height="22" rx="11" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
-              <text x="200" y="100" text-anchor="middle" fill="white" font-size="10" font-weight="600">
-                <tspan class="eta-time">~8 min</tspan>
-              </text>
-            </g>
+            <!-- Labels -->
+            <text
+              x="50"
+              y="290"
+              text-anchor="middle"
+              fill="rgba(255,255,255,0.4)"
+              font-size="10"
+              font-family="sans-serif">Restaurante</text
+            >
+            <text
+              x="350"
+              y="290"
+              text-anchor="middle"
+              fill="rgba(255,255,255,0.4)"
+              font-size="10"
+              font-family="sans-serif">Tu Casa</text
+            >
           </svg>
         </div>
       </div>
@@ -384,7 +699,7 @@
               class="feature-card"
               class:active={activeFeature === index}
               style="--feature-color: {feature.color}; --delay: {index * 100}ms"
-              onclick={() => activeFeature = index}
+              onclick={() => (activeFeature = index)}
               type="button"
             >
               <div class="feature-icon">
@@ -425,13 +740,18 @@
         <div class="cta-buttons">
           <a href="#descargar" class="cta-primary">
             <span>Descargar ahora</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </a>
-          <a href="#como-funciona" class="cta-secondary">
-            Ver demo
-          </a>
+          <a href="#como-funciona" class="cta-secondary"> Ver demo </a>
         </div>
       </div>
     </div>
@@ -456,17 +776,31 @@
   .bg-gradient {
     position: absolute;
     inset: 0;
-    background:
-      radial-gradient(ellipse 60% 40% at 70% 30%, rgba(225, 199, 142, 0.08) 0%, transparent 50%),
-      radial-gradient(ellipse 50% 30% at 30% 70%, rgba(90, 132, 103, 0.08) 0%, transparent 50%);
+    background: radial-gradient(
+        ellipse 60% 40% at 70% 30%,
+        rgba(225, 199, 142, 0.08) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse 50% 30% at 30% 70%,
+        rgba(90, 132, 103, 0.08) 0%,
+        transparent 50%
+      );
   }
 
   .bg-pattern {
     position: absolute;
     inset: 0;
-    background-image:
-      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-image: radial-gradient(
+        circle at 25% 25%,
+        rgba(255, 255, 255, 0.02) 1px,
+        transparent 1px
+      ),
+      radial-gradient(
+        circle at 75% 75%,
+        rgba(255, 255, 255, 0.02) 1px,
+        transparent 1px
+      );
     background-size: 60px 60px;
   }
 
@@ -483,13 +817,32 @@
     animation: floatIcon 20s ease-in-out infinite;
   }
 
-  .icon-1 { top: 15%; left: 10%; animation-delay: 0s; }
-  .icon-2 { top: 60%; right: 8%; animation-delay: -7s; }
-  .icon-3 { bottom: 20%; left: 15%; animation-delay: -14s; }
+  .icon-1 {
+    top: 15%;
+    left: 10%;
+    animation-delay: 0s;
+  }
+  .icon-2 {
+    top: 60%;
+    right: 8%;
+    animation-delay: -7s;
+  }
+  .icon-3 {
+    bottom: 20%;
+    left: 15%;
+    animation-delay: -14s;
+  }
 
   @keyframes floatIcon {
-    0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.06; }
-    50% { transform: translateY(-20px) rotate(10deg); opacity: 0.1; }
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 0.06;
+    }
+    50% {
+      transform: translateY(-20px) rotate(10deg);
+      opacity: 0.1;
+    }
   }
 
   .container {
@@ -539,7 +892,7 @@
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, #E1C78E 0%, #B2D69A 50%, #5A8467 100%);
+    background: linear-gradient(135deg, #e1c78e 0%, #b2d69a 50%, #5a8467 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -567,7 +920,7 @@
     transform: translateY(0);
   }
 
-  /* Route Animation */
+  /* Delivery Animation */
   .route-animation-side {
     display: flex;
     justify-content: center;
@@ -584,106 +937,63 @@
   .route-canvas {
     width: 100%;
     height: 100%;
+    overflow: visible;
   }
 
-  /* Route base (background path) */
-  .route-base {
-    opacity: 1;
-  }
-
-  /* Route dashed pattern */
-  .route-dashed {
-    animation: dashMove 2s linear infinite;
-  }
-
-  @keyframes dashMove {
-    0% {
-      stroke-dashoffset: 0;
-    }
-    100% {
-      stroke-dashoffset: -40;
-    }
-  }
-
-  /* Route trail that follows the vehicle */
-  .route-trail {
-    stroke-dasharray: 600;
-    stroke-dashoffset: 600;
-    animation: drawTrail 4s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
-  }
-
-  @keyframes drawTrail {
-    0% {
-      stroke-dashoffset: 600;
-      opacity: 0;
-    }
-    5% {
-      opacity: 0.6;
-    }
-    95% {
-      opacity: 0.6;
-    }
-    100% {
-      stroke-dashoffset: 0;
-      opacity: 0;
-    }
-  }
-
-  /* Active route with arrow */
-  .route-active {
-    stroke-dasharray: 600;
-    stroke-dashoffset: 600;
-    animation: drawRoute 4s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+  /* Route that gets drawn behind the moto */
+  .delivery-route {
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+    animation: drawRoute 5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
   @keyframes drawRoute {
     0% {
-      stroke-dashoffset: 600;
-      opacity: 0.3;
+      stroke-dashoffset: 400;
+      opacity: 0;
     }
     5% {
       opacity: 1;
     }
     95% {
       opacity: 1;
+      stroke-dashoffset: 0;
     }
     100% {
       stroke-dashoffset: 0;
-      opacity: 0.3;
+      opacity: 0;
     }
   }
 
-  /* Delivery vehicle */
-  .delivery-vehicle {
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+  /* Preview route (faint dotted line) */
+  .route-preview {
+    animation: previewPulse 5s ease-in-out infinite;
   }
 
-  /* Checkpoints */
-  .checkpoints circle {
-    filter: drop-shadow(0 0 4px currentColor);
+  @keyframes previewPulse {
+    0%,
+    100% {
+      opacity: 0.15;
+    }
+    50% {
+      opacity: 0.08;
+    }
   }
 
-  /* Start and end points */
-  .start-point, .end-point {
+  /* Moto group */
+  .moto-group {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+  }
+
+  /* Store and Customer groups */
+  .store-group,
+  .customer-group {
     transition: transform 0.3s ease;
   }
 
-  .start-point:hover, .end-point:hover {
-    transform: scale(1.05);
-  }
-
-  /* ETA indicator */
-  .eta-indicator {
-    animation: fadeInOut 4s ease-in-out infinite;
-  }
-
-  @keyframes fadeInOut {
-    0%, 100% {
-      opacity: 0.7;
-    }
-    50% {
-      opacity: 1;
-    }
+  /* Route arrow that follows the path */
+  .route-arrow {
+    filter: drop-shadow(0 0 8px rgba(225, 199, 142, 0.8));
   }
 
   /* Features */
@@ -846,7 +1156,7 @@
     display: block;
     font-size: 32px;
     font-weight: 700;
-    background: linear-gradient(135deg, #E1C78E, #B2D69A);
+    background: linear-gradient(135deg, #e1c78e, #b2d69a);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -877,7 +1187,11 @@
     align-items: center;
     gap: 32px;
     padding: 48px 32px;
-    background: linear-gradient(135deg, rgba(2, 49, 51, 0.5) 0%, rgba(90, 132, 103, 0.25) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(2, 49, 51, 0.5) 0%,
+      rgba(90, 132, 103, 0.25) 100%
+    );
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 32px;
     text-align: center;
