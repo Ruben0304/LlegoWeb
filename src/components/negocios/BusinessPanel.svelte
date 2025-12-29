@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import ProductForm from './ProductForm.svelte';
   import ProductList from './ProductList.svelte';
 
@@ -21,10 +22,27 @@
     branchId: string;
   };
 
+  type AuthUser = {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
+
+  type AuthResponse = {
+    accessToken: string;
+    tokenType: string;
+    user: AuthUser;
+  };
+
   let isAuthenticated = $state(false);
   let currentView = $state<AuthView>('login');
   let business = $state<Business | null>(null);
   let products = $state<Product[]>([]);
+
+  let googleButtonContainer = $state<HTMLDivElement | null>(null);
+  let googleInitialized = $state(false);
+  let appleReady = $state(false);
 
   // Form states
   let loginEmail = $state('');
@@ -36,6 +54,154 @@
 
   let isLoading = $state(false);
   let errorMessage = $state('');
+
+  const AUTH_TOKEN_KEY = 'llego.auth.accessToken';
+  const AUTH_TOKEN_TYPE_KEY = 'llego.auth.tokenType';
+  const AUTH_USER_KEY = 'llego.auth.user';
+
+  const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID;
+  const APPLE_CLIENT_ID = import.meta.env.PUBLIC_APPLE_CLIENT_ID;
+  const APPLE_REDIRECT_URI = import.meta.env.PUBLIC_APPLE_REDIRECT_URI;
+
+  function storeAuth(data: AuthResponse) {
+    localStorage.setItem(AUTH_TOKEN_KEY, data.accessToken);
+    localStorage.setItem(AUTH_TOKEN_TYPE_KEY, data.tokenType);
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
+  }
+
+  function clearAuth() {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(AUTH_TOKEN_TYPE_KEY);
+    localStorage.removeItem(AUTH_USER_KEY);
+  }
+
+  function setAuthenticatedUser(data: AuthResponse) {
+    business = {
+      id: data.user.id,
+      name: data.user.name || data.user.email,
+      branchId: 'default',
+    };
+    isAuthenticated = true;
+  }
+
+  function restoreSession() {
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    const userRaw = localStorage.getItem(AUTH_USER_KEY);
+
+    if (!token || !userRaw) {
+      return;
+    }
+
+    try {
+      const user = JSON.parse(userRaw) as AuthUser;
+      setAuthenticatedUser({
+        accessToken: token,
+        tokenType: localStorage.getItem(AUTH_TOKEN_TYPE_KEY) || 'bearer',
+        user,
+      });
+    } catch (error) {
+      console.error('No se pudo restaurar la sesion:', error);
+      clearAuth();
+    }
+  }
+
+  function loadScript(src: string) {
+    return new Promise<boolean>((resolve) => {
+      const existing = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`);
+      if (existing) {
+        resolve(true);
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.head.appendChild(script);
+    });
+  }
+
+  async function exchangeSocialToken(endpoint: string, payload: Record<string, string | null | undefined>) {
+    isLoading = true;
+    errorMessage = '';
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = (await response.json().catch(() => null)) as AuthResponse | { error?: string } | null;
+
+      if (!response.ok || !data || 'error' in data) {
+        errorMessage = (data && 'error' in data && data.error) || 'No se pudo autenticar.';
+        return;
+      }
+
+      storeAuth(data);
+      setAuthenticatedUser(data);
+      window.location.assign('/negocios');
+    } catch (error) {
+      console.error('Error en autenticacion social:', error);
+      errorMessage = 'Ocurrió un error al autenticar.';
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  async function handleGoogleCredentialResponse(response: { credential?: string }) {
+    if (!response?.credential) {
+      errorMessage = 'No se pudo obtener el token de Google.';
+      return;
+    }
+
+    await exchangeSocialToken('/api/auth/google', {
+      idToken: response.credential,
+    });
+  }
+
+  async function handleAppleLogin() {
+    if (!window.AppleID?.auth) {
+      errorMessage = 'Apple Sign In no está disponible.';
+      return;
+    }
+
+    try {
+      const response = await window.AppleID.auth.signIn();
+      const authorization = response?.authorization;
+
+      if (!authorization?.id_token) {
+        errorMessage = 'No se pudo obtener el token de Apple.';
+        return;
+      }
+
+      await exchangeSocialToken('/api/auth/apple', {
+        identityToken: authorization.id_token,
+        authorizationCode: authorization.code,
+      });
+    } catch (error) {
+      console.error('Error en Apple Sign In:', error);
+      errorMessage = 'No se pudo autenticar con Apple.';
+    }
+  }
+
+  function renderGoogleButton() {
+    if (!googleButtonContainer || !window.google?.accounts?.id) {
+      return;
+    }
+
+    googleButtonContainer.innerHTML = '';
+    window.google.accounts.id.renderButton(googleButtonContainer, {
+      theme: 'outline',
+      size: 'large',
+      text: 'continue_with',
+      shape: 'pill',
+      width: 320,
+    });
+  }
 
   function switchView(view: AuthView) {
     currentView = view;
@@ -89,6 +255,7 @@
     loginEmail = '';
     loginPassword = '';
     currentView = 'login';
+    clearAuth();
   }
 
   function handleProductAdded(product: Product) {
@@ -103,6 +270,64 @@
     products = products.map(p =>
       p.id === productId ? { ...p, availability: !p.availability } : p
     );
+  }
+
+  $effect(() => {
+    if (currentView !== 'login' || !googleInitialized) {
+      return;
+    }
+
+    renderGoogleButton();
+  });
+
+  onMount(async () => {
+    restoreSession();
+
+    if (GOOGLE_CLIENT_ID) {
+      const googleLoaded = await loadScript('https://accounts.google.com/gsi/client');
+      if (googleLoaded && window.google?.accounts?.id) {
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleCredentialResponse,
+        });
+        googleInitialized = true;
+        renderGoogleButton();
+      }
+    }
+
+    if (APPLE_CLIENT_ID && APPLE_REDIRECT_URI) {
+      const appleLoaded = await loadScript(
+        'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js'
+      );
+      if (appleLoaded && window.AppleID?.auth) {
+        window.AppleID.auth.init({
+          clientId: APPLE_CLIENT_ID,
+          scope: 'name email',
+          redirectURI: APPLE_REDIRECT_URI,
+          usePopup: true,
+        });
+        appleReady = true;
+      }
+    }
+  });
+
+  declare global {
+    interface Window {
+      google?: {
+        accounts?: {
+          id?: {
+            initialize: (config: { client_id: string; callback: (response: any) => void }) => void;
+            renderButton: (element: HTMLElement, options: Record<string, unknown>) => void;
+          };
+        };
+      };
+      AppleID?: {
+        auth?: {
+          init: (config: Record<string, unknown>) => void;
+          signIn: () => Promise<any>;
+        };
+      };
+    }
   }
 </script>
 
@@ -150,6 +375,25 @@
         {/if}
 
         {#if currentView === 'login'}
+          <div class="social-login">
+            <div class="social-buttons">
+              <div class="google-button" bind:this={googleButtonContainer}></div>
+              <button
+                type="button"
+                class="apple-button"
+                onclick={handleAppleLogin}
+                disabled={isLoading || !appleReady}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M16.365 1.43c0 1.14-.48 2.23-1.26 3.1-.79.88-2.09 1.56-3.33 1.46-.1-1.12.46-2.29 1.22-3.08.8-.87 2.16-1.52 3.37-1.48ZM19.29 8.27c-1.86-1.1-4.47-.97-5.98.42-1.37 1.26-1.87 3.41-.76 5.4.6 1.07 1.4 2.13 2.45 2.13 1.01 0 1.4-.65 2.62-.65 1.25 0 1.56.65 2.64.63 1.12-.02 1.82-1 2.4-2.07.72-1.21 1.01-2.39 1.02-2.45-.02-.01-1.95-.75-1.97-2.97-.02-1.86 1.51-2.74 1.58-2.79-.86-1.26-2.2-1.4-2.99-1.45Z"/>
+                </svg>
+                Continuar con Apple
+              </button>
+            </div>
+            <div class="social-divider">
+              <span>o continúa con correo</span>
+            </div>
+          </div>
           <form class="auth-form" onsubmit={handleLogin}>
             <div class="form-group">
               <label for="login-email">Correo electrónico</label>
@@ -383,6 +627,70 @@
     display: flex;
     flex-direction: column;
     gap: var(--spacing-lg);
+  }
+
+  .social-login {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .social-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: center;
+  }
+
+  .google-button :global(div) {
+    width: 100%;
+  }
+
+  .apple-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    max-width: 320px;
+    padding: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: #fff;
+    background: #000;
+    border-radius: var(--radius-full);
+    transition: all var(--transition-base);
+  }
+
+  .apple-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .social-divider {
+    position: relative;
+    text-align: center;
+    color: var(--color-text-variant);
+    font-size: var(--font-size-xs);
+  }
+
+  .social-divider::before,
+  .social-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 35%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .social-divider::before {
+    left: 0;
+  }
+
+  .social-divider::after {
+    right: 0;
   }
 
   .form-group {
