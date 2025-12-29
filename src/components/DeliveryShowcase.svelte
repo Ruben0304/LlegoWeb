@@ -346,14 +346,7 @@
                   />
                   <animate
                     attributeName="x"
-                    values="52;52;78;78"
-                    dur="6s"
-                    repeatCount="indefinite"
-                    keyTimes="0;0.1;0.2;1"
-                  />
-                  <animate
-                    attributeName="y"
-                    values="80;80;98;98"
+                    values="52;52;70;70"
                     dur="6s"
                     repeatCount="indefinite"
                     keyTimes="0;0.1;0.2;1"
@@ -374,7 +367,7 @@
                   />
                   <animate
                     attributeName="transform"
-                    values="translate(0, 0); translate(0, 0); translate(20, 26); translate(20, 26); translate(20, 26)"
+                    values="translate(0, 0); translate(0, 0); translate(18, 18); translate(18, 18); translate(18, 18)"
                     dur="6s"
                     repeatCount="indefinite"
                     keyTimes="0;0.08;0.14;0.2;1"
@@ -389,8 +382,8 @@
                 dur="6s"
                 repeatCount="indefinite"
                 rotate="auto"
-                keyPoints="0;0;0.7;0.8;1"
-                keyTimes="0;0.25;0.6;0.8;1"
+                keyPoints="0;0;0.7;0.85;0.85;1"
+                keyTimes="0;0.25;0.6;0.78;0.9;1"
                 calcMode="linear"
               >
                 <mpath href="#deliveryPath" />
@@ -450,6 +443,31 @@
                     stroke="#fff"
                     stroke-width="0.5"
                   />
+                  <rect
+                    x="2"
+                    y="-6"
+                    width="10"
+                    height="3"
+                    fill="#E1C78E"
+                    stroke="#8B4513"
+                    stroke-width="0.4"
+                    opacity="0"
+                  >
+                    <animate
+                      attributeName="opacity"
+                      values="0;0;1;0;0"
+                      dur="6s"
+                      repeatCount="indefinite"
+                      keyTimes="0;0.16;0.22;0.3;1"
+                    />
+                    <animate
+                      attributeName="y"
+                      values="-6;-6;2;2;2"
+                      dur="6s"
+                      repeatCount="indefinite"
+                      keyTimes="0;0.16;0.22;0.3;1"
+                    />
+                  </rect>
                   <rect
                     x="2"
                     y="5"
@@ -523,95 +541,97 @@
             <g class="house-group" transform="translate(350, 150)">
               <!-- House Base -->
               <path
-                d="M-28 48 L0 22 L28 48 L28 120 L-28 120 Z"
-                fill="#2f2f2f"
-                stroke="rgba(255,255,255,0.1)"
+                d="M-36 60 L0 30 L36 60 L36 124 L-36 124 Z"
+                fill="#d7c2a2"
+                stroke="rgba(0,0,0,0.08)"
                 stroke-width="1"
               />
-              <rect x="-12" y="78" width="24" height="42" fill="#3d2b1f" />
-              <!-- Door -->
-              <circle cx="8" cy="100" r="1" fill="#cda434" />
-              <!-- Knob -->
+              <path
+                d="M-40 60 L0 26 L40 60 L40 66 L-40 66 Z"
+                fill="#9a6b45"
+              />
+              <rect x="-36" y="116" width="72" height="8" fill="#b08b69" />
               <rect
-                x="-20"
-                y="60"
+                x="-8"
+                y="80"
                 width="16"
-                height="12"
-                fill="#2b3b4a"
-                stroke="rgba(255,255,255,0.2)"
-                stroke-width="0.8"
+                height="44"
+                fill="#7a5a3a"
               />
-              <line
-                x1="-20"
-                y1="66"
-                x2="-4"
-                y2="66"
-                stroke="rgba(255,255,255,0.2)"
-                stroke-width="0.8"
+              <!-- Door -->
+              <circle cx="6" cy="102" r="1" fill="#cda434" />
+              <!-- Knob -->
+              <rect x="-30" y="60" width="60" height="4" fill="#9a6b45" />
+              <rect
+                x="-30"
+                y="82"
+                width="20"
+                height="28"
+                fill="#8ea1ad"
+                opacity="0.85"
               />
-              <path d="M-30 48 L0 16 L30 48" fill="#1f1f1f" />
+              <rect
+                x="10"
+                y="82"
+                width="20"
+                height="28"
+                fill="#8ea1ad"
+                opacity="0.85"
+              />
+              <rect x="-18" y="86" width="6" height="22" fill="#dbe4ea" opacity="0.7" />
+              <rect x="12" y="86" width="6" height="22" fill="#dbe4ea" opacity="0.7" />
 
-              <!-- Customer -->
-              <g transform="translate(18, 98)">
+              <!-- Customer (clean minimal style) -->
+              <g transform="translate(16, 95)">
                 <!-- Legs -->
-                <path
-                  d="M-4 20 L-6 34 M4 20 L6 34"
-                  stroke="#2b2b2b"
-                  stroke-width="3"
-                  stroke-linecap="round"
-                />
-                <!-- Torso -->
-                <path
-                  d="M-7 18 L-5 0 L5 0 L7 18 Z"
-                  fill="#4a6e56"
-                  stroke="rgba(255,255,255,0.15)"
-                  stroke-width="1"
-                />
-                <circle cx="0" cy="-6" r="7" fill="#f1c27d" />
-                <!-- Hair -->
-                <path d="M-6 -6 Q0 -14 6 -6" fill="#2b2b2b" />
-                <!-- Face -->
-                <circle cx="-2" cy="-7" r="1" fill="#1a1a1a" />
-                <circle cx="2" cy="-7" r="1" fill="#1a1a1a" />
-                <path
-                  d="M-4 -2 Q0 3 4 -2"
-                  fill="none"
-                  stroke="#222"
-                  stroke-width="1"
-                  stroke-linecap="round"
-                />
+                <rect x="-5" y="24" width="4" height="14" rx="2" fill="#4a5568" />
+                <rect x="1" y="24" width="4" height="14" rx="2" fill="#4a5568" />
 
-                <!-- Arms receiving / paying -->
-                <g>
-                  <path
-                    d="M-6 4 L-18 10"
-                    stroke="#f1c27d"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                  >
-                    <animate
-                      attributeName="d"
-                      values="M-6 4 L-14 6;M-6 4 L-20 0;M-6 4 L-10 8;M-6 4 L-14 6"
-                      dur="6s"
-                      repeatCount="indefinite"
-                      keyTimes="0;0.8;0.9;1"
-                    />
-                  </path>
-                  <path
-                    d="M6 4 L18 10"
-                    stroke="#f1c27d"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                  >
-                    <animate
-                      attributeName="d"
-                      values="M6 4 L14 6;M6 4 L20 0;M6 4 L12 10;M6 4 L14 6"
-                      dur="6s"
-                      repeatCount="indefinite"
-                      keyTimes="0;0.8;0.9;1"
-                    />
-                  </path>
-                </g>
+                <!-- Body -->
+                <rect x="-7" y="6" width="14" height="20" rx="5" fill="#68a67d" />
+
+                <!-- Head -->
+                <circle cx="0" cy="-4" r="10" fill="#f7dcc5" />
+
+                <!-- Hair -->
+                <path d="M-9 -6 Q-10 -16 0 -16 Q10 -16 9 -6" fill="#7a5c45" />
+
+                <!-- Eyes (simple closed happy eyes) -->
+                <path d="M-5 -4 Q-3.5 -6 -2 -4" fill="none" stroke="#5a4a3a" stroke-width="1.2" stroke-linecap="round" />
+                <path d="M2 -4 Q3.5 -6 5 -4" fill="none" stroke="#5a4a3a" stroke-width="1.2" stroke-linecap="round" />
+
+                <!-- Smile -->
+                <path d="M-3 2 Q0 5 3 2" fill="none" stroke="#c9a88a" stroke-width="1" stroke-linecap="round" />
+
+                <!-- Arms -->
+                <path
+                  d="M-7 12 L-14 8"
+                  stroke="#f7dcc5"
+                  stroke-width="3.5"
+                  stroke-linecap="round"
+                >
+                  <animate
+                    attributeName="d"
+                    values="M-7 12 L-11 10;M-7 12 L-16 6;M-7 12 L-20 0;M-7 12 L-12 14"
+                    dur="6s"
+                    repeatCount="indefinite"
+                    keyTimes="0;0.6;0.8;1"
+                  />
+                </path>
+                <path
+                  d="M7 12 L14 8"
+                  stroke="#f7dcc5"
+                  stroke-width="3.5"
+                  stroke-linecap="round"
+                >
+                  <animate
+                    attributeName="d"
+                    values="M7 12 L11 10;M7 12 L16 6;M7 12 L20 0;M7 12 L12 14"
+                    dur="6s"
+                    repeatCount="indefinite"
+                    keyTimes="0;0.6;0.8;1"
+                  />
+                </path>
               </g>
 
               <!-- Delivered Pizza (Appears after moto arrives) -->
@@ -621,11 +641,11 @@
                   values="0;0;1;1;0"
                   dur="6s"
                   repeatCount="indefinite"
-                  keyTimes="0;0.8;0.85;0.95;1"
+                  keyTimes="0;0.75;0.8;0.95;1"
                 />
                 <rect
-                  x="6"
-                  y="100"
+                  x="-56"
+                  y="92"
                   width="16"
                   height="4"
                   fill="#E1C78E"
