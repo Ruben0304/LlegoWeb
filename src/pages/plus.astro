@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.svelte';
+import PricingHero from '../components/PricingHero.svelte';
+import Footer from '../components/Footer.svelte';
+
+const title = "Llego+ | Suscripcion Premium";
+const description = "Desbloquea todo el potencial de Llego con IA avanzada, cashback y beneficios exclusivos.";
+const keywords = "Llego+, suscripcion premium, IA para compras, cashback";
+---
+
+<Layout title={title} description={description} keywords={keywords}>
+  <Navbar client:load />
+  <main>
+    <PricingHero client:load />
+  </main>
+  <Footer client:visible />
+</Layout>

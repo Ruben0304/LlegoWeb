@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.svelte';
+import BusinessPanel from '../components/BusinessPanel.svelte';
+import Footer from '../components/Footer.svelte';
+
+const title = "Panel de Negocios | Llegó";
+const description = "Gestiona tu negocio en Llegó. Registra tu empresa, agrega productos y llega a más clientes.";
+---
+
+<Layout title={title} description={description}>
+  <Navbar client:load />
+  <main class="business-page">
+    <BusinessPanel client:load />
+  </main>
+  <Footer client:visible />
+</Layout>
+
+<style>
+  .business-page {
+    min-height: 100vh;
+    padding-top: 100px;
+  }
+</style>

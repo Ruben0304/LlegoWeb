@@ -1,16 +1,23 @@
 ---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.svelte';
+import Hero from '../components/Hero.svelte';
+import FeatureShowcase from '../components/FeatureShowcase.svelte';
+import ScrollytellingHowItWorks from '../components/ScrollytellingHowItWorks.svelte';
+import DeliveryShowcase from '../components/DeliveryShowcase.svelte';
+import Footer from '../components/Footer.svelte';
 
+const title = "Llegó | Compra inteligente con IA en restaurantes, ropa y mercado";
+const description = "Descubre Llegó, la app de compras inteligentes con IA conversacional. Encuentra restaurantes, ropa, mercado y agro en segundos. Prueba Llegó+ y compra mas rapido.";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title={title} description={description}>
+  <Navbar client:load />
+  <main>
+    <Hero client:load />
+    <FeatureShowcase client:visible />
+    <ScrollytellingHowItWorks client:load />
+    <DeliveryShowcase client:visible />
+  </main>
+  <Footer client:visible />
+</Layout>
