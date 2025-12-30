@@ -1,23 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import type { Product } from "@/lib/product";
   import type { Business, Branch } from "@/lib/business";
+  import BusinessBranchSelector from "./BusinessBranchSelector.svelte";
   import BusinessForm from "./BusinessForm.svelte";
   import BranchForm from "./BranchForm.svelte";
-  import BusinessBranchSelector from "./BusinessBranchSelector.svelte";
   import ProductForm from "./ProductForm.svelte";
   import ProductList from "./ProductList.svelte";
-
-  type Product = {
-    id: string;
-    name: string;
-    description: string;
-    weight: string;
-    price: number;
-    currency: "USD" | "CUP";
-    image: string;
-    availability: boolean;
-    categoryId?: string;
-  };
 
   type AuthUser = {
     id: string;
@@ -32,28 +21,25 @@
     user: AuthUser;
   };
 
-  // Panel views
-  type PanelView =
-    | "selector"
-    | "create-business"
-    | "create-branch"
-    | "products";
-
   let isAuthenticated = $state(false);
   let currentUser = $state<AuthUser | null>(null);
   let jwt = $state("");
 
-  // Business and branch state
+  // Products state
+  let products = $state<Product[]>([]);
+  let branchId = $state("");
+
+  // Business/branch state
   let businesses = $state<Business[]>([]);
   let selectedBusiness = $state<Business | null>(null);
   let selectedBranch = $state<Branch | null>(null);
-  let currentView = $state<PanelView>("selector");
-
-  // Products state
-  let products = $state<Product[]>([]);
+  let isLoadingBusinesses = $state(false);
+  let businessError = $state("");
+  let showBusinessForm = $state(false);
+  let showBranchForm = $state(false);
 
   // Loading states
-  let isLoadingBusinesses = $state(false);
+  let isLoadingProducts = $state(false);
   let googleInitialized = $state(false);
   let googleButtonRef: HTMLDivElement | null = $state(null);
   let isLoading = $state(false);
@@ -67,6 +53,7 @@
   const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL || "";
 
   function storeAuth(data: AuthResponse) {
+    if (typeof window === 'undefined') return;
     localStorage.setItem(AUTH_TOKEN_KEY, data.accessToken);
     localStorage.setItem(AUTH_TOKEN_TYPE_KEY, data.tokenType);
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
@@ -80,6 +67,7 @@
   }
 
   function clearAuth() {
+    if (typeof window === 'undefined') return;
     localStorage.removeItem(AUTH_TOKEN_KEY);
     localStorage.removeItem(AUTH_TOKEN_TYPE_KEY);
     localStorage.removeItem(AUTH_USER_KEY);
@@ -92,22 +80,38 @@
   }
 
   function restoreSession() {
+    // Solo ejecutar en el navegador, no en SSR
+    if (typeof window === 'undefined') {
+      console.log('restoreSession: No se ejecuta en SSR');
+      return;
+    }
+
+    console.log('restoreSession: Buscando datos en localStorage...');
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     const userRaw = localStorage.getItem(AUTH_USER_KEY);
 
+    console.log('restoreSession: Token encontrado?', !!token);
+    console.log('restoreSession: User encontrado?', !!userRaw);
+
     if (!token || !userRaw) {
+      console.log('restoreSession: No hay sesión guardada');
       return;
     }
 
     try {
       const user = JSON.parse(userRaw) as AuthUser;
+      console.log('restoreSession: Usuario parseado:', user.email);
+
       setAuthenticatedUser({
         accessToken: token,
         tokenType: localStorage.getItem(AUTH_TOKEN_TYPE_KEY) || "bearer",
         user,
       });
+
+      console.log('✅ Sesión restaurada exitosamente para:', user.email);
+      console.log('✅ isAuthenticated ahora es:', isAuthenticated);
     } catch (error) {
-      console.error("No se pudo restaurar la sesion:", error);
+      console.error("❌ Error al restaurar sesión:", error);
       clearAuth();
     }
   }
@@ -216,20 +220,25 @@
     isAuthenticated = false;
     currentUser = null;
     jwt = "";
+    products = [];
+    isLoadingProducts = false;
     businesses = [];
     selectedBusiness = null;
     selectedBranch = null;
-    products = [];
-    currentView = "selector";
+    branchId = "";
+    isLoadingBusinesses = false;
+    businessError = "";
+    showBusinessForm = false;
+    showBranchForm = false;
     clearAuth();
   }
 
-  // Load businesses from API
+  // Load businesses for the current user
   async function loadBusinesses() {
     if (!jwt) return;
 
     isLoadingBusinesses = true;
-    errorMessage = "";
+    businessError = "";
 
     try {
       const response = await fetch(`${BACKEND_URL}/graphql`, {
@@ -258,15 +267,16 @@
       const result = await response.json();
 
       if (result.errors) {
-        console.error("Error loading businesses:", result.errors);
-        // Don't show error if user just has no businesses
-        businesses = [];
-      } else {
-        businesses = result.data?.businesses || [];
+        throw new Error(
+          result.errors[0]?.message || "Error al cargar negocios",
+        );
       }
+
+      businesses = result.data?.businesses || [];
     } catch (error) {
       console.error("Error loading businesses:", error);
-      errorMessage = "Error al cargar negocios";
+      businessError =
+        error instanceof Error ? error.message : "Error al cargar negocios";
       businesses = [];
     } finally {
       isLoadingBusinesses = false;
@@ -277,6 +287,7 @@
   async function loadProducts(branchId: string) {
     if (!jwt || !branchId) return;
 
+    isLoadingProducts = true;
     try {
       const response = await fetch(`${BACKEND_URL}/graphql`, {
         method: "POST",
@@ -295,6 +306,7 @@
                 price
                 currency
                 image
+                imageUrl
                 availability
                 categoryId
               }
@@ -312,49 +324,16 @@
     } catch (error) {
       console.error("Error loading products:", error);
       products = [];
+    } finally {
+      isLoadingProducts = false;
     }
-  }
-
-  // Navigation handlers
-  function handleShowCreateBusiness() {
-    currentView = "create-business";
-  }
-
-  function handleShowCreateBranch(business: Business) {
-    selectedBusiness = business;
-    currentView = "create-branch";
-  }
-
-  function handleBusinessCreated(business: Business) {
-    businesses = [...businesses, business];
-    selectedBusiness = business;
-    currentView = "selector";
-  }
-
-  function handleBranchCreated(branch: Branch) {
-    selectedBranch = branch;
-    currentView = "products";
-    loadProducts(branch.id);
-  }
-
-  function handleBusinessSelected(business: Business) {
-    selectedBusiness = business;
-  }
-
-  function handleBranchSelected(branch: Branch) {
-    selectedBranch = branch;
-    currentView = "products";
-    loadProducts(branch.id);
-  }
-
-  function handleBackToSelector() {
-    currentView = "selector";
-    selectedBranch = null;
   }
 
   // Product handlers
   function handleProductAdded(product: Product) {
-    products = [...products, { ...product, id: `prod-${Date.now()}` }];
+    products = [...products, product];
+    // Reload products to ensure we have the latest data
+    loadProducts(branchId);
   }
 
   function handleProductDeleted(productId: string) {
@@ -367,8 +346,77 @@
     );
   }
 
+  function handleBusinessSelected(business: Business) {
+    selectedBusiness = business;
+    selectedBranch = null;
+    branchId = "";
+    products = [];
+    showBusinessForm = false;
+    showBranchForm = false;
+  }
+
+  function handleBranchSelected(branch: Branch) {
+    selectedBranch = branch;
+    const matchedBusiness = businesses.find(
+      (business) => business.id === branch.businessId,
+    );
+    if (matchedBusiness) {
+      selectedBusiness = matchedBusiness;
+    }
+    branchId = branch.id;
+    products = [];
+    loadProducts(branch.id);
+  }
+
+  function handleCreateBusiness() {
+    showBusinessForm = true;
+    showBranchForm = false;
+  }
+
+  function handleCreateBranch(business: Business) {
+    selectedBusiness = business;
+    showBranchForm = true;
+    showBusinessForm = false;
+  }
+
+  function handleBusinessCreated() {
+    showBusinessForm = false;
+    loadBusinesses();
+  }
+
+  function handleBranchCreated(branch: Branch) {
+    showBranchForm = false;
+    selectedBranch = branch;
+    branchId = branch.id;
+    products = [];
+    loadProducts(branch.id);
+  }
+
+  function handleBackToSelector() {
+    showBusinessForm = false;
+    showBranchForm = false;
+  }
+
+  function handleChangeBranch() {
+    selectedBranch = null;
+    selectedBusiness = null;
+    branchId = "";
+    products = [];
+    showBusinessForm = false;
+    showBranchForm = false;
+  }
+
   function renderHiddenGoogleButton() {
-    if (!googleButtonRef || !window.google?.accounts?.id) return;
+    console.log('renderHiddenGoogleButton: iniciando...');
+    console.log('- googleButtonRef:', !!googleButtonRef);
+    console.log('- window.google:', !!window.google);
+    console.log('- window.google.accounts:', !!window.google?.accounts);
+    console.log('- window.google.accounts.id:', !!window.google?.accounts?.id);
+
+    if (!googleButtonRef || !window.google?.accounts?.id) {
+      console.log('❌ renderHiddenGoogleButton: No se puede renderizar, falta googleButtonRef o Google SDK');
+      return;
+    }
 
     googleButtonRef.innerHTML = "";
     window.google.accounts.id.renderButton(googleButtonRef, {
@@ -380,13 +428,24 @@
       width: 300,
     });
     googleInitialized = true;
+    console.log('✅ renderHiddenGoogleButton: Botón de Google renderizado, googleInitialized =', googleInitialized);
   }
 
   onMount(async () => {
+    console.log('BusinessPanel onMount iniciado');
     restoreSession();
 
+    console.log('Estado después de restoreSession:', {
+      isAuthenticated,
+      hasJwt: !!jwt,
+      hasUser: !!currentUser
+    });
+
     if (isAuthenticated && jwt) {
+      console.log('Cargando negocios...');
       await loadBusinesses();
+    } else {
+      console.log('No hay sesión activa, mostrando login');
     }
 
     if (GOOGLE_CLIENT_ID) {
@@ -536,22 +595,19 @@
               <h1 class="user-name">{currentUser?.name || "Usuario"}</h1>
               <p class="user-meta">
                 {#if selectedBranch}
-                  {selectedBusiness?.name} → {selectedBranch.name}
-                {:else if selectedBusiness}
-                  {selectedBusiness.name}
+                  {products.length} {products.length === 1 ? "producto" : "productos"}
                 {:else}
-                  {businesses.length}
-                  {businesses.length === 1 ? "negocio" : "negocios"}
+                  Selecciona un negocio y una sucursal
                 {/if}
               </p>
             </div>
           </div>
           <div class="header-actions">
-            {#if currentView !== "selector"}
-              <button class="back-btn" onclick={handleBackToSelector}>
+            {#if selectedBranch}
+              <button class="back-btn" onclick={handleChangeBranch}>
                 <svg
-                  width="18"
-                  height="18"
+                  width="16"
+                  height="16"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -559,7 +615,7 @@
                 >
                   <polyline points="15 18 9 12 15 6" />
                 </svg>
-                Volver
+                Cambiar sucursal
               </button>
             {/if}
             <button class="logout-btn" onclick={handleLogout}>
@@ -581,69 +637,127 @@
         </header>
 
         <div class="dashboard-content">
-          {#if isLoadingBusinesses}
-            <div class="loading-container">
-              <span class="spinner-lg"></span>
-              <p>Cargando negocios...</p>
-            </div>
-          {:else if currentView === "selector"}
+          {#if showBusinessForm}
             <div class="panel-single">
-              <BusinessBranchSelector
-                {jwt}
-                {businesses}
-                onBusinessSelected={handleBusinessSelected}
-                onBranchSelected={handleBranchSelected}
-                onCreateBusiness={handleShowCreateBusiness}
-                onCreateBranch={handleShowCreateBranch}
-              />
-            </div>
-          {:else if currentView === "create-business"}
-            <div class="panel-single">
-              <BusinessForm
-                {jwt}
-                onBusinessCreated={handleBusinessCreated}
-                onCancel={handleBackToSelector}
-              />
-            </div>
-          {:else if currentView === "create-branch" && selectedBusiness}
-            <div class="panel-single">
-              <BranchForm
-                {jwt}
-                business={selectedBusiness}
-                onBranchCreated={handleBranchCreated}
-                onCancel={handleBackToSelector}
-              />
-            </div>
-          {:else if currentView === "products" && selectedBranch}
-            <div class="dashboard-grid">
-              <div class="form-section">
-                <div class="section-badge">
+              <div class="panel-actions">
+                <button class="back-btn" type="button" onclick={handleBackToSelector}>
                   <svg
-                    width="14"
-                    height="14"
+                    width="16"
+                    height="16"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
                     stroke-width="2"
                   >
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                    <circle cx="12" cy="10" r="3" />
+                    <polyline points="15 18 9 12 15 6" />
                   </svg>
-                  {selectedBranch.name}
-                </div>
-                <ProductForm
-                  branchId={selectedBranch.id}
-                  onProductAdded={handleProductAdded}
-                />
+                  Volver
+                </button>
               </div>
-              <div class="list-section">
-                <ProductList
-                  {products}
-                  onDelete={handleProductDeleted}
-                  onToggleAvailability={handleProductToggleAvailability}
-                />
-              </div>
+              <BusinessForm
+                jwt={jwt}
+                onBusinessCreated={handleBusinessCreated}
+                onCancel={handleBackToSelector}
+              />
             </div>
+          {:else if showBranchForm && selectedBusiness}
+            <div class="panel-single">
+              <div class="panel-actions">
+                <button class="back-btn" type="button" onclick={handleBackToSelector}>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                  Volver
+                </button>
+              </div>
+              <BranchForm
+                jwt={jwt}
+                business={selectedBusiness}
+                onBranchCreated={handleBranchCreated}
+                onCancel={handleBackToSelector}
+              />
+            </div>
+          {:else if !selectedBranch}
+            <div class="panel-single">
+              {#if businessError}
+                <div class="error-message">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  {businessError}
+                </div>
+              {/if}
+              {#if isLoadingBusinesses}
+                <div class="loading-container">
+                  <span class="spinner-lg"></span>
+                  <p>Cargando negocios...</p>
+                </div>
+              {:else}
+                <BusinessBranchSelector
+                  jwt={jwt}
+                  businesses={businesses}
+                  onBusinessSelected={handleBusinessSelected}
+                  onBranchSelected={handleBranchSelected}
+                  onCreateBusiness={handleCreateBusiness}
+                  onCreateBranch={handleCreateBranch}
+                />
+              {/if}
+            </div>
+          {:else}
+            {#if isLoadingProducts}
+              <div class="loading-container">
+                <span class="spinner-lg"></span>
+                <p>Cargando productos...</p>
+              </div>
+            {:else}
+              <div class="dashboard-grid">
+                <div class="form-section">
+                  <div class="section-badge">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                      <line x1="3" y1="6" x2="21" y2="6"/>
+                      <path d="M16 10a4 4 0 0 1-8 0"/>
+                    </svg>
+                    Mis Productos
+                  </div>
+                  <ProductForm
+                    branchId={branchId}
+                    jwt={jwt}
+                    onProductAdded={handleProductAdded}
+                  />
+                </div>
+                <div class="list-section">
+                  <ProductList
+                    {products}
+                    onDelete={handleProductDeleted}
+                    onToggleAvailability={handleProductToggleAvailability}
+                  />
+                </div>
+              </div>
+            {/if}
           {/if}
         </div>
       </div>
@@ -652,7 +766,30 @@
 
   <!-- Hidden render to force style inclusion during SSR -->
   <div class="style-preload" aria-hidden="true">
-    <ProductForm branchId="" onProductAdded={() => {}} />
+    <BusinessBranchSelector
+      jwt=""
+      businesses={[]}
+      onBusinessSelected={(business) => void business}
+      onBranchSelected={(branch) => void branch}
+      onCreateBusiness={() => {}}
+      onCreateBranch={(business) => void business}
+    />
+    <BusinessForm jwt="" onBusinessCreated={(business) => void business} />
+    <BranchForm
+      jwt=""
+      business={{
+        id: "",
+        name: "",
+        type: "",
+        ownerId: "",
+        globalRating: 0,
+        tags: [],
+        isActive: false,
+        createdAt: "",
+      }}
+      onBranchCreated={(branch) => void branch}
+    />
+    <ProductForm branchId="" jwt="" onProductAdded={() => {}} />
     <ProductList
       products={[]}
       onDelete={() => {}}
@@ -986,6 +1123,12 @@
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: var(--radius-2xl);
     padding: var(--spacing-xl);
+  }
+
+  .panel-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: var(--spacing-lg);
   }
 
   /* Dashboard Grid */

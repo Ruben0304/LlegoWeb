@@ -3,9 +3,12 @@ import { GraphQLClient } from 'graphql-request';
 /**
  * Cliente GraphQL configurado para comunicarse con el backend.
  *
- * IMPORTANTE: Esta variable usa BACKEND_URL (sin PUBLIC_), por lo que:
- * - Solo está disponible en el servidor (server-side)
- * - NO se expone al navegador del cliente
+ * IMPORTANTE: En SSR usa BACKEND_URL (sin PUBLIC_) y en cliente usa
+ * PUBLIC_BACKEND_URL. Esto evita errores en hidratacion cuando el modulo
+ * se importa desde componentes del navegador.
+ *
+ * - BACKEND_URL solo está disponible en el servidor (server-side)
+ * - PUBLIC_BACKEND_URL si se expone al navegador del cliente
  * - Se puede usar en archivos .astro, API routes, y getStaticProps
  * - Ideal para usar con el dominio privado de Railway (.railway.internal)
  *
@@ -13,11 +16,14 @@ import { GraphQLClient } from 'graphql-request';
  * para el endpoint GraphQL. Esto permite usar la misma variable base para
  * endpoints REST.
  */
-const BACKEND_URL = import.meta.env.BACKEND_URL;
+const SERVER_BACKEND_URL = import.meta.env.BACKEND_URL;
+const PUBLIC_BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL;
+const BACKEND_URL = import.meta.env.SSR ? SERVER_BACKEND_URL : PUBLIC_BACKEND_URL;
 
 if (!BACKEND_URL) {
+  const missingVar = import.meta.env.SSR ? 'BACKEND_URL' : 'PUBLIC_BACKEND_URL';
   throw new Error(
-    'BACKEND_URL no está definida. Asegúrate de crear un archivo .env con esta variable.'
+    `${missingVar} no está definida. Asegúrate de crear un archivo .env con esta variable.`
   );
 }
 

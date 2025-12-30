@@ -2,10 +2,18 @@
  * API de productos - Funciones helper para queries y mutations
  */
 
-import { query, mutation } from '@/lib/shared/graphql';
+import { query, mutation, backendUrl } from '@/lib/shared/graphql';
 import { GET_PRODUCTS, GET_PRODUCT_BY_ID, GET_CATEGORIES, SEARCH_PRODUCTS } from './queries';
 import { CREATE_PRODUCT, UPDATE_PRODUCT, DELETE_PRODUCT, UPDATE_PRODUCT_STOCK } from './mutations';
-import type { Product, ProductsResponse, ProductFilters, Category } from './types';
+import type {
+  Product,
+  ProductsResponse,
+  ProductFilters,
+  Category,
+  CreateProductInput,
+  UpdateProductInput,
+  UploadImageResponse
+} from './types';
 
 // ==================== QUERIES ====================
 
@@ -35,12 +43,51 @@ export async function searchProducts(searchTerm: string, limit = 10) {
 
 // ==================== MUTATIONS ====================
 
-export async function createProduct(input: Partial<Product>) {
-  return mutation<{ createProduct: Product }>(CREATE_PRODUCT, { input });
+/**
+ * Sube una imagen de producto al servidor
+ * @param imageFile - Archivo de imagen (File object)
+ * @param jwt - Token JWT de autenticación
+ * @returns Respuesta con image_path e image_url
+ */
+export async function uploadProductImage(
+  imageFile: File,
+  jwt: string
+): Promise<UploadImageResponse> {
+  const formData = new FormData();
+  formData.append('image', imageFile);
+
+  const response = await fetch(`${backendUrl}/upload/product/image`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${jwt}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Error al subir imagen: ${error}`);
+  }
+
+  return response.json();
 }
 
-export async function updateProduct(id: string, input: Partial<Product>) {
-  return mutation<{ updateProduct: Product }>(UPDATE_PRODUCT, { id, input });
+/**
+ * Crea un nuevo producto
+ * @param input - Datos del producto
+ * @param jwt - Token JWT de autenticación
+ * @returns Producto creado
+ */
+export async function createProduct(
+  input: CreateProductInput,
+  jwt: string
+): Promise<Product> {
+  const result = await mutation<{ createProduct: Product }>(CREATE_PRODUCT, { input, jwt });
+  return result.createProduct;
+}
+
+export async function updateProduct(id: string, input: UpdateProductInput, jwt?: string) {
+  return mutation<{ updateProduct: Product }>(UPDATE_PRODUCT, { id, input, jwt });
 }
 
 export async function deleteProduct(id: string) {

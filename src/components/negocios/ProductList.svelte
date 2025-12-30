@@ -1,15 +1,5 @@
 <script lang="ts">
-  type Product = {
-    id: string;
-    name: string;
-    description: string;
-    weight: string;
-    price: number;
-    currency: 'USD' | 'CUP';
-    image: string;
-    availability: boolean;
-    categoryId?: string;
-  };
+  import type { Product } from '@/lib/product';
 
   interface Props {
     products: Product[];
@@ -29,10 +19,10 @@
     )
   );
 
-  function formatPrice(price: number, currency: string) {
+  function formatPrice(price: number, currency?: string) {
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
-      currency: currency,
+      currency: currency || 'USD',
       minimumFractionDigits: 2
     }).format(price);
   }
@@ -119,9 +109,9 @@
       <div class="products-list">
         {#each filteredProducts as product (product.id)}
           <div class="product-card" class:unavailable={!product.availability}>
-            {#if product.image}
+            {#if product.imageUrl || product.image}
               <div class="product-image">
-                <img src={product.image} alt={product.name} onerror={(e) => e.currentTarget.style.display = 'none'} />
+                <img src={product.imageUrl || product.image} alt={product.name} onerror={(e) => e.currentTarget.style.display = 'none'} />
               </div>
             {:else}
               <div class="product-image-placeholder">

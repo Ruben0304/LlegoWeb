@@ -5,18 +5,18 @@
 import { gql } from 'graphql-request';
 
 export const CREATE_PRODUCT = gql`
-  mutation CreateProduct($input: ProductInput!) {
-    createProduct(input: $input) {
+  mutation CreateProduct($input: CreateProductInput!, $jwt: String) {
+    createProduct(input: $input, jwt: $jwt) {
       id
       name
-      price
       description
+      price
+      currency
+      weight
+      image
+      availability
+      categoryId
       imageUrl
-      stock
-      category {
-        id
-        name
-      }
       createdAt
     }
   }

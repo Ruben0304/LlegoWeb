@@ -1,22 +1,14 @@
 <script lang="ts">
-  type Product = {
-    id: string;
-    name: string;
-    description: string;
-    weight: string;
-    price: number;
-    currency: 'USD' | 'CUP';
-    image: string;
-    availability: boolean;
-    categoryId?: string;
-  };
+  import { uploadProductImage, createProduct } from '@/lib/product';
+  import type { Product } from '@/lib/product';
 
   interface Props {
     branchId: string;
+    jwt: string;
     onProductAdded: (product: Product) => void;
   }
 
-  let { branchId, onProductAdded }: Props = $props();
+  let { branchId, jwt, onProductAdded }: Props = $props();
 
   // Form fields
   let name = $state('');
@@ -24,12 +16,13 @@
   let weight = $state('');
   let price = $state<number | ''>('');
   let currency = $state<'USD' | 'CUP'>('USD');
-  let imageData = $state('');
+  let imageFile = $state<File | null>(null);
   let availability = $state(true);
   let categoryId = $state('');
 
   let isSubmitting = $state(false);
   let successMessage = $state('');
+  let errorMessage = $state('');
   let imagePreview = $state('');
   let isDragging = $state(false);
   let fileInputRef: HTMLInputElement;
@@ -49,19 +42,23 @@
 
   function handleFileSelect(file: File) {
     if (!file.type.startsWith('image/')) {
+      errorMessage = 'Por favor selecciona un archivo de imagen válido';
       return;
     }
 
     // Max 5MB
     if (file.size > 5 * 1024 * 1024) {
+      errorMessage = 'La imagen debe ser menor a 5MB';
       return;
     }
 
+    errorMessage = '';
+    imageFile = file;
     imageName = file.name;
+
     const reader = new FileReader();
     reader.onload = (e) => {
       const result = e.target?.result as string;
-      imageData = result;
       imagePreview = result;
     };
     reader.readAsDataURL(file);
@@ -95,7 +92,7 @@
   }
 
   function removeImage() {
-    imageData = '';
+    imageFile = null;
     imagePreview = '';
     imageName = '';
     if (fileInputRef) {
@@ -113,37 +110,50 @@
     weight = '';
     price = '';
     currency = 'USD';
-    imageData = '';
+    imageFile = null;
     availability = true;
     categoryId = '';
     imagePreview = '';
     imageName = '';
+    errorMessage = '';
     if (fileInputRef) {
       fileInputRef.value = '';
     }
   }
 
-  function handleSubmit(e: Event) {
+  async function handleSubmit(e: Event) {
     e.preventDefault();
+
+    if (!imageFile) {
+      errorMessage = 'Por favor selecciona una imagen para el producto';
+      return;
+    }
+
     isSubmitting = true;
+    errorMessage = '';
+    successMessage = '';
 
-    // Create product object
-    const product: Product = {
-      id: '',
-      name,
-      description,
-      weight,
-      price: Number(price) || 0,
-      currency,
-      image: imageData,
-      availability,
-      categoryId: categoryId || undefined
-    };
+    try {
+      // Paso 1: Subir la imagen
+      const uploadResponse = await uploadProductImage(imageFile, jwt);
 
-    // Simulate API call
-    setTimeout(() => {
-      isSubmitting = false;
-      onProductAdded(product);
+      // Paso 2: Crear el producto con el path de la imagen
+      const productInput = {
+        branchId,
+        name,
+        description,
+        price: Number(price),
+        currency,
+        image: uploadResponse.image_path,
+        weight: weight || undefined,
+        categoryId: categoryId || undefined,
+      };
+
+      const createdProduct = await createProduct(productInput, jwt);
+
+      // Notificar al padre
+      onProductAdded(createdProduct);
+
       successMessage = 'Producto agregado correctamente';
       resetForm();
 
@@ -151,7 +161,12 @@
       setTimeout(() => {
         successMessage = '';
       }, 3000);
-    }, 800);
+    } catch (error) {
+      console.error('Error al crear producto:', error);
+      errorMessage = error instanceof Error ? error.message : 'Error al crear el producto';
+    } finally {
+      isSubmitting = false;
+    }
   }
 </script>
 
@@ -175,6 +190,17 @@
         <polyline points="20 6 9 17 4 12"/>
       </svg>
       {successMessage}
+    </div>
+  {/if}
+
+  {#if errorMessage}
+    <div class="error-message">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      {errorMessage}
     </div>
   {/if}
 
@@ -408,6 +434,20 @@
   @keyframes slideIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: rgba(255, 59, 48, 0.1);
+    border: 1px solid rgba(255, 59, 48, 0.3);
+    border-radius: var(--radius-md);
+    color: #ff6b6b;
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-lg);
+    animation: slideIn 0.3s ease;
   }
 
   .product-form {
