@@ -1,20 +1,30 @@
 <script lang="ts">
   import { BUSINESS_TYPES, type Business, type RegisterBranchInput } from '@/lib/business';
+  import ImageUploader from './ImageUploader.svelte';
 
   interface Props {
     jwt: string;
+    business?: Business;        // Si se proporciona, modo edición
     onBusinessCreated: (business: Business) => void;
+    onBusinessUpdated?: (business: Business) => void;
     onCancel?: () => void;
   }
 
-  let { jwt, onBusinessCreated, onCancel }: Props = $props();
+  let { jwt, business, onBusinessCreated, onBusinessUpdated, onCancel }: Props = $props();
 
-  // Business fields
-  let name = $state('');
-  let type = $state('restaurant');
-  let description = $state('');
+  // Determine if we're in edit mode
+  const isEditMode = $derived(!!business);
 
-  // First branch fields
+  // Business fields - initialize with existing data if in edit mode
+  let name = $state(business?.name ?? '');
+  let type = $state(business?.type ?? 'restaurant');
+  let description = $state(business?.description ?? '');
+  
+  // Image paths for mutations
+  let avatarPath = $state(business?.avatar ?? '');
+  let coverPath = $state(business?.coverImage ?? '');
+
+  // First branch fields (only used in create mode)
   let branchName = $state('');
   let branchAddress = $state('');
   let branchPhone = $state('');
@@ -26,80 +36,181 @@
 
   const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL || '';
 
+  // Track original values for detecting changes in edit mode
+  const originalValues = business ? {
+    name: business.name,
+    type: business.type,
+    description: business.description ?? '',
+    avatar: business.avatar ?? '',
+    coverImage: business.coverImage ?? '',
+  } : null;
+
+  function handleAvatarUpload(imagePath: string) {
+    avatarPath = imagePath;
+  }
+
+  function handleCoverUpload(imagePath: string) {
+    coverPath = imagePath;
+  }
+
+  function handleImageError(error: string) {
+    errorMessage = error;
+  }
+
+  // Get only changed fields for update mutation
+  function getChangedFields(): Record<string, unknown> {
+    if (!originalValues) return {};
+    
+    const changes: Record<string, unknown> = {};
+    
+    if (name !== originalValues.name) changes.name = name;
+    if (type !== originalValues.type) changes.type = type;
+    if (description !== originalValues.description) changes.description = description || undefined;
+    if (avatarPath !== originalValues.avatar) changes.avatar = avatarPath || undefined;
+    if (coverPath !== originalValues.coverImage) changes.coverImage = coverPath || undefined;
+    
+    return changes;
+  }
+
   async function handleSubmit(e: Event) {
     e.preventDefault();
     isSubmitting = true;
     errorMessage = '';
 
     try {
-      // Parse schedule string to object
-      const scheduleObj: Record<string, string> = {};
-      branchSchedule.split(',').forEach(part => {
-        const [days, hours] = part.trim().split(':').map(s => s.trim());
-        if (days && hours) {
-          scheduleObj[days] = hours;
+      if (isEditMode && business) {
+        // Update existing business
+        const changedFields = getChangedFields();
+        
+        if (Object.keys(changedFields).length === 0) {
+          successMessage = 'No hay cambios para guardar';
+          isSubmitting = false;
+          return;
         }
-      });
 
-      const branchInput: RegisterBranchInput = {
-        name: branchName || `${name} - Principal`,
-        coordinates: { lat: 0, lng: 0 }, // Default coordinates
-        phone: branchPhone,
-        schedule: Object.keys(scheduleObj).length > 0 ? scheduleObj : { 'Lun-Dom': '9:00-21:00' },
-        address: branchAddress,
-      };
-
-      const response = await fetch(`${BACKEND_URL}/graphql`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${jwt}`,
-        },
-        body: JSON.stringify({
-          query: `
-            mutation RegisterBusiness(
-              $businessInput: CreateBusinessInput!
-              $branchesInput: [RegisterBranchInput!]!
-              $jwt: String
-            ) {
-              registerBusiness(
-                businessInput: $businessInput
-                branchesInput: $branchesInput
-                jwt: $jwt
-              ) {
-                id
-                name
-                type
-                avatarUrl
-                isActive
-              }
-            }
-          `,
-          variables: {
-            jwt,
-            businessInput: {
-              name,
-              type,
-              description: description || undefined,
-            },
-            branchesInput: [branchInput],
+        const response = await fetch(`${BACKEND_URL}/graphql`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwt}`,
           },
-        }),
-      });
+          body: JSON.stringify({
+            query: `
+              mutation UpdateBusiness(
+                $businessId: String!
+                $input: UpdateBusinessInput!
+                $jwt: String
+              ) {
+                updateBusiness(businessId: $businessId, input: $input, jwt: $jwt) {
+                  id
+                  name
+                  type
+                  description
+                  avatarUrl
+                  coverUrl
+                  isActive
+                }
+              }
+            `,
+            variables: {
+              jwt,
+              businessId: business.id,
+              input: changedFields,
+            },
+          }),
+        });
 
-      const result = await response.json();
+        const result = await response.json();
 
-      if (result.errors) {
-        throw new Error(result.errors[0]?.message || 'Error al crear el negocio');
-      }
+        if (result.errors) {
+          throw new Error(result.errors[0]?.message || 'Error al actualizar el negocio');
+        }
 
-      if (result.data?.registerBusiness) {
-        successMessage = '¡Negocio creado correctamente!';
-        onBusinessCreated(result.data.registerBusiness);
+        if (result.data?.updateBusiness) {
+          successMessage = '¡Negocio actualizado correctamente!';
+          onBusinessUpdated?.(result.data.updateBusiness);
+        }
+      } else {
+        // Create new business
+        // Parse schedule string to object
+        // Format: "Lun-Vie: 9:00-18:00, Sab: 10:00-14:00"
+        // Backend expects: { "Lun-Vie": ["9:00-18:00"], "Sab": ["10:00-14:00"] }
+        const scheduleObj: Record<string, string[]> = {};
+        branchSchedule.split(',').forEach(part => {
+          const trimmed = part.trim();
+          const colonIndex = trimmed.indexOf(':');
+          if (colonIndex > 0) {
+            const days = trimmed.slice(0, colonIndex).trim();
+            const hours = trimmed.slice(colonIndex + 1).trim();
+            if (days && hours) {
+              scheduleObj[days] = [hours];
+            }
+          }
+        });
+
+        const branchInput: RegisterBranchInput = {
+          name: branchName || `${name} - Principal`,
+          coordinates: { lat: 0, lng: 0 }, // Default coordinates
+          phone: branchPhone,
+          schedule: Object.keys(scheduleObj).length > 0 ? scheduleObj : { 'Lun-Dom': ['9:00-21:00'] },
+          address: branchAddress,
+        };
+
+        const response = await fetch(`${BACKEND_URL}/graphql`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwt}`,
+          },
+          body: JSON.stringify({
+            query: `
+              mutation RegisterBusiness(
+                $businessInput: CreateBusinessInput!
+                $branchesInput: [RegisterBranchInput!]!
+                $jwt: String
+              ) {
+                registerBusiness(
+                  businessInput: $businessInput
+                  branchesInput: $branchesInput
+                  jwt: $jwt
+                ) {
+                  id
+                  name
+                  type
+                  avatarUrl
+                  coverUrl
+                  isActive
+                }
+              }
+            `,
+            variables: {
+              jwt,
+              businessInput: {
+                name,
+                type,
+                description: description || undefined,
+                avatar: avatarPath || undefined,
+                coverImage: coverPath || undefined,
+              },
+              branchesInput: [branchInput],
+            },
+          }),
+        });
+
+        const result = await response.json();
+
+        if (result.errors) {
+          throw new Error(result.errors[0]?.message || 'Error al crear el negocio');
+        }
+
+        if (result.data?.registerBusiness) {
+          successMessage = '¡Negocio creado correctamente!';
+          onBusinessCreated(result.data.registerBusiness);
+        }
       }
     } catch (error) {
-      console.error('Error creating business:', error);
-      errorMessage = error instanceof Error ? error.message : 'Error al crear el negocio';
+      console.error('Error:', error);
+      errorMessage = error instanceof Error ? error.message : 'Error al procesar el negocio';
     } finally {
       isSubmitting = false;
     }
@@ -115,8 +226,8 @@
       </svg>
     </div>
     <div>
-      <h2 class="form-title">Crear Negocio</h2>
-      <p class="form-subtitle">Registra tu negocio para comenzar a vender</p>
+      <h2 class="form-title">{isEditMode ? 'Editar Negocio' : 'Crear Negocio'}</h2>
+      <p class="form-subtitle">{isEditMode ? 'Actualiza la información de tu negocio' : 'Registra tu negocio para comenzar a vender'}</p>
     </div>
   </div>
 
@@ -189,68 +300,106 @@
       </div>
     </div>
 
+    <!-- Images Section -->
     <div class="form-section">
       <h3 class="section-title">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-          <circle cx="12" cy="10" r="3"/>
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
         </svg>
-        Primera Sucursal
+        Imágenes
       </h3>
 
-      <!-- Branch Name -->
-      <div class="form-group">
-        <label for="branch-name">Nombre de la sucursal</label>
-        <input
-          type="text"
-          id="branch-name"
-          bind:value={branchName}
-          placeholder="Ej: Sucursal Centro (opcional)"
+      <div class="images-grid">
+        <!-- Avatar -->
+        <ImageUploader
+          endpoint="/upload/business/avatar"
+          {jwt}
+          label="Avatar"
+          currentImageUrl={business?.avatarUrl}
+          aspectRatio="square"
+          onUploadComplete={handleAvatarUpload}
+          onError={handleImageError}
         />
-      </div>
 
-      <!-- Branch Address -->
-      <div class="form-group">
-        <label for="branch-address">
-          Dirección
-          <span class="required">*</span>
-        </label>
-        <input
-          type="text"
-          id="branch-address"
-          bind:value={branchAddress}
-          placeholder="Ej: Av. Principal #123"
-          required
+        <!-- Cover -->
+        <ImageUploader
+          endpoint="/upload/business/cover"
+          {jwt}
+          label="Portada"
+          currentImageUrl={business?.coverUrl}
+          aspectRatio="wide"
+          onUploadComplete={handleCoverUpload}
+          onError={handleImageError}
         />
-      </div>
-
-      <!-- Branch Phone -->
-      <div class="form-group">
-        <label for="branch-phone">
-          Teléfono
-          <span class="required">*</span>
-        </label>
-        <input
-          type="tel"
-          id="branch-phone"
-          bind:value={branchPhone}
-          placeholder="Ej: +53 5555 5555"
-          required
-        />
-      </div>
-
-      <!-- Schedule -->
-      <div class="form-group">
-        <label for="branch-schedule">Horario</label>
-        <input
-          type="text"
-          id="branch-schedule"
-          bind:value={branchSchedule}
-          placeholder="Ej: Lun-Vie: 9:00-18:00"
-        />
-        <span class="input-hint">Separa múltiples horarios con comas</span>
       </div>
     </div>
+
+    {#if !isEditMode}
+      <div class="form-section">
+        <h3 class="section-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          Primera Sucursal
+        </h3>
+
+        <!-- Branch Name -->
+        <div class="form-group">
+          <label for="branch-name">Nombre de la sucursal</label>
+          <input
+            type="text"
+            id="branch-name"
+            bind:value={branchName}
+            placeholder="Ej: Sucursal Centro (opcional)"
+          />
+        </div>
+
+        <!-- Branch Address -->
+        <div class="form-group">
+          <label for="branch-address">
+            Dirección
+            <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="branch-address"
+            bind:value={branchAddress}
+            placeholder="Ej: Av. Principal #123"
+            required
+          />
+        </div>
+
+        <!-- Branch Phone -->
+        <div class="form-group">
+          <label for="branch-phone">
+            Teléfono
+            <span class="required">*</span>
+          </label>
+          <input
+            type="tel"
+            id="branch-phone"
+            bind:value={branchPhone}
+            placeholder="Ej: +53 5555 5555"
+            required
+          />
+        </div>
+
+        <!-- Schedule -->
+        <div class="form-group">
+          <label for="branch-schedule">Horario</label>
+          <input
+            type="text"
+            id="branch-schedule"
+            bind:value={branchSchedule}
+            placeholder="Ej: Lun-Vie: 9:00-18:00"
+          />
+          <span class="input-hint">Separa múltiples horarios con comas</span>
+        </div>
+      </div>
+    {/if}
 
     <div class="form-actions">
       {#if onCancel}
@@ -261,18 +410,25 @@
       <button type="submit" class="submit-btn" disabled={isSubmitting}>
         {#if isSubmitting}
           <span class="spinner"></span>
-          Creando...
+          {isEditMode ? 'Guardando...' : 'Creando...'}
         {:else}
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
+            {#if isEditMode}
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+              <polyline points="17 21 17 13 7 13 7 21"/>
+              <polyline points="7 3 7 8 15 8"/>
+            {:else}
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            {/if}
           </svg>
-          Crear Negocio
+          {isEditMode ? 'Guardar Cambios' : 'Crear Negocio'}
         {/if}
       </button>
     </div>
   </form>
 </div>
+
 
 <style>
   .business-form-container {
@@ -450,6 +606,13 @@
     pointer-events: none;
   }
 
+  .images-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--spacing-xl);
+    align-items: start;
+  }
+
   .form-actions {
     display: flex;
     gap: var(--spacing-md);
@@ -506,6 +669,12 @@
 
   @keyframes spin {
     to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 640px) {
+    .images-grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 480px) {

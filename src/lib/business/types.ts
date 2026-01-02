@@ -36,7 +36,7 @@ export interface Branch {
   address?: string;
   coordinates: CoordinatesType;
   phone: string;
-  schedule: Record<string, string>;
+  schedule: Record<string, string | string[]>;  // Backend may return string or string[]
   managerIds: string[];
   status: 'active' | 'inactive' | 'pending';
   avatar?: string;
@@ -63,7 +63,7 @@ export interface RegisterBranchInput {
   name: string;
   coordinates: Coordinates;
   phone: string;
-  schedule: Record<string, string>;
+  schedule: Record<string, string[]>;  // Backend expects array of time ranges
   address?: string;
   avatar?: string;
   coverImage?: string;
@@ -76,7 +76,7 @@ export interface CreateBranchInput {
   name: string;
   coordinates: Coordinates;
   phone: string;
-  schedule: Record<string, string>;
+  schedule: Record<string, string[]>;  // Backend expects array of time ranges
   address?: string;
   managerIds?: string[];
   avatar?: string;
@@ -100,7 +100,7 @@ export interface UpdateBranchInput {
   name?: string;
   address?: string;
   phone?: string;
-  schedule?: Record<string, string>;
+  schedule?: Record<string, string[]>;  // Backend expects array of time ranges
   status?: 'active' | 'inactive' | 'pending';
   deliveryRadius?: number;
   facilities?: string[];
@@ -116,6 +116,14 @@ export interface BusinessesResponse {
 
 export interface BranchesResponse {
   branches: Branch[];
+}
+
+/**
+ * Respuesta del endpoint de upload de imagen
+ */
+export interface UploadImageResponse {
+  image_path: string;
+  image_url: string;
 }
 
 // Tipos de negocio disponibles

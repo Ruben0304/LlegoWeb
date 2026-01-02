@@ -37,6 +37,10 @@
   let businessError = $state("");
   let showBusinessForm = $state(false);
   let showBranchForm = $state(false);
+  
+  // Edit mode state
+  let editingBusiness = $state<Business | null>(null);
+  let editingBranch = $state<Branch | null>(null);
 
   // Loading states
   let isLoadingProducts = $state(false);
@@ -230,6 +234,8 @@
     businessError = "";
     showBusinessForm = false;
     showBranchForm = false;
+    editingBusiness = null;
+    editingBranch = null;
     clearAuth();
   }
 
@@ -353,6 +359,8 @@
     products = [];
     showBusinessForm = false;
     showBranchForm = false;
+    editingBusiness = null;
+    editingBranch = null;
   }
 
   function handleBranchSelected(branch: Branch) {
@@ -371,30 +379,86 @@
   function handleCreateBusiness() {
     showBusinessForm = true;
     showBranchForm = false;
+    editingBusiness = null;
+    editingBranch = null;
   }
 
   function handleCreateBranch(business: Business) {
     selectedBusiness = business;
     showBranchForm = true;
     showBusinessForm = false;
+    editingBusiness = null;
+    editingBranch = null;
+  }
+
+  function handleEditBusiness(business: Business) {
+    editingBusiness = business;
+    showBusinessForm = true;
+    showBranchForm = false;
+    editingBranch = null;
+  }
+
+  function handleEditBranch(branch: Branch) {
+    editingBranch = branch;
+    showBranchForm = true;
+    showBusinessForm = false;
+    editingBusiness = null;
   }
 
   function handleBusinessCreated() {
     showBusinessForm = false;
+    editingBusiness = null;
     loadBusinesses();
+  }
+
+  function handleBusinessUpdated(updatedBusiness: Business) {
+    showBusinessForm = false;
+    editingBusiness = null;
+    // Update the business in the list
+    businesses = businesses.map(b => 
+      b.id === updatedBusiness.id ? { ...b, ...updatedBusiness } : b
+    );
+    // Update selected business if it's the one being edited
+    if (selectedBusiness?.id === updatedBusiness.id) {
+      selectedBusiness = { ...selectedBusiness, ...updatedBusiness };
+    }
+  }
+
+  function handleBusinessDeleted(deletedBusiness: Business) {
+    // Remove the business from the list
+    businesses = businesses.filter(b => b.id !== deletedBusiness.id);
+    // Clear selection if deleted business was selected
+    if (selectedBusiness?.id === deletedBusiness.id) {
+      selectedBusiness = null;
+      selectedBranch = null;
+      branchId = "";
+      products = [];
+    }
   }
 
   function handleBranchCreated(branch: Branch) {
     showBranchForm = false;
+    editingBranch = null;
     selectedBranch = branch;
     branchId = branch.id;
     products = [];
     loadProducts(branch.id);
   }
 
+  function handleBranchUpdated(updatedBranch: Branch) {
+    showBranchForm = false;
+    editingBranch = null;
+    // Update selected branch if it's the one being edited
+    if (selectedBranch?.id === updatedBranch.id) {
+      selectedBranch = { ...selectedBranch, ...updatedBranch };
+    }
+  }
+
   function handleBackToSelector() {
     showBusinessForm = false;
     showBranchForm = false;
+    editingBusiness = null;
+    editingBranch = null;
   }
 
   function handleChangeBranch() {
@@ -404,6 +468,8 @@
     products = [];
     showBusinessForm = false;
     showBranchForm = false;
+    editingBusiness = null;
+    editingBranch = null;
   }
 
   function renderHiddenGoogleButton() {
@@ -656,7 +722,9 @@
               </div>
               <BusinessForm
                 jwt={jwt}
+                business={editingBusiness ?? undefined}
                 onBusinessCreated={handleBusinessCreated}
+                onBusinessUpdated={handleBusinessUpdated}
                 onCancel={handleBackToSelector}
               />
             </div>
@@ -680,7 +748,9 @@
               <BranchForm
                 jwt={jwt}
                 business={selectedBusiness}
+                branch={editingBranch ?? undefined}
                 onBranchCreated={handleBranchCreated}
+                onBranchUpdated={handleBranchUpdated}
                 onCancel={handleBackToSelector}
               />
             </div>
@@ -716,6 +786,7 @@
                   onBranchSelected={handleBranchSelected}
                   onCreateBusiness={handleCreateBusiness}
                   onCreateBranch={handleCreateBranch}
+                  onDeleteBusiness={handleBusinessDeleted}
                 />
               {/if}
             </div>
@@ -728,20 +799,66 @@
             {:else}
               <div class="dashboard-grid">
                 <div class="form-section">
-                  <div class="section-badge">
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                      <line x1="3" y1="6" x2="21" y2="6"/>
-                      <path d="M16 10a4 4 0 0 1-8 0"/>
-                    </svg>
-                    Mis Productos
+                  <div class="section-header">
+                    <div class="section-badge">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <path d="M16 10a4 4 0 0 1-8 0"/>
+                      </svg>
+                      Mis Productos
+                    </div>
+                    <div class="edit-actions">
+                      {#if selectedBusiness}
+                        <button 
+                          class="edit-btn" 
+                          type="button" 
+                          onclick={() => handleEditBusiness(selectedBusiness!)}
+                          title="Editar negocio"
+                        >
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <polyline points="9 22 9 12 15 12 15 22"/>
+                          </svg>
+                          Editar Negocio
+                        </button>
+                      {/if}
+                      {#if selectedBranch}
+                        <button 
+                          class="edit-btn" 
+                          type="button" 
+                          onclick={() => handleEditBranch(selectedBranch!)}
+                          title="Editar sucursal"
+                        >
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                          </svg>
+                          Editar Sucursal
+                        </button>
+                      {/if}
+                    </div>
                   </div>
                   <ProductForm
                     branchId={branchId}
@@ -1157,6 +1274,47 @@
     background: rgba(225, 199, 142, 0.1);
     border-radius: var(--radius-full);
     margin-bottom: var(--spacing-lg);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .section-header .section-badge {
+    margin-bottom: 0;
+  }
+
+  .edit-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .edit-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    color: var(--color-text-variant);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-full);
+    transition: all var(--transition-base);
+  }
+
+  .edit-btn:hover {
+    color: var(--color-secondary);
+    background: rgba(225, 199, 142, 0.1);
+  }
+
+  .edit-btn svg {
+    flex-shrink: 0;
   }
 
   @media (max-width: 968px) {

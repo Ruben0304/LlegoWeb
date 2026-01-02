@@ -8,6 +8,7 @@
         onBranchSelected: (branch: Branch) => void;
         onCreateBusiness: () => void;
         onCreateBranch: (business: Business) => void;
+        onDeleteBusiness?: (business: Business) => void;
     }
 
     let {
@@ -17,12 +18,15 @@
         onBranchSelected,
         onCreateBusiness,
         onCreateBranch,
+        onDeleteBusiness,
     }: Props = $props();
 
     let selectedBusinessId = $state<string>("");
     let branches = $state<Branch[]>([]);
     let isLoadingBranches = $state(false);
     let errorMessage = $state("");
+    let deletingBusinessId = $state<string | null>(null);
+    let confirmDeleteId = $state<string | null>(null);
 
     const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL || "";
 
@@ -106,6 +110,71 @@
             onCreateBranch(selectedBusiness);
         }
     }
+
+    function handleDeleteClick(e: Event, businessId: string) {
+        e.stopPropagation();
+        confirmDeleteId = businessId;
+    }
+
+    function handleCancelDelete() {
+        confirmDeleteId = null;
+    }
+
+    async function handleConfirmDelete(business: Business) {
+        deletingBusinessId = business.id;
+        errorMessage = "";
+
+        try {
+            // Backend doesn't have deleteBusiness, so we deactivate instead
+            const response = await fetch(`${BACKEND_URL}/graphql`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${jwt}`,
+                },
+                body: JSON.stringify({
+                    query: `
+                        mutation DeactivateBusiness($businessId: String!, $input: UpdateBusinessInput!, $jwt: String) {
+                            updateBusiness(businessId: $businessId, input: $input, jwt: $jwt) {
+                                id
+                                isActive
+                            }
+                        }
+                    `,
+                    variables: { 
+                        businessId: business.id, 
+                        input: { isActive: false },
+                        jwt 
+                    },
+                }),
+            });
+
+            const result = await response.json();
+
+            if (result.errors) {
+                throw new Error(
+                    result.errors[0]?.message || "Error al desactivar negocio",
+                );
+            }
+
+            // Clear selection if deactivated business was selected
+            if (selectedBusinessId === business.id) {
+                selectedBusinessId = "";
+                branches = [];
+            }
+
+            confirmDeleteId = null;
+            onDeleteBusiness?.(business);
+        } catch (error) {
+            console.error("Error deactivating business:", error);
+            errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : "Error al desactivar negocio";
+        } finally {
+            deletingBusinessId = null;
+        }
+    }
 </script>
 
 <div class="selector-container">
@@ -183,34 +252,87 @@
             </button>
         </div>
     {:else}
-        <!-- Business selector -->
+        <!-- Business list with delete option -->
         <div class="form-group">
-            <label for="business-select">
+            <label>
                 Negocio
                 <span class="required">*</span>
             </label>
-            <div class="select-wrapper">
-                <select
-                    id="business-select"
-                    value={selectedBusinessId}
-                    onchange={handleBusinessChange}
-                >
-                    <option value="">Selecciona un negocio</option>
-                    {#each businesses as business}
-                        <option value={business.id}>{business.name}</option>
-                    {/each}
-                </select>
-                <svg
-                    class="select-arrow"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                >
-                    <polyline points="6 9 12 15 18 9" />
-                </svg>
+            <div class="businesses-list">
+                {#each businesses as business}
+                    <div 
+                        class="business-item" 
+                        class:selected={selectedBusinessId === business.id}
+                        class:deleting={deletingBusinessId === business.id}
+                    >
+                        {#if confirmDeleteId === business.id}
+                            <!-- Confirm delete state -->
+                            <div class="confirm-delete">
+                                <span class="confirm-text">¿Desactivar "{business.name}"?</span>
+                                <div class="confirm-actions">
+                                    <button 
+                                        class="confirm-btn cancel" 
+                                        onclick={handleCancelDelete}
+                                        disabled={deletingBusinessId === business.id}
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button 
+                                        class="confirm-btn delete" 
+                                        onclick={() => handleConfirmDelete(business)}
+                                        disabled={deletingBusinessId === business.id}
+                                    >
+                                        {#if deletingBusinessId === business.id}
+                                            <span class="spinner-sm"></span>
+                                        {:else}
+                                            Desactivar
+                                        {/if}
+                                    </button>
+                                </div>
+                            </div>
+                        {:else}
+                            <!-- Normal state -->
+                            <button 
+                                class="business-item-btn"
+                                onclick={() => {
+                                    selectedBusinessId = business.id;
+                                    if (selectedBusiness) {
+                                        onBusinessSelected(selectedBusiness);
+                                        loadBranches(business.id);
+                                    }
+                                }}
+                            >
+                                <div class="business-avatar-sm">
+                                    {#if business.avatarUrl}
+                                        <img src={business.avatarUrl} alt={business.name} />
+                                    {:else}
+                                        <span>{business.name.charAt(0).toUpperCase()}</span>
+                                    {/if}
+                                </div>
+                                <div class="business-info">
+                                    <span class="business-name">{business.name}</span>
+                                    <span class="business-type">{business.type}</span>
+                                </div>
+                                <div class="business-status" class:active={business.isActive}>
+                                    {business.isActive ? "Activo" : "Inactivo"}
+                                </div>
+                            </button>
+                            {#if onDeleteBusiness}
+                                <button 
+                                    class="delete-btn"
+                                    onclick={(e) => handleDeleteClick(e, business.id)}
+                                    title="Desactivar negocio"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="15" y1="9" x2="9" y2="15"/>
+                                        <line x1="9" y1="9" x2="15" y2="15"/>
+                                    </svg>
+                                </button>
+                            {/if}
+                        {/if}
+                    </div>
+                {/each}
             </div>
         </div>
 
@@ -853,5 +975,167 @@
     .create-btn.secondary:hover {
         background: rgba(255, 255, 255, 0.1);
         border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Business List Styles */
+    .businesses-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .business-item {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: var(--radius-lg);
+        transition: all var(--transition-base);
+        overflow: hidden;
+    }
+
+    .business-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .business-item.selected {
+        border-color: var(--color-secondary);
+        background: rgba(225, 199, 142, 0.08);
+    }
+
+    .business-item.deleting {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .business-item-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+        background: none;
+        text-align: left;
+        cursor: pointer;
+        min-width: 0;
+    }
+
+    .business-avatar-sm {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+            135deg,
+            var(--color-secondary) 0%,
+            var(--color-accent) 100%
+        );
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .business-avatar-sm img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .business-avatar-sm span {
+        font-size: var(--font-size-base);
+        font-weight: 700;
+        color: var(--color-primary);
+    }
+
+    .delete-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        margin-right: var(--spacing-sm);
+        background: rgba(255, 59, 48, 0.1);
+        border-radius: var(--radius-md);
+        color: #ff6b6b;
+        transition: all var(--transition-base);
+        flex-shrink: 0;
+    }
+
+    .delete-btn:hover {
+        background: rgba(255, 59, 48, 0.2);
+        color: #ff4444;
+    }
+
+    /* Confirm Delete State */
+    .confirm-delete {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: var(--spacing-md);
+        background: rgba(255, 59, 48, 0.08);
+        gap: var(--spacing-md);
+    }
+
+    .confirm-text {
+        font-size: var(--font-size-sm);
+        color: #ff6b6b;
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .confirm-actions {
+        display: flex;
+        gap: var(--spacing-sm);
+        flex-shrink: 0;
+    }
+
+    .confirm-btn {
+        padding: var(--spacing-xs) var(--spacing-md);
+        font-size: var(--font-size-xs);
+        font-weight: 500;
+        border-radius: var(--radius-md);
+        transition: all var(--transition-base);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-xs);
+    }
+
+    .confirm-btn.cancel {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--color-text-variant);
+    }
+
+    .confirm-btn.cancel:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.15);
+        color: var(--color-text);
+    }
+
+    .confirm-btn.delete {
+        background: #ff4444;
+        color: white;
+    }
+
+    .confirm-btn.delete:hover:not(:disabled) {
+        background: #ff2222;
+    }
+
+    .confirm-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .spinner-sm {
+        width: 12px;
+        height: 12px;
+        border: 2px solid transparent;
+        border-top-color: currentColor;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
     }
 </style>
