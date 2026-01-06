@@ -1,6 +1,7 @@
 <script lang="ts">
   import { BUSINESS_TYPES, type Business, type RegisterBranchInput } from '@/lib/business';
   import ImageUploader from './ImageUploader.svelte';
+  import LocationPicker from './LocationPicker.svelte';
 
   interface Props {
     jwt: string;
@@ -22,13 +23,13 @@
   
   // Image paths for mutations
   let avatarPath = $state(business?.avatar ?? '');
-  let coverPath = $state(business?.coverImage ?? '');
 
   // First branch fields (only used in create mode)
   let branchName = $state('');
   let branchAddress = $state('');
   let branchPhone = $state('');
   let branchSchedule = $state('Lun-Vie: 9:00-18:00');
+  let branchCoordinates = $state({ lat: 23.1136, lng: -82.3666 }); // Default: Havana, Cuba
 
   let isSubmitting = $state(false);
   let errorMessage = $state('');
@@ -42,19 +43,18 @@
     type: business.type,
     description: business.description ?? '',
     avatar: business.avatar ?? '',
-    coverImage: business.coverImage ?? '',
   } : null;
 
   function handleAvatarUpload(imagePath: string) {
     avatarPath = imagePath;
   }
 
-  function handleCoverUpload(imagePath: string) {
-    coverPath = imagePath;
-  }
-
   function handleImageError(error: string) {
     errorMessage = error;
+  }
+
+  function handleBranchLocationChange(coords: { lat: number; lng: number }) {
+    branchCoordinates = coords;
   }
 
   // Get only changed fields for update mutation
@@ -67,7 +67,6 @@
     if (type !== originalValues.type) changes.type = type;
     if (description !== originalValues.description) changes.description = description || undefined;
     if (avatarPath !== originalValues.avatar) changes.avatar = avatarPath || undefined;
-    if (coverPath !== originalValues.coverImage) changes.coverImage = coverPath || undefined;
     
     return changes;
   }
@@ -150,7 +149,7 @@
 
         const branchInput: RegisterBranchInput = {
           name: branchName || `${name} - Principal`,
-          coordinates: { lat: 0, lng: 0 }, // Default coordinates
+          coordinates: { lat: branchCoordinates.lat, lng: branchCoordinates.lng },
           phone: branchPhone,
           schedule: Object.keys(scheduleObj).length > 0 ? scheduleObj : { 'Lun-Dom': ['9:00-21:00'] },
           address: branchAddress,
@@ -190,7 +189,6 @@
                 type,
                 description: description || undefined,
                 avatar: avatarPath || undefined,
-                coverImage: coverPath || undefined,
               },
               branchesInput: [branchInput],
             },
@@ -308,10 +306,10 @@
           <circle cx="8.5" cy="8.5" r="1.5"/>
           <polyline points="21 15 16 10 5 21"/>
         </svg>
-        Imágenes
+        Imagen de Perfil
       </h3>
 
-      <div class="images-grid">
+      <div class="images-container">
         <!-- Avatar -->
         <ImageUploader
           endpoint="/upload/business/avatar"
@@ -320,17 +318,6 @@
           currentImageUrl={business?.avatarUrl}
           aspectRatio="square"
           onUploadComplete={handleAvatarUpload}
-          onError={handleImageError}
-        />
-
-        <!-- Cover -->
-        <ImageUploader
-          endpoint="/upload/business/cover"
-          {jwt}
-          label="Portada"
-          currentImageUrl={business?.coverUrl}
-          aspectRatio="wide"
-          onUploadComplete={handleCoverUpload}
           onError={handleImageError}
         />
       </div>
@@ -398,6 +385,11 @@
           />
           <span class="input-hint">Separa múltiples horarios con comas</span>
         </div>
+
+        <!-- Location -->
+        <LocationPicker
+          onLocationChange={handleBranchLocationChange}
+        />
       </div>
     {/if}
 
@@ -606,11 +598,10 @@
     pointer-events: none;
   }
 
-  .images-grid {
-    display: grid;
-    grid-template-columns: auto 1fr;
+  .images-container {
+    display: flex;
+    flex-direction: column;
     gap: var(--spacing-xl);
-    align-items: start;
   }
 
   .form-actions {
@@ -671,11 +662,7 @@
     to { transform: rotate(360deg); }
   }
 
-  @media (max-width: 640px) {
-    .images-grid {
-      grid-template-columns: 1fr;
-    }
-  }
+
 
   @media (max-width: 480px) {
     .form-actions {

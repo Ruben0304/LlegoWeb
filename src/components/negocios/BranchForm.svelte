@@ -133,6 +133,11 @@
     if (avatarPath !== originalValues.avatar) changes.avatar = avatarPath || undefined;
     if (coverPath !== originalValues.coverImage) changes.coverImage = coverPath || undefined;
     
+    // Check if coordinates changed
+    if (coordinates.lat !== originalValues.lat || coordinates.lng !== originalValues.lng) {
+      changes.coordinates = { lat: coordinates.lat, lng: coordinates.lng };
+    }
+    
     return changes;
   }
 
@@ -591,10 +596,9 @@
   }
 
   .images-grid {
-    display: grid;
-    grid-template-columns: auto 1fr;
+    display: flex;
+    flex-direction: column;
     gap: var(--spacing-xl);
-    align-items: start;
   }
 
   .form-actions {
@@ -655,11 +659,7 @@
     to { transform: rotate(360deg); }
   }
 
-  @media (max-width: 640px) {
-    .images-grid {
-      grid-template-columns: 1fr;
-    }
-  }
+
 
   @media (max-width: 480px) {
     .form-actions {
