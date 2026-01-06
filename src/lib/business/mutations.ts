@@ -48,6 +48,7 @@ export const CREATE_BRANCH = gql`
     createBranch(input: $input, jwt: $jwt) {
       id
       name
+      tipos
       address
       phone
       status
@@ -66,6 +67,7 @@ export const UPDATE_BRANCH = gql`
     updateBranch(branchId: $branchId, input: $input, jwt: $jwt) {
       id
       name
+      tipos
       status
       avatarUrl
       address

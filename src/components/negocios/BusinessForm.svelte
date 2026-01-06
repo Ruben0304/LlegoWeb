@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { BUSINESS_TYPES, type Business, type RegisterBranchInput } from '@/lib/business';
+  import { BUSINESS_TYPES, type Business, type RegisterBranchInput, BranchTipo, BRANCH_TIPO_LABELS } from '@/lib/business';
   import ImageUploader from './ImageUploader.svelte';
   import LocationPicker from './LocationPicker.svelte';
 
@@ -30,6 +30,7 @@
   let branchPhone = $state('');
   let branchSchedule = $state('Lun-Vie: 9:00-18:00');
   let branchCoordinates = $state({ lat: 23.1136, lng: -82.3666 }); // Default: Havana, Cuba
+  let branchTipos = $state<BranchTipo[]>([]);
 
   let isSubmitting = $state(false);
   let errorMessage = $state('');
@@ -57,6 +58,14 @@
     branchCoordinates = coords;
   }
 
+  function handleBranchTipoToggle(tipo: BranchTipo) {
+    if (branchTipos.includes(tipo)) {
+      branchTipos = branchTipos.filter(t => t !== tipo);
+    } else {
+      branchTipos = [...branchTipos, tipo];
+    }
+  }
+
   // Get only changed fields for update mutation
   function getChangedFields(): Record<string, unknown> {
     if (!originalValues) return {};
@@ -75,6 +84,13 @@
     e.preventDefault();
     isSubmitting = true;
     errorMessage = '';
+
+    // Validate branch tipos in create mode
+    if (!isEditMode && branchTipos.length === 0) {
+      errorMessage = 'Debes seleccionar al menos un tipo para la sucursal';
+      isSubmitting = false;
+      return;
+    }
 
     try {
       if (isEditMode && business) {
@@ -149,6 +165,7 @@
 
         const branchInput: RegisterBranchInput = {
           name: branchName || `${name} - Principal`,
+          tipos: branchTipos,
           coordinates: { lat: branchCoordinates.lat, lng: branchCoordinates.lng },
           phone: branchPhone,
           schedule: Object.keys(scheduleObj).length > 0 ? scheduleObj : { 'Lun-Dom': ['9:00-21:00'] },
@@ -342,6 +359,36 @@
             bind:value={branchName}
             placeholder="Ej: Sucursal Centro (opcional)"
           />
+        </div>
+
+        <!-- Branch Types -->
+        <div class="form-group">
+          <label>
+            Tipo de Sucursal
+            <span class="required">*</span>
+          </label>
+          <p class="input-hint" style="margin-bottom: var(--spacing-md);">
+            Selecciona al menos un tipo que mejor describa tu sucursal
+          </p>
+          <div class="tipo-options">
+            {#each Object.values(BranchTipo) as tipo}
+              <button
+                type="button"
+                class="tipo-option"
+                class:selected={branchTipos.includes(tipo)}
+                onclick={() => handleBranchTipoToggle(tipo)}
+              >
+                <div class="tipo-checkbox">
+                  {#if branchTipos.includes(tipo)}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  {/if}
+                </div>
+                <span class="tipo-label">{BRANCH_TIPO_LABELS[tipo]}</span>
+              </button>
+            {/each}
+          </div>
         </div>
 
         <!-- Branch Address -->
@@ -662,6 +709,58 @@
     to { transform: rotate(360deg); }
   }
 
+  /* Branch Type Selector Styles */
+  .tipo-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-md);
+  }
+
+  .tipo-option {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
+    cursor: pointer;
+  }
+
+  .tipo-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(225, 199, 142, 0.3);
+  }
+
+  .tipo-option.selected {
+    background: linear-gradient(135deg, rgba(225, 199, 142, 0.15) 0%, rgba(178, 214, 154, 0.15) 100%);
+    border-color: var(--color-secondary);
+  }
+
+  .tipo-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-base);
+    flex-shrink: 0;
+  }
+
+  .tipo-option.selected .tipo-checkbox {
+    background: var(--color-secondary);
+    border-color: var(--color-secondary);
+    color: var(--color-primary);
+  }
+
+  .tipo-label {
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--color-text);
+  }
 
 
   @media (max-width: 480px) {

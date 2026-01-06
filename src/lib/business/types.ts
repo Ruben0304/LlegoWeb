@@ -12,6 +12,20 @@ export interface CoordinatesType {
   coordinates: [number, number]; // [lng, lat]
 }
 
+// Enum para tipos de sucursal
+export enum BranchTipo {
+  RESTAURANTE = 'RESTAURANTE',
+  DULCERIA = 'DULCERIA',
+  TIENDA = 'TIENDA',
+}
+
+// Labels en español para los tipos de sucursal
+export const BRANCH_TIPO_LABELS: Record<BranchTipo, string> = {
+  [BranchTipo.RESTAURANTE]: 'Restaurante',
+  [BranchTipo.DULCERIA]: 'Dulcería',
+  [BranchTipo.TIENDA]: 'Tienda',
+};
+
 export interface Business {
   id: string;
   name: string;
@@ -33,6 +47,7 @@ export interface Branch {
   id: string;
   businessId: string;
   name: string;
+  tipos: BranchTipo[];  // Array de tipos de sucursal (obligatorio)
   address?: string;
   coordinates: CoordinatesType;
   phone: string;
@@ -61,6 +76,7 @@ export interface CreateBusinessInput {
 
 export interface RegisterBranchInput {
   name: string;
+  tipos: BranchTipo[];  // Obligatorio al crear
   coordinates: Coordinates;
   phone: string;
   schedule: Record<string, string[]>;  // Backend expects array of time ranges
@@ -74,6 +90,7 @@ export interface RegisterBranchInput {
 export interface CreateBranchInput {
   businessId: string;
   name: string;
+  tipos: BranchTipo[];  // Obligatorio al crear
   coordinates: Coordinates;
   phone: string;
   schedule: Record<string, string[]>;  // Backend expects array of time ranges
@@ -98,6 +115,7 @@ export interface UpdateBusinessInput {
 
 export interface UpdateBranchInput {
   name?: string;
+  tipos?: BranchTipo[];  // Opcional al actualizar
   address?: string;
   phone?: string;
   schedule?: Record<string, string[]>;  // Backend expects array of time ranges

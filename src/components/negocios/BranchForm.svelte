@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Branch, Business } from '@/lib/business';
+  import { BranchTipo, BRANCH_TIPO_LABELS } from '@/lib/business';
   import ImageUploader from './ImageUploader.svelte';
   import LocationPicker from './LocationPicker.svelte';
 
@@ -38,7 +39,8 @@
   let name = $state(branch?.name ?? '');
   let address = $state(branch?.address ?? '');
   let phone = $state(branch?.phone ?? '');
-  
+  let selectedTipos = $state<BranchTipo[]>(branch?.tipos ?? []);
+
   // Convert schedule object to string for display
   // Backend format: { "Lun-Vie": ["9:00-18:00"] } or legacy { "Lun-Vie": "9:00-18:00" }
   function scheduleToString(schedule?: Record<string, string | string[]>): string {
@@ -72,6 +74,7 @@
   // Track original values for detecting changes in edit mode
   const originalValues = branch ? {
     name: branch.name,
+    tipos: JSON.stringify(branch.tipos.sort()),  // Stringify for comparison
     address: branch.address ?? '',
     phone: branch.phone,
     schedule: scheduleToString(branch.schedule),
@@ -98,6 +101,14 @@
     coordinates = coords;
   }
 
+  function handleTipoToggle(tipo: BranchTipo) {
+    if (selectedTipos.includes(tipo)) {
+      selectedTipos = selectedTipos.filter(t => t !== tipo);
+    } else {
+      selectedTipos = [...selectedTipos, tipo];
+    }
+  }
+
   // Parse schedule string to object
   // Format: "Lun-Vie: 9:00-18:00, Sab: 10:00-14:00"
   // Backend expects: { "Lun-Vie": ["9:00-18:00"], "Sab": ["10:00-14:00"] }
@@ -120,10 +131,13 @@
   // Get only changed fields for update mutation
   function getChangedFields(): Record<string, unknown> {
     if (!originalValues) return {};
-    
+
     const changes: Record<string, unknown> = {};
-    
+
     if (name !== originalValues.name) changes.name = name;
+    if (JSON.stringify(selectedTipos.sort()) !== originalValues.tipos) {
+      changes.tipos = selectedTipos;
+    }
     if (address !== originalValues.address) changes.address = address || undefined;
     if (phone !== originalValues.phone) changes.phone = phone;
     if (schedule !== originalValues.schedule) changes.schedule = parseSchedule(schedule);
@@ -132,12 +146,12 @@
     }
     if (avatarPath !== originalValues.avatar) changes.avatar = avatarPath || undefined;
     if (coverPath !== originalValues.coverImage) changes.coverImage = coverPath || undefined;
-    
+
     // Check if coordinates changed
     if (coordinates.lat !== originalValues.lat || coordinates.lng !== originalValues.lng) {
       changes.coordinates = { lat: coordinates.lat, lng: coordinates.lng };
     }
-    
+
     return changes;
   }
 
@@ -145,6 +159,13 @@
     e.preventDefault();
     isSubmitting = true;
     errorMessage = '';
+
+    // Validate tipos selection
+    if (selectedTipos.length === 0) {
+      errorMessage = 'Debes seleccionar al menos un tipo de sucursal';
+      isSubmitting = false;
+      return;
+    }
 
     try {
       if (isEditMode && branch) {
@@ -173,6 +194,7 @@
                 updateBranch(branchId: $branchId, input: $input, jwt: $jwt) {
                   id
                   name
+                  tipos
                   address
                   phone
                   status
@@ -215,6 +237,7 @@
                 createBranch(input: $input, jwt: $jwt) {
                   id
                   name
+                  tipos
                   address
                   phone
                   status
@@ -228,6 +251,7 @@
               input: {
                 businessId: business.id,
                 name: name || `${business.name} - Nueva Sucursal`,
+                tipos: selectedTipos,
                 coordinates: { lat: coordinates.lat, lng: coordinates.lng },
                 phone,
                 schedule: scheduleObj,
@@ -363,6 +387,43 @@
           step="0.5"
           min="0"
         />
+      </div>
+    </div>
+
+    <!-- Branch Type Section -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 3h7v7H3z"/>
+          <path d="M14 3h7v7h-7z"/>
+          <path d="M14 14h7v7h-7z"/>
+          <path d="M3 14h7v7H3z"/>
+        </svg>
+        Tipo de Sucursal
+        <span class="required">*</span>
+      </h3>
+
+      <div class="tipo-selector">
+        <p class="tipo-description">Selecciona al menos un tipo que mejor describa tu sucursal</p>
+        <div class="tipo-options">
+          {#each Object.values(BranchTipo) as tipo}
+            <button
+              type="button"
+              class="tipo-option"
+              class:selected={selectedTipos.includes(tipo)}
+              onclick={() => handleTipoToggle(tipo)}
+            >
+              <div class="tipo-checkbox">
+                {#if selectedTipos.includes(tipo)}
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                {/if}
+              </div>
+              <span class="tipo-label">{BRANCH_TIPO_LABELS[tipo]}</span>
+            </button>
+          {/each}
+        </div>
       </div>
     </div>
 
@@ -659,7 +720,70 @@
     to { transform: rotate(360deg); }
   }
 
+  /* Branch Type Selector Styles */
+  .tipo-selector {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+  }
 
+  .tipo-description {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-variant);
+    margin: 0;
+  }
+
+  .tipo-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-md);
+  }
+
+  .tipo-option {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
+    cursor: pointer;
+  }
+
+  .tipo-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(225, 199, 142, 0.3);
+  }
+
+  .tipo-option.selected {
+    background: linear-gradient(135deg, rgba(225, 199, 142, 0.15) 0%, rgba(178, 214, 154, 0.15) 100%);
+    border-color: var(--color-secondary);
+  }
+
+  .tipo-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-base);
+    flex-shrink: 0;
+  }
+
+  .tipo-option.selected .tipo-checkbox {
+    background: var(--color-secondary);
+    border-color: var(--color-secondary);
+    color: var(--color-primary);
+  }
+
+  .tipo-label {
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--color-text);
+  }
 
   @media (max-width: 480px) {
     .form-actions {

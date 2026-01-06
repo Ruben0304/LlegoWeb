@@ -57,6 +57,7 @@
                 id
                 businessId
                 name
+                tipos
                 address
                 phone
                 status

@@ -44,6 +44,7 @@ export const GET_BRANCHES = gql`
       id
       businessId
       name
+      tipos
       address
       phone
       status
@@ -65,6 +66,7 @@ export const GET_BRANCH = gql`
       id
       businessId
       name
+      tipos
       address
       phone
       schedule
@@ -99,6 +101,7 @@ export const GET_MY_BRANCHES = gql`
     branches(businessId: $businessId, jwt: $jwt) {
       id
       name
+      tipos
       address
       status
       avatarUrl
