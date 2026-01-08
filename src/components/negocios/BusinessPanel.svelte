@@ -303,29 +303,38 @@
         },
         body: JSON.stringify({
           query: `
-            query GetProducts($branchId: String!, $jwt: String!) {
-              products(branchId: $branchId, jwt: $jwt) {
-                id
-                name
-                description
-                weight
-                price
-                currency
-                image
-                imageUrl
-                availability
-                categoryId
+            query GetProducts($first: Int!, $branchId: String!, $availableOnly: Boolean!, $jwt: String!) {
+              products(first: $first, branchId: $branchId, availableOnly: $availableOnly, jwt: $jwt) {
+                edges {
+                  node {
+                    id
+                    name
+                    description
+                    weight
+                    price
+                    currency
+                    image
+                    imageUrl
+                    availability
+                    categoryId
+                  }
+                }
+                pageInfo {
+                  hasNextPage
+                  endCursor
+                  totalCount
+                }
               }
             }
           `,
-          variables: { branchId, jwt },
+          variables: { first: 100, branchId, availableOnly: false, jwt },
         }),
       });
 
       const result = await response.json();
 
-      if (result.data?.products) {
-        products = result.data.products;
+      if (result.data?.products?.edges) {
+        products = result.data.products.edges.map((edge: any) => edge.node);
       }
     } catch (error) {
       console.error("Error loading products:", error);

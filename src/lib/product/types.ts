@@ -2,6 +2,28 @@
  * Types para el feature de productos
  */
 
+// ==================== PAGINATION TYPES ====================
+
+export interface PageInfo {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string | null;
+  endCursor: string | null;
+  totalCount: number;
+}
+
+export interface ProductEdge {
+  node: Product;
+  cursor: string;
+}
+
+export interface ProductConnection {
+  edges: ProductEdge[];
+  pageInfo: PageInfo;
+}
+
+// ==================== PRODUCT TYPES ====================
+
 export interface Product {
   id: string;
   name: string;
@@ -28,18 +50,20 @@ export interface Category {
 }
 
 export interface ProductsResponse {
-  products: Product[];
-  total: number;
-  page: number;
-  pageSize: number;
+  products: ProductConnection;
 }
 
 export interface ProductFilters {
+  branchId?: string;
   categoryId?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  searchTerm?: string;
-  inStock?: boolean;
+  availableOnly?: boolean;
+  branchTipo?: string;
+  radiusKm?: number;
+}
+
+export interface ProductPaginationParams {
+  first: number;
+  after?: string;
 }
 
 /**

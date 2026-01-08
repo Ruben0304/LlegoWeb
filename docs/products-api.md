@@ -191,33 +191,108 @@ mutation DeleteProduct($productId: String!, $jwt: String) {
 
 ## Queries
 
-### Obtener Productos
+### Obtener Productos (con paginación por cursor)
+
+⚠️ **IMPORTANTE**: Esta query ahora usa paginación por cursor. La estructura de respuesta ha cambiado.
 
 ```graphql
-query GetProducts($branchId: String, $categoryId: String, $availableOnly: Boolean, $jwt: String) {
-  products(branchId: $branchId, categoryId: $categoryId, availableOnly: $availableOnly, jwt: $jwt) {
-    id
-    name
-    description
-    price
-    currency
-    availability
-    imageUrl
+query GetProducts(
+  $first: Int!
+  $after: String
+  $branchId: String
+  $categoryId: String
+  $availableOnly: Boolean!
+  $branchTipo: BranchTipo
+  $jwt: String
+) {
+  products(
+    first: $first
+    after: $after
+    branchId: $branchId
+    categoryId: $categoryId
+    availableOnly: $availableOnly
+    branchTipo: $branchTipo
+    jwt: $jwt
+  ) {
+    edges {
+      node {
+        id
+        name
+        description
+        price
+        currency
+        availability
+        imageUrl
+      }
+      cursor
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+      totalCount
+    }
   }
 }
 ```
 
-**Variables (por sucursal):**
+**Variables (primera carga - 20 productos):**
 ```json
 {
-  "branchId": "6774branch123"
+  "first": 20,
+  "availableOnly": true,
+  "branchTipo": "RESTAURANTE"
 }
 ```
 
-**Variables (solo disponibles):**
+**Variables (cargar más - scroll infinito):**
 ```json
 {
-  "availableOnly": true
+  "first": 20,
+  "after": "c2NvcmVkOjAuNTphYmMxMjM=",
+  "availableOnly": true,
+  "branchTipo": "RESTAURANTE"
+}
+```
+
+**Variables (por sucursal específica):**
+```json
+{
+  "first": 20,
+  "branchId": "6774branch123",
+  "availableOnly": false
+}
+```
+
+**Response:**
+```json
+{
+  "data": {
+    "products": {
+      "edges": [
+        {
+          "node": {
+            "id": "6774product789",
+            "name": "Hamburguesa Clásica",
+            "description": "Deliciosa hamburguesa",
+            "price": 15.99,
+            "currency": "USD",
+            "availability": true,
+            "imageUrl": "https://s3.../products/6774abc123.png?..."
+          },
+          "cursor": "c2NvcmVkOjAuOTphYmMxMjM="
+        }
+      ],
+      "pageInfo": {
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "startCursor": "c2NvcmVkOjAuOTphYmMxMjM=",
+        "endCursor": "c2NvcmVkOjAuNTp4eXo0NTY=",
+        "totalCount": 45
+      }
+    }
+  }
 }
 ```
 
@@ -271,24 +346,61 @@ query GetProduct($id: String!, $jwt: String) {
 
 ---
 
-### Buscar Productos
+### Buscar Productos (con paginación por cursor)
+
+⚠️ **IMPORTANTE**: Esta query ahora usa paginación por cursor.
 
 ```graphql
-query SearchProducts($query: String!, $limit: Int, $useVectorSearch: Boolean, $jwt: String) {
-  searchProducts(query: $query, limit: $limit, useVectorSearch: $useVectorSearch, jwt: $jwt) {
-    id
-    name
-    price
-    imageUrl
+query SearchProducts(
+  $query: String!
+  $first: Int!
+  $after: String
+  $useVectorSearch: Boolean!
+  $branchTipo: BranchTipo
+  $jwt: String
+) {
+  searchProducts(
+    query: $query
+    first: $first
+    after: $after
+    useVectorSearch: $useVectorSearch
+    branchTipo: $branchTipo
+    jwt: $jwt
+  ) {
+    edges {
+      node {
+        id
+        name
+        price
+        imageUrl
+      }
+      cursor
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+      totalCount
+    }
   }
 }
 ```
 
-**Variables:**
+**Variables (primera búsqueda):**
 ```json
 {
   "query": "hamburguesa",
-  "limit": 10,
+  "first": 20,
+  "useVectorSearch": true,
+  "branchTipo": "RESTAURANTE"
+}
+```
+
+**Variables (cargar más resultados):**
+```json
+{
+  "query": "hamburguesa",
+  "first": 20,
+  "after": "c2NvcmVkOjAuNTphYmMxMjM=",
   "useVectorSearch": true
 }
 ```

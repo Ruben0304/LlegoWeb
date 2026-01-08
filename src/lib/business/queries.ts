@@ -39,22 +39,48 @@ export const GET_BUSINESS = gql`
 `;
 
 export const GET_BRANCHES = gql`
-  query GetBranches($businessId: String, $jwt: String) {
-    branches(businessId: $businessId, jwt: $jwt) {
-      id
-      businessId
-      name
-      tipos
-      address
-      phone
-      status
-      avatarUrl
-      coverUrl
-      deliveryRadius
-      facilities
-      schedule
-      coordinates {
-        coordinates
+  query GetBranches(
+    $first: Int!
+    $after: String
+    $businessId: String
+    $onlyActive: Boolean
+    $tipo: BranchTipo
+    $jwt: String
+  ) {
+    branches(
+      first: $first
+      after: $after
+      businessId: $businessId
+      onlyActive: $onlyActive
+      tipo: $tipo
+      jwt: $jwt
+    ) {
+      edges {
+        node {
+          id
+          businessId
+          name
+          tipos
+          address
+          phone
+          status
+          avatarUrl
+          coverUrl
+          deliveryRadius
+          facilities
+          schedule
+          coordinates {
+            coordinates
+          }
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+        totalCount
       }
     }
   }
@@ -97,15 +123,35 @@ export const GET_MY_BUSINESSES = gql`
 `;
 
 export const GET_MY_BRANCHES = gql`
-  query GetMyBranches($businessId: String!, $jwt: String!) {
-    branches(businessId: $businessId, jwt: $jwt) {
-      id
-      name
-      tipos
-      address
-      status
-      avatarUrl
-      phone
+  query GetMyBranches(
+    $first: Int!
+    $after: String
+    $businessId: String!
+    $jwt: String!
+  ) {
+    branches(
+      first: $first
+      after: $after
+      businessId: $businessId
+      jwt: $jwt
+    ) {
+      edges {
+        node {
+          id
+          name
+          tipos
+          address
+          status
+          avatarUrl
+          phone
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+        totalCount
+      }
     }
   }
 `;

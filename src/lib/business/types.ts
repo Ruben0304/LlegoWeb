@@ -2,6 +2,28 @@
  * Types para el feature de negocios y sucursales
  */
 
+// ==================== PAGINATION TYPES ====================
+
+export interface PageInfo {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string | null;
+  endCursor: string | null;
+  totalCount: number;
+}
+
+export interface BranchEdge {
+  node: Branch;
+  cursor: string;
+}
+
+export interface BranchConnection {
+  edges: BranchEdge[];
+  pageInfo: PageInfo;
+}
+
+// ==================== COORDINATE TYPES ====================
+
 export interface Coordinates {
   lat: number;
   lng: number;
@@ -133,7 +155,12 @@ export interface BusinessesResponse {
 }
 
 export interface BranchesResponse {
-  branches: Branch[];
+  branches: BranchConnection;
+}
+
+export interface BranchPaginationParams {
+  first: number;
+  after?: string;
 }
 
 /**

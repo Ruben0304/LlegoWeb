@@ -19,11 +19,12 @@ import type {
 
 export async function getProducts(
   filters: ProductFilters = {},
-  pagination = { limit: 20, offset: 0 }
+  pagination: ProductPaginationParams = { first: 20 }
 ) {
   const variables = {
     ...pagination,
     ...filters,
+    availableOnly: filters.availableOnly ?? true,
   };
 
   return query<ProductsResponse>(GET_PRODUCTS, variables);
@@ -37,8 +38,26 @@ export async function getCategories() {
   return query<{ categories: Category[] }>(GET_CATEGORIES);
 }
 
-export async function searchProducts(searchTerm: string, limit = 10) {
-  return query<{ searchProducts: Product[] }>(SEARCH_PRODUCTS, { searchTerm, limit });
+export async function searchProducts(
+  searchQuery: string,
+  pagination: ProductPaginationParams = { first: 20 },
+  options: {
+    useVectorSearch?: boolean;
+    branchTipo?: string;
+    radiusKm?: number;
+    jwt?: string;
+  } = {}
+) {
+  const variables = {
+    query: searchQuery,
+    ...pagination,
+    useVectorSearch: options.useVectorSearch ?? true,
+    branchTipo: options.branchTipo,
+    radiusKm: options.radiusKm,
+    jwt: options.jwt,
+  };
+
+  return query<{ searchProducts: ProductConnection }>(SEARCH_PRODUCTS, variables);
 }
 
 // ==================== MUTATIONS ====================

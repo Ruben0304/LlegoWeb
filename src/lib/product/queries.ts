@@ -6,45 +6,51 @@ import { gql } from 'graphql-request';
 
 export const GET_PRODUCTS = gql`
   query GetProducts(
-    $limit: Int
-    $offset: Int
+    $first: Int!
+    $after: String
+    $ids: [String!]
+    $branchId: String
     $categoryId: String
-    $minPrice: Float
-    $maxPrice: Float
-    $searchTerm: String
-    $inStock: Boolean
+    $availableOnly: Boolean!
+    $branchTipo: BranchTipo
+    $radiusKm: Float
+    $jwt: String
   ) {
     products(
-      limit: $limit
-      offset: $offset
+      first: $first
+      after: $after
+      ids: $ids
+      branchId: $branchId
       categoryId: $categoryId
-      minPrice: $minPrice
-      maxPrice: $maxPrice
-      searchTerm: $searchTerm
-      inStock: $inStock
+      availableOnly: $availableOnly
+      branchTipo: $branchTipo
+      radiusKm: $radiusKm
+      jwt: $jwt
     ) {
-      id
-      name
-      price
-      description
-      imageUrl
-      stock
-      category {
-        id
-        name
-        icon
-        gradient
+      edges {
+        node {
+          id
+          name
+          price
+          description
+          imageUrl
+          availability
+          categoryId
+          branchId
+          currency
+          weight
+          createdAt
+        }
+        cursor
       }
-      createdAt
-      updatedAt
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+        totalCount
+      }
     }
-    total: productsCount(
-      categoryId: $categoryId
-      minPrice: $minPrice
-      maxPrice: $maxPrice
-      searchTerm: $searchTerm
-      inStock: $inStock
-    )
   }
 `;
 
@@ -81,15 +87,40 @@ export const GET_CATEGORIES = gql`
 `;
 
 export const SEARCH_PRODUCTS = gql`
-  query SearchProducts($searchTerm: String!, $limit: Int) {
-    searchProducts(searchTerm: $searchTerm, limit: $limit) {
-      id
-      name
-      price
-      imageUrl
-      category {
-        id
-        name
+  query SearchProducts(
+    $query: String!
+    $first: Int!
+    $after: String
+    $useVectorSearch: Boolean!
+    $branchTipo: BranchTipo
+    $radiusKm: Float
+    $jwt: String
+  ) {
+    searchProducts(
+      query: $query
+      first: $first
+      after: $after
+      useVectorSearch: $useVectorSearch
+      branchTipo: $branchTipo
+      radiusKm: $radiusKm
+      jwt: $jwt
+    ) {
+      edges {
+        node {
+          id
+          name
+          price
+          imageUrl
+          categoryId
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+        totalCount
       }
     }
   }

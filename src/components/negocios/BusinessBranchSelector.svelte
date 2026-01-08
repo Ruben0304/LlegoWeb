@@ -52,20 +52,29 @@
                 },
                 body: JSON.stringify({
                     query: `
-            query GetBranches($businessId: String!, $jwt: String!) {
-              branches(businessId: $businessId, jwt: $jwt) {
-                id
-                businessId
-                name
-                tipos
-                address
-                phone
-                status
-                avatarUrl
+            query GetBranches($first: Int!, $businessId: String!, $jwt: String!) {
+              branches(first: $first, businessId: $businessId, jwt: $jwt) {
+                edges {
+                  node {
+                    id
+                    businessId
+                    name
+                    tipos
+                    address
+                    phone
+                    status
+                    avatarUrl
+                  }
+                }
+                pageInfo {
+                  hasNextPage
+                  endCursor
+                  totalCount
+                }
               }
             }
           `,
-                    variables: { businessId, jwt },
+                    variables: { first: 100, businessId, jwt },
                 }),
             });
 
@@ -77,7 +86,7 @@
                 );
             }
 
-            branches = result.data?.branches || [];
+            branches = result.data?.branches?.edges?.map((edge: any) => edge.node) || [];
         } catch (error) {
             console.error("Error loading branches:", error);
             errorMessage =
@@ -126,7 +135,6 @@
         errorMessage = "";
 
         try {
-            // Backend doesn't have deleteBusiness, so we deactivate instead
             const response = await fetch(`${BACKEND_URL}/graphql`, {
                 method: "POST",
                 headers: {
@@ -158,7 +166,6 @@
                 );
             }
 
-            // Clear selection if deactivated business was selected
             if (selectedBusinessId === business.id) {
                 selectedBusinessId = "";
                 branches = [];
@@ -179,73 +186,44 @@
 </script>
 
 <div class="selector-container">
+    <!-- Header -->
     <div class="selector-header">
-        <div class="selector-icon">
-            <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-            >
+        <div class="header-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                 <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
         </div>
-        <div>
-            <h2 class="selector-title">Seleccionar Ubicación</h2>
-            <p class="selector-subtitle">Elige dónde agregar el producto</p>
+        <div class="header-content">
+            <h2 class="header-title">Seleccionar Ubicación</h2>
+            <p class="header-subtitle">Elige el negocio y sucursal</p>
         </div>
     </div>
 
     {#if errorMessage}
-        <div class="error-message">
-            <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-            >
+        <div class="alert alert-error">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
-            {errorMessage}
+            <span>{errorMessage}</span>
         </div>
     {/if}
 
     {#if businesses.length === 0}
-        <!-- No businesses yet -->
+        <!-- Empty State -->
         <div class="empty-state">
             <div class="empty-icon">
-                <svg
-                    width="48"
-                    height="48"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                >
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                     <polyline points="9 22 9 12 15 12 15 22" />
                 </svg>
             </div>
             <h3 class="empty-title">Sin negocios registrados</h3>
-            <p class="empty-text">
-                Crea tu primer negocio para comenzar a agregar productos
-            </p>
-            <button class="create-btn primary" onclick={onCreateBusiness}>
-                <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                >
+            <p class="empty-description">Crea tu primer negocio para comenzar a agregar productos</p>
+            <button class="btn btn-primary" onclick={onCreateBusiness}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <line x1="12" y1="5" x2="12" y2="19" />
                     <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
@@ -253,33 +231,33 @@
             </button>
         </div>
     {:else}
-        <!-- Business list with delete option -->
-        <div class="form-group">
-            <label>
-                Negocio
-                <span class="required">*</span>
-            </label>
-            <div class="businesses-list">
+        <!-- Business Selection -->
+        <div class="section">
+            <div class="section-label">
+                <span class="label-text">Negocio</span>
+                <span class="label-required">*</span>
+            </div>
+            
+            <div class="business-grid">
                 {#each businesses as business}
                     <div 
-                        class="business-item" 
+                        class="business-card" 
                         class:selected={selectedBusinessId === business.id}
                         class:deleting={deletingBusinessId === business.id}
                     >
                         {#if confirmDeleteId === business.id}
-                            <!-- Confirm delete state -->
-                            <div class="confirm-delete">
-                                <span class="confirm-text">¿Desactivar "{business.name}"?</span>
-                                <div class="confirm-actions">
+                            <div class="confirm-overlay">
+                                <p class="confirm-message">¿Desactivar este negocio?</p>
+                                <div class="confirm-buttons">
                                     <button 
-                                        class="confirm-btn cancel" 
+                                        class="btn btn-ghost btn-sm" 
                                         onclick={handleCancelDelete}
                                         disabled={deletingBusinessId === business.id}
                                     >
                                         Cancelar
                                     </button>
                                     <button 
-                                        class="confirm-btn delete" 
+                                        class="btn btn-danger btn-sm" 
                                         onclick={() => handleConfirmDelete(business)}
                                         disabled={deletingBusinessId === business.id}
                                     >
@@ -292,9 +270,8 @@
                                 </div>
                             </div>
                         {:else}
-                            <!-- Normal state -->
                             <button 
-                                class="business-item-btn"
+                                class="business-card-content"
                                 onclick={() => {
                                     selectedBusinessId = business.id;
                                     if (selectedBusiness) {
@@ -303,31 +280,40 @@
                                     }
                                 }}
                             >
-                                <div class="business-avatar-sm">
+                                <div class="business-avatar">
                                     {#if business.avatarUrl}
                                         <img src={business.avatarUrl} alt={business.name} />
                                     {:else}
-                                        <span>{business.name.charAt(0).toUpperCase()}</span>
+                                        <span class="avatar-letter">{business.name.charAt(0).toUpperCase()}</span>
                                     {/if}
                                 </div>
-                                <div class="business-info">
+                                <div class="business-details">
                                     <span class="business-name">{business.name}</span>
                                     <span class="business-type">{business.type}</span>
                                 </div>
-                                <div class="business-status" class:active={business.isActive}>
-                                    {business.isActive ? "Activo" : "Inactivo"}
+                                <div class="business-meta">
+                                    <span class="status-badge" class:active={business.isActive}>
+                                        <span class="status-dot"></span>
+                                        {business.isActive ? "Activo" : "Inactivo"}
+                                    </span>
                                 </div>
+                                {#if selectedBusinessId === business.id}
+                                    <div class="selected-indicator">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                            <polyline points="20 6 9 17 4 12" />
+                                        </svg>
+                                    </div>
+                                {/if}
                             </button>
                             {#if onDeleteBusiness}
                                 <button 
-                                    class="delete-btn"
+                                    class="card-action-btn"
                                     onclick={(e) => handleDeleteClick(e, business.id)}
                                     title="Desactivar negocio"
                                 >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <line x1="15" y1="9" x2="9" y2="15"/>
-                                        <line x1="9" y1="9" x2="15" y2="15"/>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"/>
+                                        <line x1="6" y1="6" x2="18" y2="18"/>
                                     </svg>
                                 </button>
                             {/if}
@@ -338,140 +324,68 @@
         </div>
 
         {#if selectedBusinessId}
-            <!-- Selected business card -->
-            <div class="selected-business-card">
-                <div class="business-avatar">
-                    {#if selectedBusiness?.avatarUrl}
-                        <img
-                            src={selectedBusiness.avatarUrl}
-                            alt={selectedBusiness.name}
-                        />
-                    {:else}
-                        <span
-                            >{selectedBusiness?.name
-                                .charAt(0)
-                                .toUpperCase()}</span
-                        >
-                    {/if}
-                </div>
-                <div class="business-info">
-                    <span class="business-name">{selectedBusiness?.name}</span>
-                    <span class="business-type">{selectedBusiness?.type}</span>
-                </div>
-                <div
-                    class="business-status"
-                    class:active={selectedBusiness?.isActive}
-                >
-                    {selectedBusiness?.isActive ? "Activo" : "Inactivo"}
-                </div>
-            </div>
-
-            <!-- Branch list section -->
-            <div class="branches-section">
+            <!-- Branches Section -->
+            <div class="section branches-section">
                 <div class="section-header">
-                    <h3 class="section-title">
-                        <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path
-                                d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
-                            />
+                    <div class="section-label">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                             <circle cx="12" cy="10" r="3" />
                         </svg>
-                        Sucursales
-                    </h3>
-                    <button class="add-branch-btn" onclick={handleCreateBranch}>
-                        <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
+                        <span class="label-text">Sucursales</span>
+                    </div>
+                    <button class="btn btn-outline btn-sm" onclick={handleCreateBranch}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                             <line x1="12" y1="5" x2="12" y2="19" />
                             <line x1="5" y1="12" x2="19" y2="12" />
                         </svg>
-                        Agregar
+                        Nueva
                     </button>
                 </div>
 
                 {#if isLoadingBranches}
                     <div class="loading-state">
                         <span class="spinner"></span>
-                        <span>Cargando sucursales...</span>
+                        <span class="loading-text">Cargando sucursales...</span>
                     </div>
                 {:else if branches.length === 0}
                     <div class="empty-branches">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                            <circle cx="12" cy="10" r="3" />
+                        </svg>
                         <p>No hay sucursales registradas</p>
-                        <button
-                            class="create-branch-link"
-                            onclick={handleCreateBranch}
-                        >
+                        <button class="link-btn" onclick={handleCreateBranch}>
                             Crear primera sucursal
                         </button>
                     </div>
                 {:else}
-                    <div class="branches-list">
+                    <div class="branches-grid">
                         {#each branches as branch}
-                            <button
-                                class="branch-card"
-                                onclick={() => handleBranchClick(branch)}
-                            >
+                            <button class="branch-card" onclick={() => handleBranchClick(branch)}>
                                 <div class="branch-avatar">
                                     {#if branch.avatarUrl}
-                                        <img
-                                            src={branch.avatarUrl}
-                                            alt={branch.name}
-                                        />
+                                        <img src={branch.avatarUrl} alt={branch.name} />
                                     {:else}
-                                        <svg
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="2"
-                                        >
-                                            <path
-                                                d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
-                                            />
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                                             <circle cx="12" cy="10" r="3" />
                                         </svg>
                                     {/if}
                                 </div>
-                                <div class="branch-info">
-                                    <span class="branch-name"
-                                        >{branch.name}</span
-                                    >
+                                <div class="branch-details">
+                                    <span class="branch-name">{branch.name}</span>
                                     {#if branch.address}
-                                        <span class="branch-address"
-                                            >{branch.address}</span
-                                        >
+                                        <span class="branch-address">{branch.address}</span>
                                     {/if}
                                 </div>
-                                <div
-                                    class="branch-status"
-                                    class:active={branch.status === "active"}
-                                >
-                                    {branch.status === "active"
-                                        ? "Activa"
-                                        : "Inactiva"}
+                                <div class="branch-meta">
+                                    <span class="status-badge status-sm" class:active={branch.status === "active"}>
+                                        <span class="status-dot"></span>
+                                        {branch.status === "active" ? "Activa" : "Inactiva"}
+                                    </span>
                                 </div>
-                                <svg
-                                    class="branch-arrow"
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
+                                <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polyline points="9 18 15 12 9 6" />
                                 </svg>
                             </button>
@@ -481,80 +395,92 @@
             </div>
         {/if}
 
-        <!-- Create new business option -->
-        <div class="create-business-section">
-            <div class="divider">
-                <span>o</span>
-            </div>
-            <button class="create-btn secondary" onclick={onCreateBusiness}>
-                <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                >
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                Crear Nuevo Negocio
-            </button>
+        <!-- Create New Business -->
+        <div class="divider-section">
+            <div class="divider-line"></div>
+            <span class="divider-text">o</span>
+            <div class="divider-line"></div>
         </div>
+        
+        <button class="btn btn-secondary btn-full" onclick={onCreateBusiness}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Crear Nuevo Negocio
+        </button>
     {/if}
 </div>
 
+
 <style>
+    /* Container */
     .selector-container {
         height: 100%;
+        padding: 4px;
     }
 
+    /* Header */
     .selector-header {
         display: flex;
-        align-items: flex-start;
-        gap: var(--spacing-md);
-        margin-bottom: var(--spacing-xl);
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .selector-icon {
-        width: 44px;
-        height: 44px;
+    .header-icon {
+        width: 48px;
+        height: 48px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(
-            135deg,
-            rgba(90, 132, 103, 0.2) 0%,
-            rgba(178, 214, 154, 0.2) 100%
-        );
-        border-radius: var(--radius-lg);
-        color: var(--color-accent);
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+        border: 1px solid rgba(99, 102, 241, 0.25);
+        border-radius: 12px;
+        color: #a5b4fc;
         flex-shrink: 0;
     }
 
-    .selector-title {
-        font-size: var(--font-size-xl);
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        margin-bottom: 2px;
+    .header-content {
+        flex: 1;
     }
 
-    .selector-subtitle {
-        font-size: var(--font-size-sm);
-        color: var(--color-text-variant);
+    .header-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #f1f5f9;
+        margin: 0 0 4px 0;
+        letter-spacing: -0.01em;
     }
 
-    .error-message {
+    .header-subtitle {
+        font-size: 13px;
+        color: #94a3b8;
+        margin: 0;
+    }
+
+    /* Alert */
+    .alert {
         display: flex;
         align-items: center;
-        gap: var(--spacing-sm);
-        padding: var(--spacing-md);
-        background: rgba(255, 59, 48, 0.1);
-        border: 1px solid rgba(255, 59, 48, 0.3);
-        border-radius: var(--radius-md);
-        color: #ff6b6b;
-        font-size: var(--font-size-sm);
-        margin-bottom: var(--spacing-lg);
+        gap: 10px;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .alert-error {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.25);
+        color: #fca5a5;
+    }
+
+    .alert-error svg {
+        flex-shrink: 0;
+        color: #f87171;
     }
 
     /* Empty State */
@@ -563,98 +489,117 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
-        padding: var(--spacing-3xl) var(--spacing-lg);
+        padding: 48px 24px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
     }
 
     .empty-icon {
-        width: 88px;
-        height: 88px;
+        width: 80px;
+        height: 80px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(99, 102, 241, 0.1);
         border-radius: 50%;
-        color: var(--color-text-variant);
-        margin-bottom: var(--spacing-xl);
+        color: #818cf8;
+        margin-bottom: 20px;
     }
 
     .empty-title {
-        font-size: var(--font-size-lg);
+        font-size: 16px;
         font-weight: 600;
-        margin-bottom: var(--spacing-sm);
+        color: #e2e8f0;
+        margin: 0 0 8px 0;
     }
 
-    .empty-text {
-        font-size: var(--font-size-sm);
-        color: var(--color-text-variant);
-        max-width: 280px;
-        margin-bottom: var(--spacing-xl);
+    .empty-description {
+        font-size: 13px;
+        color: #94a3b8;
+        max-width: 260px;
+        margin: 0 0 24px 0;
+        line-height: 1.5;
     }
 
-    /* Form Group */
-    .form-group {
+    /* Sections */
+    .section {
+        margin-bottom: 24px;
+    }
+
+    .section-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    .section-label svg {
+        color: #818cf8;
+    }
+
+    .label-text {
+        font-size: 12px;
+        font-weight: 600;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .label-required {
+        color: #f87171;
+        font-size: 14px;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    /* Business Grid */
+    .business-grid {
         display: flex;
         flex-direction: column;
-        gap: var(--spacing-sm);
-        margin-bottom: var(--spacing-lg);
+        gap: 10px;
     }
 
-    .form-group label {
-        font-size: var(--font-size-sm);
-        font-weight: 500;
-        color: var(--color-text-variant);
-    }
-
-    .required {
-        color: #ff6b6b;
-        margin-left: 2px;
-    }
-
-    .select-wrapper {
+    .business-card {
         position: relative;
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        overflow: hidden;
     }
 
-    .select-wrapper select {
-        width: 100%;
-        padding: var(--spacing-md) var(--spacing-lg);
-        padding-right: calc(var(--spacing-lg) + 20px);
-        font-size: var(--font-size-base);
-        font-family: inherit;
-        color: var(--color-text);
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: var(--radius-lg);
-        appearance: none;
-        cursor: pointer;
-        transition: all var(--transition-base);
+    .business-card:hover {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: rgba(255, 255, 255, 0.12);
     }
 
-    .select-wrapper select:focus {
-        outline: none;
-        border-color: var(--color-secondary);
-        background: rgba(255, 255, 255, 0.08);
-        box-shadow: 0 0 0 4px rgba(225, 199, 142, 0.1);
+    .business-card.selected {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: rgba(99, 102, 241, 0.4);
+        box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
     }
 
-    .select-arrow {
-        position: absolute;
-        right: var(--spacing-lg);
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--color-text-variant);
+    .business-card.deleting {
+        opacity: 0.5;
         pointer-events: none;
     }
 
-    /* Selected Business Card */
-    .selected-business-card {
+    .business-card-content {
         display: flex;
         align-items: center;
-        gap: var(--spacing-md);
-        padding: var(--spacing-md);
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: var(--radius-lg);
-        margin-bottom: var(--spacing-xl);
+        gap: 14px;
+        width: 100%;
+        padding: 14px 16px;
+        background: none;
+        border: none;
+        text-align: left;
+        cursor: pointer;
     }
 
     .business-avatar {
@@ -663,12 +608,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(
-            135deg,
-            var(--color-secondary) 0%,
-            var(--color-accent) 100%
-        );
-        border-radius: var(--radius-md);
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border-radius: 10px;
         overflow: hidden;
         flex-shrink: 0;
     }
@@ -679,168 +620,165 @@
         object-fit: cover;
     }
 
-    .business-avatar span {
-        font-size: var(--font-size-lg);
+    .avatar-letter {
+        font-size: 18px;
         font-weight: 700;
-        color: var(--color-primary);
+        color: #ffffff;
     }
 
-    .business-info {
+    .business-details {
         flex: 1;
+        min-width: 0;
         display: flex;
         flex-direction: column;
-        min-width: 0;
+        gap: 2px;
     }
 
     .business-name {
-        font-size: var(--font-size-base);
+        font-size: 14px;
         font-weight: 600;
+        color: #f1f5f9;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
     .business-type {
-        font-size: var(--font-size-xs);
-        color: var(--color-text-variant);
+        font-size: 12px;
+        color: #94a3b8;
         text-transform: capitalize;
     }
 
-    .business-status {
-        padding: 4px 10px;
-        font-size: var(--font-size-xs);
-        font-weight: 500;
-        border-radius: var(--radius-full);
-        background: rgba(255, 255, 255, 0.1);
-        color: var(--color-text-variant);
+    .business-meta {
+        flex-shrink: 0;
     }
 
-    .business-status.active {
-        background: rgba(52, 199, 89, 0.15);
-        color: #34c759;
+    /* Status Badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        font-size: 11px;
+        font-weight: 500;
+        border-radius: 20px;
+        background: rgba(100, 116, 139, 0.2);
+        color: #94a3b8;
+    }
+
+    .status-badge.active {
+        background: rgba(34, 197, 94, 0.15);
+        color: #4ade80;
+    }
+
+    .status-badge.status-sm {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+
+    .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .selected-indicator {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #6366f1;
+        border-radius: 50%;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .card-action-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(239, 68, 68, 0.1);
+        border: none;
+        border-radius: 6px;
+        color: #f87171;
+        cursor: pointer;
+        opacity: 0;
+        transition: all 0.2s ease;
+    }
+
+    .business-card:hover .card-action-btn {
+        opacity: 1;
+    }
+
+    .card-action-btn:hover {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+    }
+
+    /* Confirm Overlay */
+    .confirm-overlay {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 20px;
+        background: rgba(239, 68, 68, 0.08);
+        text-align: center;
+    }
+
+    .confirm-message {
+        font-size: 13px;
+        font-weight: 500;
+        color: #fca5a5;
+        margin: 0;
+    }
+
+    .confirm-buttons {
+        display: flex;
+        gap: 8px;
     }
 
     /* Branches Section */
     .branches-section {
-        margin-bottom: var(--spacing-xl);
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .section-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: var(--spacing-md);
-    }
-
-    .section-title {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-sm);
-        font-size: var(--font-size-sm);
-        font-weight: 600;
-        color: var(--color-text-variant);
-    }
-
-    .section-title svg {
-        color: var(--color-secondary);
-    }
-
-    .add-branch-btn {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-        padding: var(--spacing-xs) var(--spacing-sm);
-        font-size: var(--font-size-xs);
-        font-weight: 500;
-        color: var(--color-secondary);
-        background: rgba(225, 199, 142, 0.1);
-        border-radius: var(--radius-full);
-        transition: all var(--transition-base);
-    }
-
-    .add-branch-btn:hover {
-        background: rgba(225, 199, 142, 0.2);
-    }
-
-    .loading-state {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: var(--spacing-sm);
-        padding: var(--spacing-xl);
-        color: var(--color-text-variant);
-        font-size: var(--font-size-sm);
-    }
-
-    .spinner {
-        width: 18px;
-        height: 18px;
-        border: 2px solid transparent;
-        border-top-color: var(--color-secondary);
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-
-    .empty-branches {
+    .branches-grid {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        padding: var(--spacing-xl);
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px dashed rgba(255, 255, 255, 0.1);
-        border-radius: var(--radius-lg);
-        text-align: center;
-    }
-
-    .empty-branches p {
-        font-size: var(--font-size-sm);
-        color: var(--color-text-variant);
-        margin-bottom: var(--spacing-md);
-    }
-
-    .create-branch-link {
-        font-size: var(--font-size-sm);
-        font-weight: 500;
-        color: var(--color-secondary);
-        background: none;
-        padding: 0;
-        text-decoration: underline;
-        text-underline-offset: 3px;
-    }
-
-    .create-branch-link:hover {
-        color: var(--color-accent);
-    }
-
-    .branches-list {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-sm);
+        gap: 8px;
     }
 
     .branch-card {
         display: flex;
         align-items: center;
-        gap: var(--spacing-md);
+        gap: 12px;
         width: 100%;
-        padding: var(--spacing-md);
-        background: rgba(255, 255, 255, 0.02);
+        padding: 12px 14px;
+        background: rgba(30, 41, 59, 0.4);
         border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: var(--radius-lg);
+        border-radius: 10px;
         text-align: left;
-        transition: all var(--transition-base);
         cursor: pointer;
+        transition: all 0.2s ease;
     }
 
     .branch-card:hover {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(30, 41, 59, 0.7);
         border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .branch-card:hover .chevron-icon {
+        transform: translateX(3px);
+        color: #a5b4fc;
     }
 
     .branch-avatar {
@@ -849,11 +787,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: var(--radius-md);
+        background: rgba(99, 102, 241, 0.15);
+        border-radius: 8px;
         overflow: hidden;
         flex-shrink: 0;
-        color: var(--color-text-variant);
+        color: #818cf8;
     }
 
     .branch-avatar img {
@@ -862,281 +800,221 @@
         object-fit: cover;
     }
 
-    .branch-info {
+    .branch-details {
         flex: 1;
+        min-width: 0;
         display: flex;
         flex-direction: column;
-        min-width: 0;
+        gap: 2px;
     }
 
     .branch-name {
-        font-size: var(--font-size-sm);
+        font-size: 13px;
         font-weight: 500;
-        color: var(--color-text);
+        color: #e2e8f0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
     .branch-address {
-        font-size: var(--font-size-xs);
-        color: var(--color-text-variant);
+        font-size: 11px;
+        color: #64748b;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
-    .branch-status {
-        padding: 3px 8px;
-        font-size: 10px;
-        font-weight: 500;
-        border-radius: var(--radius-full);
-        background: rgba(255, 255, 255, 0.1);
-        color: var(--color-text-variant);
+    .branch-meta {
         flex-shrink: 0;
     }
 
-    .branch-status.active {
-        background: rgba(52, 199, 89, 0.15);
-        color: #34c759;
-    }
-
-    .branch-arrow {
-        color: var(--color-text-variant);
+    .chevron-icon {
+        color: #64748b;
         flex-shrink: 0;
-        transition: transform var(--transition-base);
+        transition: all 0.2s ease;
     }
 
-    .branch-card:hover .branch-arrow {
-        transform: translateX(4px);
-        color: var(--color-secondary);
-    }
-
-    /* Create Business Section */
-    .create-business-section {
-        margin-top: var(--spacing-xl);
-    }
-
-    .divider {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-md);
-        margin-bottom: var(--spacing-lg);
-    }
-
-    .divider::before,
-    .divider::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: rgba(255, 255, 255, 0.1);
-    }
-
-    .divider span {
-        font-size: var(--font-size-xs);
-        color: var(--color-text-variant);
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-    }
-
-    /* Buttons */
-    .create-btn {
+    /* Loading State */
+    .loading-state {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: var(--spacing-sm);
-        width: 100%;
-        padding: var(--spacing-md) var(--spacing-xl);
-        font-size: var(--font-size-base);
-        font-weight: 600;
-        border-radius: var(--radius-full);
-        transition: all var(--transition-base);
+        gap: 10px;
+        padding: 32px;
+        color: #94a3b8;
     }
 
-    .create-btn.primary {
-        color: var(--color-primary);
-        background: linear-gradient(
-            135deg,
-            var(--color-secondary) 0%,
-            var(--color-accent) 100%
-        );
+    .loading-text {
+        font-size: 13px;
     }
 
-    .create-btn.primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(225, 199, 142, 0.3);
-    }
-
-    .create-btn.secondary {
-        color: var(--color-text);
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .create-btn.secondary:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    /* Business List Styles */
-    .businesses-list {
-        display: flex;
-        flex-direction: column;
-        gap: var(--spacing-sm);
-    }
-
-    .business-item {
-        display: flex;
-        align-items: center;
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: var(--radius-lg);
-        transition: all var(--transition-base);
-        overflow: hidden;
-    }
-
-    .business-item:hover {
-        background: rgba(255, 255, 255, 0.05);
-        border-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .business-item.selected {
-        border-color: var(--color-secondary);
-        background: rgba(225, 199, 142, 0.08);
-    }
-
-    .business-item.deleting {
-        opacity: 0.6;
-        pointer-events: none;
-    }
-
-    .business-item-btn {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-md);
-        padding: var(--spacing-md);
-        background: none;
-        text-align: left;
-        cursor: pointer;
-        min-width: 0;
-    }
-
-    .business-avatar-sm {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(
-            135deg,
-            var(--color-secondary) 0%,
-            var(--color-accent) 100%
-        );
-        border-radius: var(--radius-md);
-        overflow: hidden;
-        flex-shrink: 0;
-    }
-
-    .business-avatar-sm img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .business-avatar-sm span {
-        font-size: var(--font-size-base);
-        font-weight: 700;
-        color: var(--color-primary);
-    }
-
-    .delete-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        margin-right: var(--spacing-sm);
-        background: rgba(255, 59, 48, 0.1);
-        border-radius: var(--radius-md);
-        color: #ff6b6b;
-        transition: all var(--transition-base);
-        flex-shrink: 0;
-    }
-
-    .delete-btn:hover {
-        background: rgba(255, 59, 48, 0.2);
-        color: #ff4444;
-    }
-
-    /* Confirm Delete State */
-    .confirm-delete {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        padding: var(--spacing-md);
-        background: rgba(255, 59, 48, 0.08);
-        gap: var(--spacing-md);
-    }
-
-    .confirm-text {
-        font-size: var(--font-size-sm);
-        color: #ff6b6b;
-        flex: 1;
-        min-width: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .confirm-actions {
-        display: flex;
-        gap: var(--spacing-sm);
-        flex-shrink: 0;
-    }
-
-    .confirm-btn {
-        padding: var(--spacing-xs) var(--spacing-md);
-        font-size: var(--font-size-xs);
-        font-weight: 500;
-        border-radius: var(--radius-md);
-        transition: all var(--transition-base);
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-    }
-
-    .confirm-btn.cancel {
-        background: rgba(255, 255, 255, 0.1);
-        color: var(--color-text-variant);
-    }
-
-    .confirm-btn.cancel:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.15);
-        color: var(--color-text);
-    }
-
-    .confirm-btn.delete {
-        background: #ff4444;
-        color: white;
-    }
-
-    .confirm-btn.delete:hover:not(:disabled) {
-        background: #ff2222;
-    }
-
-    .confirm-btn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
+    .spinner {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(99, 102, 241, 0.2);
+        border-top-color: #6366f1;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
     }
 
     .spinner-sm {
         width: 12px;
         height: 12px;
-        border: 2px solid transparent;
+        border: 2px solid rgba(255, 255, 255, 0.2);
         border-top-color: currentColor;
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Empty Branches */
+    .empty-branches {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 32px 20px;
+        background: rgba(30, 41, 59, 0.3);
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .empty-branches svg {
+        margin-bottom: 12px;
+        opacity: 0.5;
+    }
+
+    .empty-branches p {
+        font-size: 13px;
+        margin: 0 0 12px 0;
+        color: #94a3b8;
+    }
+
+    .link-btn {
+        font-size: 13px;
+        font-weight: 500;
+        color: #818cf8;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+
+    .link-btn:hover {
+        color: #a5b4fc;
+    }
+
+    /* Divider */
+    .divider-section {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin: 28px 0 20px;
+    }
+
+    .divider-line {
+        flex: 1;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .divider-text {
+        font-size: 11px;
+        font-weight: 500;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    /* Buttons */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 8px;
+    }
+
+    .btn-full {
+        width: 100%;
+        padding: 14px 20px;
+    }
+
+    .btn-primary {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+    }
+
+    .btn-secondary {
+        padding: 14px 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #e2e8f0;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .btn-outline {
+        padding: 6px 12px;
+        background: transparent;
+        border: 1px solid rgba(99, 102, 241, 0.4);
+        color: #a5b4fc;
+    }
+
+    .btn-outline:hover {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: rgba(99, 102, 241, 0.6);
+    }
+
+    .btn-ghost {
+        background: rgba(255, 255, 255, 0.08);
+        color: #94a3b8;
+    }
+
+    .btn-ghost:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.12);
+        color: #e2e8f0;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover:not(:disabled) {
+        background: #dc2626;
+    }
+
+    .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 </style>
