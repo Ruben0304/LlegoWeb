@@ -3,13 +3,16 @@
  */
 
 import { query, mutation, backendUrl } from '@/lib/shared/graphql';
-import { GET_PRODUCTS, GET_PRODUCT_BY_ID, GET_CATEGORIES, SEARCH_PRODUCTS } from './queries';
+import { GET_PRODUCTS, GET_PRODUCT_BY_ID, GET_CATEGORIES, GET_PRODUCT_CATEGORIES, GET_PRODUCT_CATEGORY, SEARCH_PRODUCTS } from './queries';
 import { CREATE_PRODUCT, UPDATE_PRODUCT, DELETE_PRODUCT, UPDATE_PRODUCT_STOCK } from './mutations';
 import type {
   Product,
   ProductsResponse,
   ProductFilters,
+  ProductPaginationParams,
+  ProductConnection,
   Category,
+  ProductCategory,
   CreateProductInput,
   UpdateProductInput,
   UploadImageResponse
@@ -34,8 +37,27 @@ export async function getProductById(id: string) {
   return query<{ product: Product }>(GET_PRODUCT_BY_ID, { id });
 }
 
+// Legacy function - to be removed
 export async function getCategories() {
   return query<{ categories: Category[] }>(GET_CATEGORIES);
+}
+
+/**
+ * Obtiene las categorías de productos
+ * @param branchType - Tipo de negocio (opcional): "restaurante", "dulceria", "tienda"
+ * @returns Lista de categorías de productos
+ */
+export async function getProductCategories(branchType?: string) {
+  return query<{ product_categories: ProductCategory[] }>(GET_PRODUCT_CATEGORIES, { branchType });
+}
+
+/**
+ * Obtiene una categoría de producto por ID
+ * @param id - ID de la categoría
+ * @returns Categoría de producto
+ */
+export async function getProductCategory(id: string) {
+  return query<{ product_category: ProductCategory }>(GET_PRODUCT_CATEGORY, { id });
 }
 
 export async function searchProducts(
@@ -101,12 +123,13 @@ export async function createProduct(
   input: CreateProductInput,
   jwt: string
 ): Promise<Product> {
-  const result = await mutation<{ createProduct: Product }>(CREATE_PRODUCT, { input, jwt });
-  return result.createProduct;
+  const result = await mutation<{ create_product: Product }>(CREATE_PRODUCT, { input, jwt });
+  return result.create_product;
 }
 
-export async function updateProduct(id: string, input: UpdateProductInput, jwt?: string) {
-  return mutation<{ updateProduct: Product }>(UPDATE_PRODUCT, { id, input, jwt });
+export async function updateProduct(productId: string, input: UpdateProductInput, jwt?: string) {
+  const result = await mutation<{ update_product: Product }>(UPDATE_PRODUCT, { productId, input, jwt });
+  return result.update_product;
 }
 
 export async function deleteProduct(id: string) {

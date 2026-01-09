@@ -131,9 +131,14 @@
 
               <p class="product-description">{product.description}</p>
 
-              {#if product.weight}
-                <span class="product-weight">{product.weight}</span>
-              {/if}
+              <div class="product-meta">
+                {#if product.category}
+                  <span class="product-category">{product.category.name}</span>
+                {/if}
+                {#if product.weight}
+                  <span class="product-weight">{product.weight}</span>
+                {/if}
+              </div>
 
               <div class="product-actions">
                 <button
@@ -418,13 +423,28 @@
     overflow: hidden;
   }
 
+  .product-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+  }
+
+  .product-category {
+    font-size: var(--font-size-xs);
+    color: var(--color-secondary);
+    background: rgba(225, 199, 142, 0.15);
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+  }
+
   .product-weight {
     font-size: var(--font-size-xs);
     color: var(--color-text-variant);
     background: rgba(255, 255, 255, 0.08);
     padding: 2px 8px;
     border-radius: var(--radius-sm);
-    align-self: flex-start;
   }
 
   .product-actions {

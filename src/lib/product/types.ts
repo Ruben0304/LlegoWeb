@@ -31,7 +31,7 @@ export interface Product {
   description: string;
   imageUrl?: string;
   image?: string;
-  category?: Category;
+  category?: ProductCategory;
   categoryId?: string;
   stock?: number;
   currency?: string;
@@ -42,6 +42,17 @@ export interface Product {
   updatedAt?: string;
 }
 
+export interface ProductCategory {
+  id: string;
+  branchType: string; // "restaurante", "dulceria", "tienda"
+  name: string;
+  iconIos: string;
+  iconWeb: string;
+  iconAndroid: string;
+  createdAt?: string;
+}
+
+// Legacy Category interface - to be removed after full migration
 export interface Category {
   id: string;
   name: string;

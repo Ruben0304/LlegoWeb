@@ -317,6 +317,14 @@
                     imageUrl
                     availability
                     categoryId
+                    category {
+                      id
+                      branchType
+                      name
+                      iconIos
+                      iconWeb
+                      iconAndroid
+                    }
                   }
                 }
                 pageInfo {
@@ -871,6 +879,7 @@
                   </div>
                   <ProductForm
                     branchId={branchId}
+                    branchTypes={selectedBranch?.tipos || []}
                     jwt={jwt}
                     onProductAdded={handleProductAdded}
                   />
@@ -915,7 +924,7 @@
       }}
       onBranchCreated={(branch) => void branch}
     />
-    <ProductForm branchId="" jwt="" onProductAdded={() => {}} />
+    <ProductForm branchId="" branchTypes={[]} jwt="" onProductAdded={() => {}} />
     <ProductList
       products={[]}
       onDelete={() => {}}
