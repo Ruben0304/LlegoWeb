@@ -36,6 +36,14 @@ export const GET_PRODUCTS = gql`
           imageUrl
           availability
           categoryId
+          category {
+            id
+            branchType
+            name
+            iconIos
+            iconWeb
+            iconAndroid
+          }
           branchId
           currency
           weight
@@ -75,6 +83,7 @@ export const GET_PRODUCT_BY_ID = gql`
   }
 `;
 
+// Legacy query - to be removed
 export const GET_CATEGORIES = gql`
   query GetCategories {
     categories {
@@ -82,6 +91,35 @@ export const GET_CATEGORIES = gql`
       name
       icon
       gradient
+    }
+  }
+`;
+
+// New product categories queries
+export const GET_PRODUCT_CATEGORIES = gql`
+  query GetProductCategories($branchType: String) {
+    product_categories(branchType: $branchType) {
+      id
+      branchType
+      name
+      iconIos
+      iconWeb
+      iconAndroid
+      createdAt
+    }
+  }
+`;
+
+export const GET_PRODUCT_CATEGORY = gql`
+  query GetProductCategory($id: String!) {
+    product_category(id: $id) {
+      id
+      branchType
+      name
+      iconIos
+      iconWeb
+      iconAndroid
+      createdAt
     }
   }
 `;

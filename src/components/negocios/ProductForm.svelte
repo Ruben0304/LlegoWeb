@@ -1,14 +1,16 @@
 <script lang="ts">
-  import { uploadProductImage, createProduct } from '@/lib/product';
-  import type { Product } from '@/lib/product';
+  import { onMount } from 'svelte';
+  import { uploadProductImage, createProduct, getProductCategories } from '@/lib/product';
+  import type { Product, ProductCategory } from '@/lib/product';
 
   interface Props {
     branchId: string;
+    branchTypes: string[]; // Array de tipos de branch: ["restaurante"], ["tienda"], etc.
     jwt: string;
     onProductAdded: (product: Product) => void;
   }
 
-  let { branchId, jwt, onProductAdded }: Props = $props();
+  let { branchId, branchTypes, jwt, onProductAdded }: Props = $props();
 
   // Form fields
   let name = $state('');
@@ -28,17 +30,54 @@
   let fileInputRef: HTMLInputElement;
   let imageName = $state('');
 
-  // Categories (can be fetched from API later)
-  const categories = [
-    { id: '', label: 'Sin categoría' },
-    { id: 'food', label: 'Comida' },
-    { id: 'drinks', label: 'Bebidas' },
-    { id: 'desserts', label: 'Postres' },
-    { id: 'electronics', label: 'Electrónica' },
-    { id: 'clothing', label: 'Ropa' },
-    { id: 'home', label: 'Hogar' },
-    { id: 'other', label: 'Otros' }
-  ];
+  // Categories loaded from backend
+  let categories = $state<ProductCategory[]>([]);
+  let isLoadingCategories = $state(false);
+  let categoriesError = $state('');
+
+  // Load product categories based on branch types
+  async function loadCategories() {
+    if (branchTypes.length === 0) {
+      categories = [];
+      return;
+    }
+
+    isLoadingCategories = true;
+    categoriesError = '';
+
+    try {
+      // Load categories for all branch types
+      const categoryPromises = branchTypes.map(branchType =>
+        getProductCategories(branchType)
+      );
+
+      const results = await Promise.all(categoryPromises);
+
+      // Combine and deduplicate categories by ID
+      const allCategories = results.flatMap(result => result.product_categories || []);
+      const uniqueCategories = Array.from(
+        new Map(allCategories.map(cat => [cat.id, cat])).values()
+      );
+
+      categories = uniqueCategories;
+    } catch (error) {
+      console.error('Error loading categories:', error);
+      categoriesError = 'Error al cargar las categorías';
+      categories = [];
+    } finally {
+      isLoadingCategories = false;
+    }
+  }
+
+  // Load categories when component mounts or branchTypes change
+  onMount(() => {
+    loadCategories();
+  });
+
+  $effect(() => {
+    // Reload categories if branchTypes change
+    loadCategories();
+  });
 
   function handleFileSelect(file: File) {
     if (!file.type.startsWith('image/')) {
@@ -282,17 +321,30 @@
 
     <!-- Category -->
     <div class="form-group">
-      <label for="product-category">Categoría</label>
+      <label for="product-category">
+        Categoría
+        {#if isLoadingCategories}
+          <span class="loading-text">(cargando...)</span>
+        {/if}
+      </label>
       <div class="select-wrapper">
-        <select id="product-category" bind:value={categoryId}>
+        <select
+          id="product-category"
+          bind:value={categoryId}
+          disabled={isLoadingCategories || categories.length === 0}
+        >
+          <option value="">Sin categoría</option>
           {#each categories as cat}
-            <option value={cat.id}>{cat.label}</option>
+            <option value={cat.id}>{cat.name}</option>
           {/each}
         </select>
         <svg class="select-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="6 9 12 15 18 9"/>
         </svg>
       </div>
+      {#if categoriesError}
+        <span class="field-error">{categoriesError}</span>
+      {/if}
     </div>
 
     <!-- Image Upload -->
@@ -471,6 +523,20 @@
   .required {
     color: #ff6b6b;
     margin-left: 2px;
+  }
+
+  .loading-text {
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 400;
+    margin-left: var(--spacing-xs);
+  }
+
+  .field-error {
+    font-size: var(--font-size-xs);
+    color: #ff6b6b;
+    margin-top: var(--spacing-xs);
+    display: block;
   }
 
   .form-group input,
