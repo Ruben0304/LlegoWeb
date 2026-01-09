@@ -45,10 +45,11 @@ export async function getCategories() {
 /**
  * Obtiene las categorías de productos
  * @param branchType - Tipo de negocio (opcional): "restaurante", "dulceria", "tienda"
+ * @param jwt - Token JWT de autenticación (opcional)
  * @returns Lista de categorías de productos
  */
-export async function getProductCategories(branchType?: string) {
-  return query<{ productCategories: ProductCategory[] }>(GET_PRODUCT_CATEGORIES, { branchType });
+export async function getProductCategories(branchType?: string, jwt?: string) {
+  return query<{ productCategories: ProductCategory[] }>(GET_PRODUCT_CATEGORIES, { branchType }, jwt);
 }
 
 /**

@@ -70,9 +70,20 @@ export const graphqlClient = new GraphQLClient(GRAPHQL_ENDPOINT, {
  */
 export async function query<T = any>(
   query: string,
-  variables?: Record<string, any>
+  variables?: Record<string, any>,
+  jwt?: string
 ): Promise<T> {
   try {
+    // Si se proporciona un JWT, crear un cliente con headers de autenticación
+    if (jwt) {
+      const authenticatedClient = new GraphQLClient(GRAPHQL_ENDPOINT, {
+        headers: {
+          'Authorization': `Bearer ${jwt}`,
+        },
+      });
+      return await authenticatedClient.request<T>(query, variables);
+    }
+
     return await graphqlClient.request<T>(query, variables);
   } catch (error) {
     console.error('Error en GraphQL query:', error);

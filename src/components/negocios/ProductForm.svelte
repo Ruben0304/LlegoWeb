@@ -1,16 +1,20 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { uploadProductImage, createProduct, getProductCategories } from '@/lib/product';
+  import { uploadProductImage, createProduct, updateProduct, getProductCategories } from '@/lib/product';
   import type { Product, ProductCategory } from '@/lib/product';
 
   interface Props {
     branchId: string;
-    branchTypes: string[]; // Array de tipos de branch: ["restaurante"], ["tienda"], etc.
+    branchTypes: string[]; // Array de tipos de branch: ["RESTAURANTE"], ["DULCERIA"], etc.
     jwt: string;
     onProductAdded: (product: Product) => void;
+    product?: Product | null; // Optional: for edit mode
   }
 
-  let { branchId, branchTypes, jwt, onProductAdded }: Props = $props();
+  let { branchId, branchTypes, jwt, onProductAdded, product = null }: Props = $props();
+
+  // Estado para tipo de branch seleccionado (cuando hay múltiples)
+  let selectedBranchType = $state(branchTypes.length === 1 ? branchTypes[0] : '');
 
   // Form fields
   let name = $state('');
@@ -35,6 +39,33 @@
   let isLoadingCategories = $state(false);
   let categoriesError = $state('');
 
+  // Modo de edición
+  let isEditMode = $derived(product !== null);
+
+  // Initialize form with product data if in edit mode
+  $effect(() => {
+    if (product) {
+      name = product.name;
+      description = product.description;
+      weight = product.weight || '';
+      price = product.price;
+      currency = product.currency || 'USD';
+      availability = product.availability;
+      categoryId = product.categoryId || '';
+      if (product.imageUrl) {
+        imagePreview = product.imageUrl;
+        imageName = 'Imagen actual';
+      }
+    }
+  });
+
+  // Categorías filtradas según el tipo de branch seleccionado
+  let filteredCategories = $derived(
+    selectedBranchType
+      ? categories.filter(cat => cat.branchType === selectedBranchType)
+      : categories
+  );
+
   // Load product categories based on branch types
   async function loadCategories() {
     if (branchTypes.length === 0) {
@@ -46,9 +77,12 @@
     categoriesError = '';
 
     try {
+      // Si hay múltiples tipos pero no se ha seleccionado ninguno, cargamos todos
+      const typesToLoad = branchTypes;
+
       // Load categories for all branch types
-      const categoryPromises = branchTypes.map(branchType =>
-        getProductCategories(branchType)
+      const categoryPromises = typesToLoad.map(branchType =>
+        getProductCategories(branchType, jwt)
       );
 
       const results = await Promise.all(categoryPromises);
@@ -75,7 +109,7 @@
   });
 
   $effect(() => {
-    // Reload categories if branchTypes change
+    // Reload categories if branchTypes or selectedBranchType change
     loadCategories();
   });
 
@@ -163,7 +197,14 @@
   async function handleSubmit(e: Event) {
     e.preventDefault();
 
-    if (!imageFile) {
+    // Validar que hay tipo de branch seleccionado si hay múltiples
+    if (branchTypes.length > 1 && !selectedBranchType) {
+      errorMessage = 'Por favor selecciona el tipo de negocio para este producto';
+      return;
+    }
+
+    // En modo creación, la imagen es obligatoria
+    if (!isEditMode && !imageFile) {
       errorMessage = 'Por favor selecciona una imagen para el producto';
       return;
     }
@@ -173,36 +214,56 @@
     successMessage = '';
 
     try {
-      // Paso 1: Subir la imagen
-      const uploadResponse = await uploadProductImage(imageFile, jwt);
+      let imagePath = product?.image; // En edición, usar la imagen existente por defecto
 
-      // Paso 2: Crear el producto con el path de la imagen
-      const productInput = {
-        branchId,
-        name,
-        description,
-        price: Number(price),
-        currency,
-        image: uploadResponse.image_path,
-        weight: weight || undefined,
-        categoryId: categoryId || undefined,
-      };
+      // Si hay una nueva imagen, subirla
+      if (imageFile) {
+        const uploadResponse = await uploadProductImage(imageFile, jwt);
+        imagePath = uploadResponse.image_path;
+      }
 
-      const createdProduct = await createProduct(productInput, jwt);
+      if (isEditMode && product) {
+        // Modo edición: actualizar producto existente
+        const updateInput = {
+          name,
+          description,
+          price: Number(price),
+          currency,
+          weight: weight || undefined,
+          categoryId: categoryId || undefined,
+          availability,
+          ...(imagePath && { image: imagePath }),
+        };
 
-      // Notificar al padre
-      onProductAdded(createdProduct);
+        const updatedProduct = await updateProduct(product.id, updateInput, jwt);
+        onProductAdded(updatedProduct);
+        successMessage = 'Producto actualizado correctamente';
+      } else {
+        // Modo creación: crear nuevo producto
+        const productInput = {
+          branchId,
+          name,
+          description,
+          price: Number(price),
+          currency,
+          image: imagePath!,
+          weight: weight || undefined,
+          categoryId: categoryId || undefined,
+        };
 
-      successMessage = 'Producto agregado correctamente';
-      resetForm();
+        const createdProduct = await createProduct(productInput, jwt);
+        onProductAdded(createdProduct);
+        successMessage = 'Producto agregado correctamente';
+        resetForm();
+      }
 
       // Clear success message after 3 seconds
       setTimeout(() => {
         successMessage = '';
       }, 3000);
     } catch (error) {
-      console.error('Error al crear producto:', error);
-      errorMessage = error instanceof Error ? error.message : 'Error al crear el producto';
+      console.error('Error al guardar producto:', error);
+      errorMessage = error instanceof Error ? error.message : 'Error al guardar el producto';
     } finally {
       isSubmitting = false;
     }
@@ -213,13 +274,18 @@
   <div class="form-header">
     <div class="form-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="12" y1="5" x2="12" y2="19"/>
-        <line x1="5" y1="12" x2="19" y2="12"/>
+        {#if isEditMode}
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        {:else}
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        {/if}
       </svg>
     </div>
     <div>
-      <h2 class="form-title">Agregar Producto</h2>
-      <p class="form-subtitle">Completa los datos del nuevo producto</p>
+      <h2 class="form-title">{isEditMode ? 'Editar Producto' : 'Agregar Producto'}</h2>
+      <p class="form-subtitle">{isEditMode ? 'Modifica los datos del producto' : 'Completa los datos del nuevo producto'}</p>
     </div>
   </div>
 
@@ -319,6 +385,34 @@
       />
     </div>
 
+    <!-- Branch Type Selector (only if multiple types) -->
+    {#if branchTypes.length > 1}
+      <div class="form-group">
+        <label for="branch-type-selector">
+          Tipo de Negocio
+          <span class="required">*</span>
+        </label>
+        <p class="field-hint">Selecciona en qué categoría de negocio aparecerá este producto</p>
+        <div class="radio-group">
+          {#each branchTypes as branchType}
+            <label class="radio-option">
+              <input
+                type="radio"
+                name="branch-type"
+                value={branchType}
+                bind:group={selectedBranchType}
+              />
+              <span class="radio-label">
+                {branchType === 'RESTAURANTE' ? 'Restaurante' :
+                 branchType === 'DULCERIA' ? 'Dulcería' :
+                 branchType === 'TIENDA' ? 'Tienda' : branchType}
+              </span>
+            </label>
+          {/each}
+        </div>
+      </div>
+    {/if}
+
     <!-- Category -->
     <div class="form-group">
       <label for="product-category">
@@ -331,10 +425,10 @@
         <select
           id="product-category"
           bind:value={categoryId}
-          disabled={isLoadingCategories || categories.length === 0}
+          disabled={isLoadingCategories || filteredCategories.length === 0 || (branchTypes.length > 1 && !selectedBranchType)}
         >
           <option value="">Sin categoría</option>
-          {#each categories as cat}
+          {#each filteredCategories as cat}
             <option value={cat.id}>{cat.name}</option>
           {/each}
         </select>
@@ -345,11 +439,17 @@
       {#if categoriesError}
         <span class="field-error">{categoriesError}</span>
       {/if}
+      {#if branchTypes.length > 1 && !selectedBranchType}
+        <span class="field-hint">Primero selecciona el tipo de negocio</span>
+      {/if}
     </div>
 
     <!-- Image Upload -->
     <div class="form-group">
-      <label>Imagen del producto</label>
+      <label>Imagen del producto {#if !isEditMode}<span class="required">*</span>{/if}</label>
+      {#if isEditMode}
+        <p class="field-hint">Deja en blanco para mantener la imagen actual</p>
+      {/if}
       <input
         type="file"
         accept="image/*"
@@ -421,13 +521,19 @@
     <button type="submit" class="submit-btn" disabled={isSubmitting}>
       {#if isSubmitting}
         <span class="spinner"></span>
-        Agregando...
+        {isEditMode ? 'Guardando...' : 'Agregando...'}
       {:else}
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
+          {#if isEditMode}
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          {:else}
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          {/if}
         </svg>
-        Agregar Producto
+        {isEditMode ? 'Guardar Cambios' : 'Agregar Producto'}
       {/if}
     </button>
   </form>
@@ -851,6 +957,62 @@
 
   @keyframes spin {
     to { transform: rotate(360deg); }
+  }
+
+  /* Radio Group */
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+  }
+
+  .radio-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .radio-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--color-secondary);
+  }
+
+  .radio-option input[type="radio"]:checked + .radio-label {
+    color: var(--color-secondary);
+    font-weight: 600;
+  }
+
+  .radio-option:has(input[type="radio"]:checked) {
+    background: rgba(225, 199, 142, 0.1);
+    border-color: var(--color-secondary);
+  }
+
+  .radio-label {
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+    transition: all var(--transition-base);
+  }
+
+  /* Field Hint */
+  .field-hint {
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: var(--spacing-xs);
+    display: block;
   }
 
   @media (max-width: 480px) {
