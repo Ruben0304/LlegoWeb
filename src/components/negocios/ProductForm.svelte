@@ -54,7 +54,7 @@
       const results = await Promise.all(categoryPromises);
 
       // Combine and deduplicate categories by ID
-      const allCategories = results.flatMap(result => result.product_categories || []);
+      const allCategories = results.flatMap(result => result.productCategories || []);
       const uniqueCategories = Array.from(
         new Map(allCategories.map(cat => [cat.id, cat])).values()
       );

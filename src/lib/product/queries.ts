@@ -98,7 +98,7 @@ export const GET_CATEGORIES = gql`
 // New product categories queries
 export const GET_PRODUCT_CATEGORIES = gql`
   query GetProductCategories($branchType: String) {
-    product_categories(branchType: $branchType) {
+    productCategories(branchType: $branchType) {
       id
       branchType
       name
@@ -112,7 +112,7 @@ export const GET_PRODUCT_CATEGORIES = gql`
 
 export const GET_PRODUCT_CATEGORY = gql`
   query GetProductCategory($id: String!) {
-    product_category(id: $id) {
+    productCategory(id: $id) {
       id
       branchType
       name

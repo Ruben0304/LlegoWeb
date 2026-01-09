@@ -48,7 +48,7 @@ export async function getCategories() {
  * @returns Lista de categorías de productos
  */
 export async function getProductCategories(branchType?: string) {
-  return query<{ product_categories: ProductCategory[] }>(GET_PRODUCT_CATEGORIES, { branchType });
+  return query<{ productCategories: ProductCategory[] }>(GET_PRODUCT_CATEGORIES, { branchType });
 }
 
 /**
@@ -57,7 +57,7 @@ export async function getProductCategories(branchType?: string) {
  * @returns Categoría de producto
  */
 export async function getProductCategory(id: string) {
-  return query<{ product_category: ProductCategory }>(GET_PRODUCT_CATEGORY, { id });
+  return query<{ productCategory: ProductCategory }>(GET_PRODUCT_CATEGORY, { id });
 }
 
 export async function searchProducts(
