@@ -226,31 +226,45 @@
     errorMessage = "";
 
     try {
+      console.log("🍎 Iniciando Apple Sign In...");
+      console.log("Backend URL:", BACKEND_URL);
+      
       // Call backend to get Apple auth URL
       const response = await fetch(`${BACKEND_URL}/apple/start`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
 
+      console.log("Response status:", response.status);
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Backend error:", errorText);
         throw new Error("No se pudo iniciar el flujo de Apple Sign In");
       }
 
       const data = await response.json();
+      console.log("Backend response:", data);
       
       if (!data.auth_url) {
         throw new Error("No se recibió la URL de autenticación");
       }
 
+      console.log("Auth URL recibida:", data.auth_url);
+
       // Store state for validation (optional)
       if (data.state) {
         sessionStorage.setItem("apple_auth_state", data.state);
+        console.log("State guardado:", data.state);
       }
 
       // Redirect to Apple's auth page
-      window.location.href = data.auth_url;
+      console.log("🚀 Redirigiendo a Apple...");
+      
+      // Try using window.location.assign as it's more reliable
+      window.location.assign(data.auth_url);
     } catch (error) {
-      console.error("Error en Apple Sign In:", error);
+      console.error("❌ Error en Apple Sign In:", error);
       errorMessage = error instanceof Error ? error.message : "Error al iniciar sesión con Apple";
       isLoading = false;
     }

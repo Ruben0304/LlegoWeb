@@ -41,10 +41,13 @@ Es el último paso del flujo, después de que el backend ya validó todo con App
 
 ### ¿Qué variables de entorno necesito en el frontend?
 
+**Solo necesitas la que ya tienes:**
+
 ```env
 PUBLIC_BACKEND_URL=https://llegobackend-production.up.railway.app
-PUBLIC_APPLE_CLIENT_ID=com.llego.web  # Opcional
 ```
+
+No necesitas agregar nada más para Apple Sign-In.
 
 ### ¿Qué variables de entorno necesita el backend?
 
@@ -65,6 +68,18 @@ FRONTEND_URL=https://tu-dominio.com
 5. Descarga el archivo `.p8` (esto es tu `APPLE_PRIVATE_KEY`)
 
 ## 🐛 Troubleshooting
+
+### Error: "Safari no puede abrir la dirección porque no es válida"
+
+**Causa:** Configuración incorrecta en Apple Developer Console o dominio no verificado.
+
+**Solución:** 
+1. Verifica que el Service ID esté correctamente configurado en Apple Developer
+2. Asegúrate de que el dominio esté verificado (archivo `.well-known`)
+3. Verifica que el Return URL sea exactamente: `https://llegobackend-production.up.railway.app/apple/callback`
+4. Espera 5-10 minutos después de hacer cambios en Apple Developer
+
+**Ver:** [apple-signin-troubleshooting.md](./apple-signin-troubleshooting.md) para guía detallada.
 
 ### Error: "redirect_uri_mismatch"
 

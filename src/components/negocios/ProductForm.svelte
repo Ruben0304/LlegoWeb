@@ -212,6 +212,22 @@
     }
   }
 
+  // Función para extraer el path de imagen desde imageUrl
+  function extractImagePathFromUrl(imageUrl: string | undefined): string | undefined {
+    if (!imageUrl) return undefined;
+    // El imageUrl tiene formato: https://domain.com/products/filename.jpg
+    // Necesitamos extraer: products/filename.jpg
+    try {
+      const url = new URL(imageUrl);
+      // Remover el slash inicial del pathname
+      return url.pathname.startsWith('/') ? url.pathname.slice(1) : url.pathname;
+    } catch {
+      // Si no es una URL válida, intentar extraer el path directamente
+      const match = imageUrl.match(/products\/[^?#]+/);
+      return match ? match[0] : undefined;
+    }
+  }
+
   async function handleSubmit(e: Event) {
     e.preventDefault();
 
@@ -233,7 +249,8 @@
     successMessage = "";
 
     try {
-      let imagePath = product?.image; // En edición, usar la imagen existente por defecto
+      // En edición, usar la imagen existente por defecto (extraer path de imageUrl si no hay image)
+      let imagePath = product?.image || extractImagePathFromUrl(product?.imageUrl);
 
       // Si hay una nueva imagen, subirla
       if (imageFile) {
