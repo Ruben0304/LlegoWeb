@@ -56,11 +56,12 @@ Frontend captura token → Guarda en localStorage → Redirige a /negocios
 ## ⚙️ Configuración Necesaria
 
 ### En tu `.env` (Frontend):
+**No necesitas agregar nada nuevo.** Solo asegúrate de tener:
 ```env
-PUBLIC_APPLE_CLIENT_ID=com.llego.web
+PUBLIC_BACKEND_URL=https://llegobackend-production.up.railway.app
 ```
 
-**Nota:** Esta variable es opcional, el flujo OAuth lo maneja completamente el backend.
+Eso es todo. El frontend solo necesita saber dónde está el backend.
 
 ### En Apple Developer Console:
 El **Redirect URI** debe apuntar al **BACKEND**:

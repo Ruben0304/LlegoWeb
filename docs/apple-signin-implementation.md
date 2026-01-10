@@ -57,13 +57,13 @@ Se ha implementado Apple Sign-In en el panel de negocios siguiendo el flujo OAut
 
 ### Variables de Entorno (Frontend)
 
-Actualiza tu archivo `.env` con:
+**No necesitas agregar nada nuevo al `.env`**. Solo asegúrate de tener:
 
 ```env
-PUBLIC_APPLE_CLIENT_ID=com.llego.web
+PUBLIC_BACKEND_URL=https://llegobackend-production.up.railway.app
 ```
 
-**Nota:** Esta variable es opcional y solo se usa para referencia. El flujo OAuth completo lo maneja el backend.
+El frontend solo necesita saber dónde está el backend para llamar a `/apple/start`.
 
 ### Backend
 
