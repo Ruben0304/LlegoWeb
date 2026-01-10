@@ -56,7 +56,6 @@
 
   const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID;
   const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL || "";
-  const APPLE_CLIENT_ID = import.meta.env.PUBLIC_APPLE_CLIENT_ID;
 
   function storeAuth(data: AuthResponse) {
     if (typeof window === "undefined") return;
@@ -223,11 +222,6 @@
   }
 
   async function handleAppleLogin() {
-    if (!APPLE_CLIENT_ID) {
-      errorMessage = "Apple Sign In no está configurado.";
-      return;
-    }
-
     isLoading = true;
     errorMessage = "";
 
@@ -707,7 +701,7 @@
             type="button"
             class="apple-signin-btn"
             onclick={handleAppleLogin}
-            disabled={isLoading || !APPLE_CLIENT_ID}
+            disabled={isLoading}
           >
             {#if isLoading}
               <span class="spinner-dark"></span>
