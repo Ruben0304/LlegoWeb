@@ -50,7 +50,6 @@ export const UPDATE_PRODUCT = gql`
       }
       weight
       currency
-      updatedAt
     }
   }
 `;
@@ -68,8 +67,6 @@ export const UPDATE_PRODUCT_STOCK = gql`
   mutation UpdateProductStock($id: ID!, $stock: Int!) {
     updateProductStock(id: $id, stock: $stock) {
       id
-      stock
-      updatedAt
     }
   }
 `;
