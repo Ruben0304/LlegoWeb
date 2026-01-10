@@ -1,29 +1,31 @@
 <script lang="ts">
-  import type { Product } from '@/lib/product';
+  import type { Product } from "@/lib/product";
 
   interface Props {
     products: Product[];
     onDelete: (id: string) => void;
     onToggleAvailability: (id: string) => void;
+    onEdit: (product: Product) => void;
   }
 
-  let { products, onDelete, onToggleAvailability }: Props = $props();
+  let { products, onDelete, onToggleAvailability, onEdit }: Props = $props();
 
-  let searchQuery = $state('');
+  let searchQuery = $state("");
   let deleteConfirmId = $state<string | null>(null);
 
   const filteredProducts = $derived(
-    products.filter(p =>
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.description.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    products.filter(
+      (p) =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description.toLowerCase().includes(searchQuery.toLowerCase()),
+    ),
   );
 
   function formatPrice(price: number, currency?: string) {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: currency || 'USD',
-      minimumFractionDigits: 2
+    return new Intl.NumberFormat("es-ES", {
+      style: "currency",
+      currency: currency || "USD",
+      minimumFractionDigits: 2,
     }).format(price);
   }
 
@@ -45,24 +47,42 @@
   <div class="list-header">
     <div class="header-info">
       <div class="list-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-          <line x1="3" y1="6" x2="21" y2="6"/>
-          <path d="M16 10a4 4 0 0 1-8 0"/>
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
         </svg>
       </div>
       <div>
         <h2 class="list-title">Tus Productos</h2>
-        <p class="list-subtitle">{products.length} {products.length === 1 ? 'producto' : 'productos'} en tu catálogo</p>
+        <p class="list-subtitle">
+          {products.length}
+          {products.length === 1 ? "producto" : "productos"} en tu catálogo
+        </p>
       </div>
     </div>
   </div>
 
   {#if products.length > 0}
     <div class="search-container">
-      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="8"/>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      <svg
+        class="search-icon"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
       </svg>
       <input
         type="text"
@@ -71,10 +91,17 @@
         bind:value={searchQuery}
       />
       {#if searchQuery}
-        <button class="clear-search" onclick={() => searchQuery = ''}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
+        <button class="clear-search" onclick={() => (searchQuery = "")}>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
       {/if}
@@ -85,10 +112,17 @@
     {#if products.length === 0}
       <div class="empty-state">
         <div class="empty-icon">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <path d="M16 10a4 4 0 0 1-8 0"/>
+          <svg
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 0 1-8 0" />
           </svg>
         </div>
         <h3>Sin productos aún</h3>
@@ -97,9 +131,16 @@
     {:else if filteredProducts.length === 0}
       <div class="empty-state">
         <div class="empty-icon">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <svg
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         </div>
         <h3>Sin resultados</h3>
@@ -111,14 +152,25 @@
           <div class="product-card" class:unavailable={!product.availability}>
             {#if product.imageUrl || product.image}
               <div class="product-image">
-                <img src={product.imageUrl || product.image} alt={product.name} onerror={(e) => e.currentTarget.style.display = 'none'} />
+                <img
+                  src={product.imageUrl || product.image}
+                  alt={product.name}
+                  onerror={(e) => (e.currentTarget.style.display = "none")}
+                />
               </div>
             {:else}
               <div class="product-image-placeholder">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                  <circle cx="8.5" cy="8.5" r="1.5"/>
-                  <polyline points="21 15 16 10 5 21"/>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
                 </svg>
               </div>
             {/if}
@@ -126,7 +178,9 @@
             <div class="product-content">
               <div class="product-header">
                 <h3 class="product-name">{product.name}</h3>
-                <span class="product-price">{formatPrice(product.price, product.currency)}</span>
+                <span class="product-price"
+                  >{formatPrice(product.price, product.currency)}</span
+                >
               </div>
 
               <p class="product-description">{product.description}</p>
@@ -145,28 +199,71 @@
                   class="action-btn toggle-btn"
                   class:active={product.availability}
                   onclick={() => onToggleAvailability(product.id)}
-                  title={product.availability ? 'Desactivar' : 'Activar'}
+                  title={product.availability ? "Desactivar" : "Activar"}
                 >
                   {#if product.availability}
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                      <circle cx="12" cy="12" r="3"/>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
                     </svg>
                     Visible
                   {:else}
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                      <line x1="1" y1="1" x2="23" y2="23"/>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                      />
+                      <line x1="1" y1="1" x2="23" y2="23" />
                     </svg>
                     Oculto
                   {/if}
                 </button>
 
+                <button
+                  class="action-btn edit-btn"
+                  onclick={() => onEdit(product)}
+                  title="Editar producto"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                    />
+                    <path
+                      d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                    />
+                  </svg>
+                  Editar
+                </button>
+
                 {#if deleteConfirmId === product.id}
                   <div class="delete-confirm">
                     <span>¿Eliminar?</span>
-                    <button class="confirm-yes" onclick={() => executeDelete(product.id)}>Sí</button>
-                    <button class="confirm-no" onclick={cancelDelete}>No</button>
+                    <button
+                      class="confirm-yes"
+                      onclick={() => executeDelete(product.id)}>Sí</button
+                    >
+                    <button class="confirm-no" onclick={cancelDelete}>No</button
+                    >
                   </div>
                 {:else}
                   <button
@@ -174,9 +271,18 @@
                     onclick={() => confirmDelete(product.id)}
                     title="Eliminar producto"
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="3 6 5 6 21 6"/>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <polyline points="3 6 5 6 21 6" />
+                      <path
+                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                      />
                     </svg>
                   </button>
                 {/if}
@@ -215,7 +321,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(225, 199, 142, 0.2) 0%, rgba(211, 170, 122, 0.2) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(225, 199, 142, 0.2) 0%,
+      rgba(211, 170, 122, 0.2) 100%
+    );
     border-radius: var(--radius-lg);
     color: var(--color-secondary);
     flex-shrink: 0;
@@ -477,6 +587,11 @@
     background: rgba(52, 199, 89, 0.1);
   }
 
+  .edit-btn:hover {
+    color: #5ac8fa;
+    background: rgba(90, 200, 250, 0.1);
+  }
+
   .delete-btn:hover {
     color: #ff6b6b;
     background: rgba(255, 59, 48, 0.1);
@@ -493,8 +608,14 @@
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 
   .delete-confirm span {

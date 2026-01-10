@@ -37,10 +37,11 @@
   let businessError = $state("");
   let showBusinessForm = $state(false);
   let showBranchForm = $state(false);
-  
+
   // Edit mode state
   let editingBusiness = $state<Business | null>(null);
   let editingBranch = $state<Branch | null>(null);
+  let editingProduct = $state<Product | null>(null);
 
   // Loading states
   let isLoadingProducts = $state(false);
@@ -57,7 +58,7 @@
   const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL || "";
 
   function storeAuth(data: AuthResponse) {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
     localStorage.setItem(AUTH_TOKEN_KEY, data.accessToken);
     localStorage.setItem(AUTH_TOKEN_TYPE_KEY, data.tokenType);
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
@@ -71,7 +72,7 @@
   }
 
   function clearAuth() {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
     localStorage.removeItem(AUTH_TOKEN_KEY);
     localStorage.removeItem(AUTH_TOKEN_TYPE_KEY);
     localStorage.removeItem(AUTH_USER_KEY);
@@ -85,26 +86,26 @@
 
   function restoreSession() {
     // Solo ejecutar en el navegador, no en SSR
-    if (typeof window === 'undefined') {
-      console.log('restoreSession: No se ejecuta en SSR');
+    if (typeof window === "undefined") {
+      console.log("restoreSession: No se ejecuta en SSR");
       return;
     }
 
-    console.log('restoreSession: Buscando datos en localStorage...');
+    console.log("restoreSession: Buscando datos en localStorage...");
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     const userRaw = localStorage.getItem(AUTH_USER_KEY);
 
-    console.log('restoreSession: Token encontrado?', !!token);
-    console.log('restoreSession: User encontrado?', !!userRaw);
+    console.log("restoreSession: Token encontrado?", !!token);
+    console.log("restoreSession: User encontrado?", !!userRaw);
 
     if (!token || !userRaw) {
-      console.log('restoreSession: No hay sesión guardada');
+      console.log("restoreSession: No hay sesión guardada");
       return;
     }
 
     try {
       const user = JSON.parse(userRaw) as AuthUser;
-      console.log('restoreSession: Usuario parseado:', user.email);
+      console.log("restoreSession: Usuario parseado:", user.email);
 
       setAuthenticatedUser({
         accessToken: token,
@@ -112,8 +113,8 @@
         user,
       });
 
-      console.log('✅ Sesión restaurada exitosamente para:', user.email);
-      console.log('✅ isAuthenticated ahora es:', isAuthenticated);
+      console.log("✅ Sesión restaurada exitosamente para:", user.email);
+      console.log("✅ isAuthenticated ahora es:", isAuthenticated);
     } catch (error) {
       console.error("❌ Error al restaurar sesión:", error);
       clearAuth();
@@ -354,7 +355,7 @@
 
   // Product handlers
   function handleProductAdded(product: Product) {
-    products = [...products, product];
+    editingProduct = null; // Clear editing state after save
     // Reload products to ensure we have the latest data
     loadProducts(branchId);
   }
@@ -367,6 +368,10 @@
     products = products.map((p) =>
       p.id === productId ? { ...p, availability: !p.availability } : p,
     );
+  }
+
+  function handleProductEdit(product: Product) {
+    editingProduct = product;
   }
 
   function handleBusinessSelected(business: Business) {
@@ -432,8 +437,8 @@
     showBusinessForm = false;
     editingBusiness = null;
     // Update the business in the list
-    businesses = businesses.map(b => 
-      b.id === updatedBusiness.id ? { ...b, ...updatedBusiness } : b
+    businesses = businesses.map((b) =>
+      b.id === updatedBusiness.id ? { ...b, ...updatedBusiness } : b,
     );
     // Update selected business if it's the one being edited
     if (selectedBusiness?.id === updatedBusiness.id) {
@@ -443,7 +448,7 @@
 
   function handleBusinessDeleted(deletedBusiness: Business) {
     // Remove the business from the list
-    businesses = businesses.filter(b => b.id !== deletedBusiness.id);
+    businesses = businesses.filter((b) => b.id !== deletedBusiness.id);
     // Clear selection if deleted business was selected
     if (selectedBusiness?.id === deletedBusiness.id) {
       selectedBusiness = null;
@@ -490,14 +495,16 @@
   }
 
   function renderHiddenGoogleButton() {
-    console.log('renderHiddenGoogleButton: iniciando...');
-    console.log('- googleButtonRef:', !!googleButtonRef);
-    console.log('- window.google:', !!window.google);
-    console.log('- window.google.accounts:', !!window.google?.accounts);
-    console.log('- window.google.accounts.id:', !!window.google?.accounts?.id);
+    console.log("renderHiddenGoogleButton: iniciando...");
+    console.log("- googleButtonRef:", !!googleButtonRef);
+    console.log("- window.google:", !!window.google);
+    console.log("- window.google.accounts:", !!window.google?.accounts);
+    console.log("- window.google.accounts.id:", !!window.google?.accounts?.id);
 
     if (!googleButtonRef || !window.google?.accounts?.id) {
-      console.log('❌ renderHiddenGoogleButton: No se puede renderizar, falta googleButtonRef o Google SDK');
+      console.log(
+        "❌ renderHiddenGoogleButton: No se puede renderizar, falta googleButtonRef o Google SDK",
+      );
       return;
     }
 
@@ -511,24 +518,27 @@
       width: 300,
     });
     googleInitialized = true;
-    console.log('✅ renderHiddenGoogleButton: Botón de Google renderizado, googleInitialized =', googleInitialized);
+    console.log(
+      "✅ renderHiddenGoogleButton: Botón de Google renderizado, googleInitialized =",
+      googleInitialized,
+    );
   }
 
   onMount(async () => {
-    console.log('BusinessPanel onMount iniciado');
+    console.log("BusinessPanel onMount iniciado");
     restoreSession();
 
-    console.log('Estado después de restoreSession:', {
+    console.log("Estado después de restoreSession:", {
       isAuthenticated,
       hasJwt: !!jwt,
-      hasUser: !!currentUser
+      hasUser: !!currentUser,
     });
 
     if (isAuthenticated && jwt) {
-      console.log('Cargando negocios...');
+      console.log("Cargando negocios...");
       await loadBusinesses();
     } else {
-      console.log('No hay sesión activa, mostrando login');
+      console.log("No hay sesión activa, mostrando login");
     }
 
     if (GOOGLE_CLIENT_ID) {
@@ -678,7 +688,8 @@
               <h1 class="user-name">{currentUser?.name || "Usuario"}</h1>
               <p class="user-meta">
                 {#if selectedBranch}
-                  {products.length} {products.length === 1 ? "producto" : "productos"}
+                  {products.length}
+                  {products.length === 1 ? "producto" : "productos"}
                 {:else}
                   Selecciona un negocio y una sucursal
                 {/if}
@@ -723,7 +734,11 @@
           {#if showBusinessForm}
             <div class="panel-single">
               <div class="panel-actions">
-                <button class="back-btn" type="button" onclick={handleBackToSelector}>
+                <button
+                  class="back-btn"
+                  type="button"
+                  onclick={handleBackToSelector}
+                >
                   <svg
                     width="16"
                     height="16"
@@ -738,7 +753,7 @@
                 </button>
               </div>
               <BusinessForm
-                jwt={jwt}
+                {jwt}
                 business={editingBusiness ?? undefined}
                 onBusinessCreated={handleBusinessCreated}
                 onBusinessUpdated={handleBusinessUpdated}
@@ -748,7 +763,11 @@
           {:else if showBranchForm && selectedBusiness}
             <div class="panel-single">
               <div class="panel-actions">
-                <button class="back-btn" type="button" onclick={handleBackToSelector}>
+                <button
+                  class="back-btn"
+                  type="button"
+                  onclick={handleBackToSelector}
+                >
                   <svg
                     width="16"
                     height="16"
@@ -763,7 +782,7 @@
                 </button>
               </div>
               <BranchForm
-                jwt={jwt}
+                {jwt}
                 business={selectedBusiness}
                 branch={editingBranch ?? undefined}
                 onBranchCreated={handleBranchCreated}
@@ -797,8 +816,8 @@
                 </div>
               {:else}
                 <BusinessBranchSelector
-                  jwt={jwt}
-                  businesses={businesses}
+                  {jwt}
+                  {businesses}
                   onBusinessSelected={handleBusinessSelected}
                   onBranchSelected={handleBranchSelected}
                   onCreateBusiness={handleCreateBusiness}
@@ -807,92 +826,98 @@
                 />
               {/if}
             </div>
+          {:else if isLoadingProducts}
+            <div class="loading-container">
+              <span class="spinner-lg"></span>
+              <p>Cargando productos...</p>
+            </div>
           {:else}
-            {#if isLoadingProducts}
-              <div class="loading-container">
-                <span class="spinner-lg"></span>
-                <p>Cargando productos...</p>
-              </div>
-            {:else}
-              <div class="dashboard-grid">
-                <div class="form-section">
-                  <div class="section-header">
-                    <div class="section-badge">
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                        <line x1="3" y1="6" x2="21" y2="6"/>
-                        <path d="M16 10a4 4 0 0 1-8 0"/>
-                      </svg>
-                      Mis Productos
-                    </div>
-                    <div class="edit-actions">
-                      {#if selectedBusiness}
-                        <button 
-                          class="edit-btn" 
-                          type="button" 
-                          onclick={() => handleEditBusiness(selectedBusiness!)}
-                          title="Editar negocio"
-                        >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                            <polyline points="9 22 9 12 15 12 15 22"/>
-                          </svg>
-                          Editar Negocio
-                        </button>
-                      {/if}
-                      {#if selectedBranch}
-                        <button 
-                          class="edit-btn" 
-                          type="button" 
-                          onclick={() => handleEditBranch(selectedBranch!)}
-                          title="Editar sucursal"
-                        >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                          </svg>
-                          Editar Sucursal
-                        </button>
-                      {/if}
-                    </div>
+            <div class="dashboard-grid">
+              <div class="form-section">
+                <div class="section-header">
+                  <div class="section-badge">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"
+                      />
+                      <line x1="3" y1="6" x2="21" y2="6" />
+                      <path d="M16 10a4 4 0 0 1-8 0" />
+                    </svg>
+                    Mis Productos
                   </div>
-                  <ProductForm
-                    branchId={branchId}
-                    branchTypes={selectedBranch?.tipos || []}
-                    jwt={jwt}
-                    onProductAdded={handleProductAdded}
-                  />
+                  <div class="edit-actions">
+                    {#if selectedBusiness}
+                      <button
+                        class="edit-btn"
+                        type="button"
+                        onclick={() => handleEditBusiness(selectedBusiness!)}
+                        title="Editar negocio"
+                      >
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path
+                            d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+                          />
+                          <polyline points="9 22 9 12 15 12 15 22" />
+                        </svg>
+                        Editar Negocio
+                      </button>
+                    {/if}
+                    {#if selectedBranch}
+                      <button
+                        class="edit-btn"
+                        type="button"
+                        onclick={() => handleEditBranch(selectedBranch!)}
+                        title="Editar sucursal"
+                      >
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path
+                            d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                          />
+                          <circle cx="12" cy="10" r="3" />
+                        </svg>
+                        Editar Sucursal
+                      </button>
+                    {/if}
+                  </div>
                 </div>
-                <div class="list-section">
-                  <ProductList
-                    {products}
-                    onDelete={handleProductDeleted}
-                    onToggleAvailability={handleProductToggleAvailability}
-                  />
-                </div>
+                <ProductForm
+                  {branchId}
+                  branchTypes={selectedBranch?.tipos || []}
+                  {jwt}
+                  onProductAdded={handleProductAdded}
+                  product={editingProduct}
+                />
               </div>
-            {/if}
+              <div class="list-section">
+                <ProductList
+                  {products}
+                  onDelete={handleProductDeleted}
+                  onToggleAvailability={handleProductToggleAvailability}
+                  onEdit={handleProductEdit}
+                />
+              </div>
+            </div>
           {/if}
         </div>
       </div>
@@ -924,11 +949,17 @@
       }}
       onBranchCreated={(branch) => void branch}
     />
-    <ProductForm branchId="" branchTypes={[]} jwt="" onProductAdded={() => {}} />
+    <ProductForm
+      branchId=""
+      branchTypes={[]}
+      jwt=""
+      onProductAdded={() => {}}
+    />
     <ProductList
       products={[]}
       onDelete={() => {}}
       onToggleAvailability={() => {}}
+      onEdit={() => {}}
     />
   </div>
 </section>
