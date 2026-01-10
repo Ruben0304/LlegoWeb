@@ -26,9 +26,8 @@ Se ha implementado exitosamente Apple Sign-In en el panel de negocios, siguiendo
 ### 3. **Variables de Entorno**
 - ✅ Actualizado `.env` con configuración de Apple
 - ✅ Actualizado `.env.example` con documentación
-- ✅ Variables agregadas:
-  - `PUBLIC_APPLE_CLIENT_ID=com.llego.web`
-  - `PUBLIC_APPLE_REDIRECT_URI=https://tu-dominio.com/auth/callback`
+- ✅ Variable agregada:
+  - `PUBLIC_APPLE_CLIENT_ID=com.llego.web` (opcional, solo para referencia)
 
 ### 4. **Documentación**
 - ✅ Creado `docs/apple-signin-implementation.md` con detalles técnicos
@@ -56,18 +55,24 @@ Frontend captura token → Guarda en localStorage → Redirige a /negocios
 
 ## ⚙️ Configuración Necesaria
 
-### En tu `.env`:
+### En tu `.env` (Frontend):
 ```env
 PUBLIC_APPLE_CLIENT_ID=com.llego.web
-PUBLIC_APPLE_REDIRECT_URI=https://tu-dominio-produccion.com/auth/callback
 ```
 
-**IMPORTANTE:** Actualiza `PUBLIC_APPLE_REDIRECT_URI` con tu dominio real de producción antes de desplegar.
+**Nota:** Esta variable es opcional, el flujo OAuth lo maneja completamente el backend.
+
+### En Apple Developer Console:
+El **Redirect URI** debe apuntar al **BACKEND**:
+```
+https://llegobackend-production.up.railway.app/apple/callback
+```
 
 ### En el Backend:
 El backend ya debe tener:
 - ✅ `GET /apple/start` - Retorna `{ auth_url, state }`
-- ✅ `POST /apple/callback` - Recibe callback de Apple y redirige con token
+- ✅ `POST /apple/callback` - Recibe callback de Apple y redirige al frontend con token
+- ✅ Configurado el redirect URI en Apple Developer apuntando al backend
 
 ## 🧪 Testing
 
@@ -103,8 +108,8 @@ El backend ya debe tener:
 ## 🚀 Próximos Pasos
 
 1. ✅ Implementación completada
-2. ⏳ Actualiza `PUBLIC_APPLE_REDIRECT_URI` con tu dominio de producción
-3. ⏳ Verifica que el backend esté configurado correctamente
+2. ⏳ Verifica que el backend tenga configurado el redirect URI de Apple Developer
+3. ⏳ Asegúrate de que el backend redirija a tu dominio frontend correcto
 4. ⏳ Prueba el flujo completo en desarrollo
 5. ⏳ Despliega a producción
 

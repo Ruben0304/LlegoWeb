@@ -15,6 +15,8 @@ Esta carpeta contiene la documentación técnica del proyecto.
 - **[apple-signin-summary.md](./apple-signin-summary.md)** - ✨ Resumen de implementación de Apple Sign-In
 - **[apple-signin-implementation.md](./apple-signin-implementation.md)** - Detalles técnicos de Apple Sign-In
 - **[apple-signin-ui.md](./apple-signin-ui.md)** - Diseño visual de Apple Sign-In
+- **[apple-signin-flow-diagram.md](./apple-signin-flow-diagram.md)** - 🔄 Diagrama completo del flujo OAuth
+- **[apple-signin-faq.md](./apple-signin-faq.md)** - ❓ Preguntas frecuentes y troubleshooting
 
 ## 🆕 Últimas Actualizaciones
 

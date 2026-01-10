@@ -26,9 +26,8 @@ Se ha implementado Apple Sign-In en el panel de negocios siguiendo el flujo OAut
 - Maneja errores con mensajes amigables
 
 ### 3. `.env` y `.env.example`
-- Agregadas variables de configuración:
-  - `PUBLIC_APPLE_CLIENT_ID`: ID del cliente de Apple (debe coincidir con el backend)
-  - `PUBLIC_APPLE_REDIRECT_URI`: URL de callback del frontend
+- Agregada variable de configuración:
+  - `PUBLIC_APPLE_CLIENT_ID`: ID del cliente de Apple (opcional, solo para referencia)
 
 ## Flujo de Autenticación
 
@@ -56,24 +55,33 @@ Se ha implementado Apple Sign-In en el panel de negocios siguiendo el flujo OAut
 
 ## Configuración Requerida
 
-### Variables de Entorno
+### Variables de Entorno (Frontend)
 
 Actualiza tu archivo `.env` con:
 
 ```env
 PUBLIC_APPLE_CLIENT_ID=com.llego.web
-PUBLIC_APPLE_REDIRECT_URI=https://tu-dominio.com/auth/callback
 ```
 
-**Importante:** 
-- El `PUBLIC_APPLE_CLIENT_ID` debe coincidir con el configurado en tu backend
-- El `PUBLIC_APPLE_REDIRECT_URI` debe apuntar a tu dominio de producción
+**Nota:** Esta variable es opcional y solo se usa para referencia. El flujo OAuth completo lo maneja el backend.
 
 ### Backend
 
-El backend ya debe tener configurados los endpoints:
+El backend ya debe tener configurados:
+
+**Endpoints:**
 - `GET /apple/start` - Inicia el flujo de autenticación
-- `POST /apple/callback` - Recibe el callback de Apple (configurado en Apple Developer)
+- `POST /apple/callback` - Recibe el callback de Apple
+
+**Apple Developer Configuration:**
+El redirect URI configurado en Apple Developer debe apuntar al **BACKEND**, no al frontend:
+```
+https://llegobackend-production.up.railway.app/apple/callback
+```
+
+**Flujo de redirección:**
+1. Apple → Backend (`/apple/callback`)
+2. Backend valida y redirige → Frontend (`https://tu-dominio.com/auth/callback?token=JWT`)
 
 ## Características
 
