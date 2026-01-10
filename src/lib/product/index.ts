@@ -49,7 +49,8 @@ export async function getCategories() {
  * @returns Lista de categorías de productos
  */
 export async function getProductCategories(branchType?: string, jwt?: string) {
-  return query<{ productCategories: ProductCategory[] }>(GET_PRODUCT_CATEGORIES, { branchType }, jwt);
+  const normalizedBranchType = branchType ? branchType.toLowerCase() : branchType;
+  return query<{ productCategories: ProductCategory[] }>(GET_PRODUCT_CATEGORIES, { branchType: normalizedBranchType }, jwt);
 }
 
 /**

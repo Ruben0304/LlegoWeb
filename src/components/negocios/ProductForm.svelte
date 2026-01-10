@@ -1,7 +1,12 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { uploadProductImage, createProduct, updateProduct, getProductCategories } from '@/lib/product';
-  import type { Product, ProductCategory } from '@/lib/product';
+  import { onMount } from "svelte";
+  import {
+    uploadProductImage,
+    createProduct,
+    updateProduct,
+    getProductCategories,
+  } from "@/lib/product";
+  import type { Product, ProductCategory } from "@/lib/product";
 
   interface Props {
     branchId: string;
@@ -11,33 +16,41 @@
     product?: Product | null; // Optional: for edit mode
   }
 
-  let { branchId, branchTypes, jwt, onProductAdded, product = null }: Props = $props();
+  let {
+    branchId,
+    branchTypes,
+    jwt,
+    onProductAdded,
+    product = null,
+  }: Props = $props();
 
   // Estado para tipo de branch seleccionado (cuando hay múltiples)
-  let selectedBranchType = $state(branchTypes.length === 1 ? branchTypes[0] : '');
+  let selectedBranchType = $state(
+    branchTypes.length === 1 ? branchTypes[0] : "",
+  );
 
   // Form fields
-  let name = $state('');
-  let description = $state('');
-  let weight = $state('');
-  let price = $state<number | ''>('');
-  let currency = $state<'USD' | 'CUP'>('USD');
+  let name = $state("");
+  let description = $state("");
+  let weight = $state("");
+  let price = $state<number | "">("");
+  let currency = $state<"USD" | "CUP">("USD");
   let imageFile = $state<File | null>(null);
   let availability = $state(true);
-  let categoryId = $state('');
+  let categoryId = $state("");
 
   let isSubmitting = $state(false);
-  let successMessage = $state('');
-  let errorMessage = $state('');
-  let imagePreview = $state('');
+  let successMessage = $state("");
+  let errorMessage = $state("");
+  let imagePreview = $state("");
   let isDragging = $state(false);
   let fileInputRef: HTMLInputElement;
-  let imageName = $state('');
+  let imageName = $state("");
 
   // Categories loaded from backend
   let categories = $state<ProductCategory[]>([]);
   let isLoadingCategories = $state(false);
-  let categoriesError = $state('');
+  let categoriesError = $state("");
 
   // Modo de edición
   let isEditMode = $derived(product !== null);
@@ -47,14 +60,14 @@
     if (product) {
       name = product.name;
       description = product.description;
-      weight = product.weight || '';
+      weight = product.weight || "";
       price = product.price;
-      currency = product.currency || 'USD';
-      availability = product.availability;
-      categoryId = product.categoryId || '';
+      currency = (product.currency as "USD" | "CUP") || "USD";
+      availability = product.availability ?? true;
+      categoryId = product.categoryId || "";
       if (product.imageUrl) {
         imagePreview = product.imageUrl;
-        imageName = 'Imagen actual';
+        imageName = "Imagen actual";
       }
     }
   });
@@ -62,8 +75,11 @@
   // Categorías filtradas según el tipo de branch seleccionado
   let filteredCategories = $derived(
     selectedBranchType
-      ? categories.filter(cat => cat.branchType === selectedBranchType)
-      : categories
+      ? categories.filter(
+          (cat) =>
+            cat.branchType.toLowerCase() === selectedBranchType.toLowerCase(),
+        )
+      : categories,
   );
 
   // Load product categories based on branch types
@@ -74,29 +90,31 @@
     }
 
     isLoadingCategories = true;
-    categoriesError = '';
+    categoriesError = "";
 
     try {
       // Si hay múltiples tipos pero no se ha seleccionado ninguno, cargamos todos
       const typesToLoad = branchTypes;
 
       // Load categories for all branch types
-      const categoryPromises = typesToLoad.map(branchType =>
-        getProductCategories(branchType, jwt)
+      const categoryPromises = typesToLoad.map((branchType) =>
+        getProductCategories(branchType, jwt),
       );
 
       const results = await Promise.all(categoryPromises);
 
       // Combine and deduplicate categories by ID
-      const allCategories = results.flatMap(result => result.productCategories || []);
+      const allCategories = results.flatMap(
+        (result) => result.productCategories || [],
+      );
       const uniqueCategories = Array.from(
-        new Map(allCategories.map(cat => [cat.id, cat])).values()
+        new Map(allCategories.map((cat) => [cat.id, cat])).values(),
       );
 
       categories = uniqueCategories;
     } catch (error) {
-      console.error('Error loading categories:', error);
-      categoriesError = 'Error al cargar las categorías';
+      console.error("Error loading categories:", error);
+      categoriesError = "Error al cargar las categorías";
       categories = [];
     } finally {
       isLoadingCategories = false;
@@ -114,18 +132,18 @@
   });
 
   function handleFileSelect(file: File) {
-    if (!file.type.startsWith('image/')) {
-      errorMessage = 'Por favor selecciona un archivo de imagen válido';
+    if (!file.type.startsWith("image/")) {
+      errorMessage = "Por favor selecciona un archivo de imagen válido";
       return;
     }
 
     // Max 5MB
     if (file.size > 5 * 1024 * 1024) {
-      errorMessage = 'La imagen debe ser menor a 5MB';
+      errorMessage = "La imagen debe ser menor a 5MB";
       return;
     }
 
-    errorMessage = '';
+    errorMessage = "";
     imageFile = file;
     imageName = file.name;
 
@@ -166,10 +184,10 @@
 
   function removeImage() {
     imageFile = null;
-    imagePreview = '';
-    imageName = '';
+    imagePreview = "";
+    imageName = "";
     if (fileInputRef) {
-      fileInputRef.value = '';
+      fileInputRef.value = "";
     }
   }
 
@@ -178,19 +196,19 @@
   }
 
   function resetForm() {
-    name = '';
-    description = '';
-    weight = '';
-    price = '';
-    currency = 'USD';
+    name = "";
+    description = "";
+    weight = "";
+    price = "";
+    currency = "USD";
     imageFile = null;
     availability = true;
-    categoryId = '';
-    imagePreview = '';
-    imageName = '';
-    errorMessage = '';
+    categoryId = "";
+    imagePreview = "";
+    imageName = "";
+    errorMessage = "";
     if (fileInputRef) {
-      fileInputRef.value = '';
+      fileInputRef.value = "";
     }
   }
 
@@ -199,19 +217,20 @@
 
     // Validar que hay tipo de branch seleccionado si hay múltiples
     if (branchTypes.length > 1 && !selectedBranchType) {
-      errorMessage = 'Por favor selecciona el tipo de negocio para este producto';
+      errorMessage =
+        "Por favor selecciona el tipo de negocio para este producto";
       return;
     }
 
     // En modo creación, la imagen es obligatoria
     if (!isEditMode && !imageFile) {
-      errorMessage = 'Por favor selecciona una imagen para el producto';
+      errorMessage = "Por favor selecciona una imagen para el producto";
       return;
     }
 
     isSubmitting = true;
-    errorMessage = '';
-    successMessage = '';
+    errorMessage = "";
+    successMessage = "";
 
     try {
       let imagePath = product?.image; // En edición, usar la imagen existente por defecto
@@ -235,9 +254,13 @@
           ...(imagePath && { image: imagePath }),
         };
 
-        const updatedProduct = await updateProduct(product.id, updateInput, jwt);
+        const updatedProduct = await updateProduct(
+          product.id,
+          updateInput,
+          jwt,
+        );
         onProductAdded(updatedProduct);
-        successMessage = 'Producto actualizado correctamente';
+        successMessage = "Producto actualizado correctamente";
       } else {
         // Modo creación: crear nuevo producto
         const productInput = {
@@ -253,17 +276,18 @@
 
         const createdProduct = await createProduct(productInput, jwt);
         onProductAdded(createdProduct);
-        successMessage = 'Producto agregado correctamente';
+        successMessage = "Producto agregado correctamente";
         resetForm();
       }
 
       // Clear success message after 3 seconds
       setTimeout(() => {
-        successMessage = '';
+        successMessage = "";
       }, 3000);
     } catch (error) {
-      console.error('Error al guardar producto:', error);
-      errorMessage = error instanceof Error ? error.message : 'Error al guardar el producto';
+      console.error("Error al guardar producto:", error);
+      errorMessage =
+        error instanceof Error ? error.message : "Error al guardar el producto";
     } finally {
       isSubmitting = false;
     }
@@ -273,26 +297,48 @@
 <div class="product-form-container">
   <div class="form-header">
     <div class="form-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         {#if isEditMode}
-          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          <path
+            d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+          />
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
         {:else}
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
         {/if}
       </svg>
     </div>
     <div>
-      <h2 class="form-title">{isEditMode ? 'Editar Producto' : 'Agregar Producto'}</h2>
-      <p class="form-subtitle">{isEditMode ? 'Modifica los datos del producto' : 'Completa los datos del nuevo producto'}</p>
+      <h2 class="form-title">
+        {isEditMode ? "Editar Producto" : "Agregar Producto"}
+      </h2>
+      <p class="form-subtitle">
+        {isEditMode
+          ? "Modifica los datos del producto"
+          : "Completa los datos del nuevo producto"}
+      </p>
     </div>
   </div>
 
   {#if successMessage}
     <div class="success-message">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="20 6 9 17 4 12"/>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <polyline points="20 6 9 17 4 12" />
       </svg>
       {successMessage}
     </div>
@@ -300,10 +346,17 @@
 
   {#if errorMessage}
     <div class="error-message">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10"/>
-        <line x1="12" y1="8" x2="12" y2="12"/>
-        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
       </svg>
       {errorMessage}
     </div>
@@ -367,8 +420,16 @@
             <option value="USD">USD</option>
             <option value="CUP">CUP</option>
           </select>
-          <svg class="select-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="6 9 12 15 18 9"/>
+          <svg
+            class="select-arrow"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="6 9 12 15 18 9" />
           </svg>
         </div>
       </div>
@@ -392,7 +453,9 @@
           Tipo de Negocio
           <span class="required">*</span>
         </label>
-        <p class="field-hint">Selecciona en qué categoría de negocio aparecerá este producto</p>
+        <p class="field-hint">
+          Selecciona en qué categoría de negocio aparecerá este producto
+        </p>
         <div class="radio-group">
           {#each branchTypes as branchType}
             <label class="radio-option">
@@ -403,9 +466,13 @@
                 bind:group={selectedBranchType}
               />
               <span class="radio-label">
-                {branchType === 'RESTAURANTE' ? 'Restaurante' :
-                 branchType === 'DULCERIA' ? 'Dulcería' :
-                 branchType === 'TIENDA' ? 'Tienda' : branchType}
+                {branchType === "RESTAURANTE"
+                  ? "Restaurante"
+                  : branchType === "DULCERIA"
+                    ? "Dulcería"
+                    : branchType === "TIENDA"
+                      ? "Tienda"
+                      : branchType}
               </span>
             </label>
           {/each}
@@ -425,15 +492,25 @@
         <select
           id="product-category"
           bind:value={categoryId}
-          disabled={isLoadingCategories || filteredCategories.length === 0 || (branchTypes.length > 1 && !selectedBranchType)}
+          disabled={isLoadingCategories ||
+            filteredCategories.length === 0 ||
+            (branchTypes.length > 1 && !selectedBranchType)}
         >
           <option value="">Sin categoría</option>
           {#each filteredCategories as cat}
             <option value={cat.id}>{cat.name}</option>
           {/each}
         </select>
-        <svg class="select-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="6 9 12 15 18 9"/>
+        <svg
+          class="select-arrow"
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <polyline points="6 9 12 15 18 9" />
         </svg>
       </div>
       {#if categoriesError}
@@ -446,7 +523,10 @@
 
     <!-- Image Upload -->
     <div class="form-group">
-      <label>Imagen del producto {#if !isEditMode}<span class="required">*</span>{/if}</label>
+      <label
+        >Imagen del producto {#if !isEditMode}<span class="required">*</span
+          >{/if}</label
+      >
       {#if isEditMode}
         <p class="field-hint">Deja en blanco para mantener la imagen actual</p>
       {/if}
@@ -465,10 +545,21 @@
           </div>
           <div class="image-info">
             <span class="image-name">{imageName}</span>
-            <button type="button" class="remove-image-btn" onclick={removeImage}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
+            <button
+              type="button"
+              class="remove-image-btn"
+              onclick={removeImage}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
               Eliminar
             </button>
@@ -485,10 +576,17 @@
           onclick={triggerFileInput}
         >
           <div class="upload-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="17 8 12 3 7 8"/>
-              <line x1="12" y1="3" x2="12" y2="15"/>
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
             </svg>
           </div>
           <span class="upload-text">Arrastra una imagen aquí</span>
@@ -502,7 +600,9 @@
     <div class="form-group-toggle">
       <div class="toggle-info">
         <label for="product-availability">Disponibilidad</label>
-        <span class="toggle-description">El producto estará visible para los clientes</span>
+        <span class="toggle-description"
+          >El producto estará visible para los clientes</span
+        >
       </div>
       <label class="toggle-switch">
         <input
@@ -521,19 +621,28 @@
     <button type="submit" class="submit-btn" disabled={isSubmitting}>
       {#if isSubmitting}
         <span class="spinner"></span>
-        {isEditMode ? 'Guardando...' : 'Agregando...'}
+        {isEditMode ? "Guardando..." : "Agregando..."}
       {:else}
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           {#if isEditMode}
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-            <polyline points="17 21 17 13 7 13 7 21"/>
-            <polyline points="7 3 7 8 15 8"/>
+            <path
+              d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+            />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
           {:else}
-            <line x1="12" y1="5" x2="12" y2="19"/>
-            <line x1="5" y1="12" x2="19" y2="12"/>
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
           {/if}
         </svg>
-        {isEditMode ? 'Guardar Cambios' : 'Agregar Producto'}
+        {isEditMode ? "Guardar Cambios" : "Agregar Producto"}
       {/if}
     </button>
   </form>
@@ -557,7 +666,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(90, 132, 103, 0.2) 0%, rgba(178, 214, 154, 0.2) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba(90, 132, 103, 0.2) 0%,
+      rgba(178, 214, 154, 0.2) 100%
+    );
     border-radius: var(--radius-lg);
     color: var(--color-accent);
     flex-shrink: 0;
@@ -590,8 +703,14 @@
   }
 
   @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .error-message {
@@ -930,7 +1049,11 @@
     font-size: var(--font-size-base);
     font-weight: 600;
     color: var(--color-primary);
-    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--color-secondary) 0%,
+      var(--color-accent) 100%
+    );
     border-radius: var(--radius-full);
     transition: all var(--transition-base);
     margin-top: var(--spacing-sm);
@@ -956,7 +1079,9 @@
   }
 
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   /* Radio Group */
