@@ -56,6 +56,7 @@
 
   const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID;
   const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL || "";
+  const APPLE_CLIENT_ID = import.meta.env.PUBLIC_APPLE_CLIENT_ID;
 
   function storeAuth(data: AuthResponse) {
     if (typeof window === "undefined") return;
@@ -218,6 +219,46 @@
     } else {
       // Fallback to prompt if button not found
       window.google?.accounts?.id?.prompt();
+    }
+  }
+
+  async function handleAppleLogin() {
+    if (!APPLE_CLIENT_ID) {
+      errorMessage = "Apple Sign In no está configurado.";
+      return;
+    }
+
+    isLoading = true;
+    errorMessage = "";
+
+    try {
+      // Call backend to get Apple auth URL
+      const response = await fetch(`${BACKEND_URL}/apple/start`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error("No se pudo iniciar el flujo de Apple Sign In");
+      }
+
+      const data = await response.json();
+      
+      if (!data.auth_url) {
+        throw new Error("No se recibió la URL de autenticación");
+      }
+
+      // Store state for validation (optional)
+      if (data.state) {
+        sessionStorage.setItem("apple_auth_state", data.state);
+      }
+
+      // Redirect to Apple's auth page
+      window.location.href = data.auth_url;
+    } catch (error) {
+      console.error("Error en Apple Sign In:", error);
+      errorMessage = error instanceof Error ? error.message : "Error al iniciar sesión con Apple";
+      isLoading = false;
     }
   }
 
@@ -659,6 +700,29 @@
                 />
               </svg>
               <span>Continuar con Google</span>
+            {/if}
+          </button>
+
+          <button
+            type="button"
+            class="apple-signin-btn"
+            onclick={handleAppleLogin}
+            disabled={isLoading || !APPLE_CLIENT_ID}
+          >
+            {#if isLoading}
+              <span class="spinner-dark"></span>
+              <span>Conectando...</span>
+            {:else}
+              <svg
+                class="apple-icon"
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+                fill="currentColor"
+              >
+                <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+              </svg>
+              <span>Continuar con Apple</span>
             {/if}
           </button>
 
@@ -1104,6 +1168,70 @@
 
   .google-signin-btn span {
     white-space: nowrap;
+  }
+
+  /* Apple Sign In Button - Apple Style */
+  .apple-signin-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 320px;
+    height: 54px;
+    padding: 0 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
+      Roboto, sans-serif;
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+    background: #000000;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.3),
+      0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .apple-signin-btn:hover:not(:disabled) {
+    transform: scale(1.02);
+    background: #1a1a1a;
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.4),
+      0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  .apple-signin-btn:active:not(:disabled) {
+    transform: scale(0.98);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.3),
+      0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .apple-signin-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .apple-signin-btn .apple-icon {
+    flex-shrink: 0;
+  }
+
+  .apple-signin-btn span {
+    white-space: nowrap;
+  }
+
+  .spinner-dark {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
   }
 
   /* Hidden Google Button */

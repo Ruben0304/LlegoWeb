@@ -1,0 +1,212 @@
+---
+// Auth callback page - handles OAuth redirects from backend
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Autenticando...</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        text-align: center;
+        max-width: 400px;
+      }
+
+      .icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 20px;
+        color: #e1c78e;
+      }
+
+      .spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid rgba(225, 199, 142, 0.2);
+        border-top-color: #e1c78e;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      h1 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        letter-spacing: -0.02em;
+      }
+
+      p {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .error {
+        background: rgba(255, 59, 48, 0.08);
+        border: 1px solid rgba(255, 59, 48, 0.2);
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 24px;
+        color: #ff6b6b;
+      }
+
+      .error-title {
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 16px;
+      }
+
+      .error-message {
+        font-size: 14px;
+        color: rgba(255, 107, 107, 0.8);
+      }
+
+      .back-link {
+        display: inline-block;
+        margin-top: 24px;
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        color: #e1c78e;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+
+      .back-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="icon">
+        <div class="spinner"></div>
+      </div>
+      <h1 id="status-title">Autenticando...</h1>
+      <p id="status-message">Por favor espera un momento</p>
+      <div id="error-container" style="display: none;"></div>
+    </div>
+
+    <script>
+      const AUTH_TOKEN_KEY = 'llego.auth.accessToken';
+      const AUTH_TOKEN_TYPE_KEY = 'llego.auth.tokenType';
+      const AUTH_USER_KEY = 'llego.auth.user';
+
+      function showError(title: string, message: string) {
+        const titleEl = document.getElementById('status-title');
+        const messageEl = document.getElementById('status-message');
+        const errorContainer = document.getElementById('error-container');
+        const spinner = document.querySelector('.spinner');
+
+        if (titleEl) titleEl.textContent = title;
+        if (messageEl) messageEl.style.display = 'none';
+        
+        if (errorContainer) {
+          errorContainer.innerHTML = `
+            <div class="error">
+              <div class="error-title">${title}</div>
+              <div class="error-message">${message}</div>
+            </div>
+            <a href="/negocios" class="back-link">Volver al inicio</a>
+          `;
+          errorContainer.style.display = 'block';
+        }
+        
+        if (spinner) (spinner as HTMLElement).style.display = 'none';
+      }
+
+      function handleCallback() {
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const token = params.get('token');
+          const error = params.get('error');
+          const errorMessage = params.get('message');
+
+          if (error) {
+            console.error('Auth error:', error, errorMessage);
+            showError(
+              'Error de autenticación',
+              errorMessage || 'No se pudo completar la autenticación. Por favor intenta nuevamente.'
+            );
+            return;
+          }
+
+          if (!token) {
+            showError(
+              'Token no encontrado',
+              'No se recibió un token de autenticación válido.'
+            );
+            return;
+          }
+
+          // Decode JWT to get user info (simple base64 decode, no verification needed here)
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            
+            // Store auth data
+            localStorage.setItem(AUTH_TOKEN_KEY, token);
+            localStorage.setItem(AUTH_TOKEN_TYPE_KEY, 'bearer');
+            localStorage.setItem(AUTH_USER_KEY, JSON.stringify({
+              id: payload.sub || payload.userId,
+              name: payload.name || payload.email?.split('@')[0] || 'Usuario',
+              email: payload.email,
+              role: payload.role || 'user'
+            }));
+
+            console.log('✅ Auth successful, redirecting to /negocios');
+            
+            // Redirect to business panel
+            window.location.href = '/negocios';
+          } catch (decodeError) {
+            console.error('Error decoding token:', decodeError);
+            // Still try to store the token even if decode fails
+            localStorage.setItem(AUTH_TOKEN_KEY, token);
+            localStorage.setItem(AUTH_TOKEN_TYPE_KEY, 'bearer');
+            window.location.href = '/negocios';
+          }
+        } catch (error) {
+          console.error('Callback error:', error);
+          showError(
+            'Error inesperado',
+            'Ocurrió un error al procesar la autenticación.'
+          );
+        }
+      }
+
+      // Execute on page load
+      handleCallback();
+    </script>
+  </body>
+</html>
