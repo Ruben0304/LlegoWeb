@@ -234,7 +234,7 @@
         <!-- Business Selection -->
         <div class="section">
             <div class="section-label">
-                <span class="label-text">Negocio</span>
+                <span class="label-text">Negocios</span>
                 <span class="label-required">*</span>
             </div>
             
@@ -287,15 +287,17 @@
                                         <span class="avatar-letter">{business.name.charAt(0).toUpperCase()}</span>
                                     {/if}
                                 </div>
-                                <div class="business-details">
-                                    <span class="business-name">{business.name}</span>
-                                    <span class="business-type">{business.type}</span>
-                                </div>
-                                <div class="business-meta">
-                                    <span class="status-badge" class:active={business.isActive}>
-                                        <span class="status-dot"></span>
-                                        {business.isActive ? "Activo" : "Inactivo"}
-                                    </span>
+                                <div class="business-info">
+                                    <div class="business-details">
+                                        <span class="business-name">{business.name}</span>
+                                        <span class="business-type">{business.type}</span>
+                                    </div>
+                                    <div class="business-meta">
+                                        <span class="status-badge" class:active={business.isActive}>
+                                            <span class="status-dot"></span>
+                                            {business.isActive ? "Activo" : "Inactivo"}
+                                        </span>
+                                    </div>
                                 </div>
                                 {#if selectedBusinessId === business.id}
                                     <div class="selected-indicator">
@@ -367,23 +369,25 @@
                                     {#if branch.avatarUrl}
                                         <img src={branch.avatarUrl} alt={branch.name} />
                                     {:else}
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                                             <circle cx="12" cy="10" r="3" />
                                         </svg>
                                     {/if}
                                 </div>
-                                <div class="branch-details">
-                                    <span class="branch-name">{branch.name}</span>
-                                    {#if branch.address}
-                                        <span class="branch-address">{branch.address}</span>
-                                    {/if}
-                                </div>
-                                <div class="branch-meta">
-                                    <span class="status-badge status-sm" class:active={branch.status === "active"}>
-                                        <span class="status-dot"></span>
-                                        {branch.status === "active" ? "Activa" : "Inactiva"}
-                                    </span>
+                                <div class="branch-content">
+                                    <div class="branch-details">
+                                        <span class="branch-name">{branch.name}</span>
+                                        {#if branch.address}
+                                            <span class="branch-address">{branch.address}</span>
+                                        {/if}
+                                    </div>
+                                    <div class="branch-meta">
+                                        <span class="status-badge status-sm" class:active={branch.status === "active"}>
+                                            <span class="status-dot"></span>
+                                            {branch.status === "active" ? "Activa" : "Inactiva"}
+                                        </span>
+                                    </div>
                                 </div>
                                 <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polyline points="9 18 15 12 9 6" />
@@ -560,29 +564,59 @@
 
     /* Business Grid */
     .business-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 14px;
+    }
+
+    @media (max-width: 768px) {
+        .business-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     .business-card {
         position: relative;
-        background: rgba(30, 41, 59, 0.5);
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(30, 41, 59, 0.4) 100%);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        transition: all 0.2s ease;
+        border-radius: 14px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden;
+        height: 100%;
+        min-height: 140px;
+    }
+
+    .business-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
     }
 
     .business-card:hover {
-        background: rgba(30, 41, 59, 0.8);
-        border-color: rgba(255, 255, 255, 0.12);
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+        border-color: rgba(99, 102, 241, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(99, 102, 241, 0.1);
+    }
+
+    .business-card:hover::before {
+        opacity: 1;
     }
 
     .business-card.selected {
-        background: rgba(99, 102, 241, 0.1);
-        border-color: rgba(99, 102, 241, 0.4);
-        box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+        border-color: rgba(99, 102, 241, 0.5);
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2), 0 8px 24px rgba(99, 102, 241, 0.15);
+    }
+
+    .business-card.selected::before {
+        opacity: 1;
     }
 
     .business-card.deleting {
@@ -592,26 +626,34 @@
 
     .business-card-content {
         display: flex;
+        flex-direction: column;
         align-items: center;
         gap: 14px;
         width: 100%;
-        padding: 14px 16px;
+        height: 100%;
+        padding: 20px 16px;
         background: none;
         border: none;
-        text-align: left;
+        text-align: center;
         cursor: pointer;
     }
 
     .business-avatar {
-        width: 44px;
-        height: 44px;
+        width: 64px;
+        height: 64px;
         display: flex;
         align-items: center;
         justify-content: center;
         background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        border-radius: 10px;
+        border-radius: 14px;
         overflow: hidden;
         flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        transition: transform 0.3s ease;
+    }
+
+    .business-card:hover .business-avatar {
+        transform: scale(1.05);
     }
 
     .business-avatar img {
@@ -621,26 +663,33 @@
     }
 
     .avatar-letter {
-        font-size: 18px;
+        font-size: 26px;
         font-weight: 700;
         color: #ffffff;
     }
 
-    .business-details {
+    .business-info {
         flex: 1;
-        min-width: 0;
+        width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 10px;
+    }
+
+    .business-details {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
     }
 
     .business-name {
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 600;
         color: #f1f5f9;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        letter-spacing: -0.01em;
     }
 
     .business-type {
@@ -650,7 +699,8 @@
     }
 
     .business-meta {
-        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
     }
 
     /* Status Badge */
@@ -684,33 +734,51 @@
     }
 
     .selected-indicator {
-        width: 28px;
-        height: 28px;
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 32px;
+        height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #6366f1;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         border-radius: 50%;
         color: white;
         flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
     }
 
     .card-action-btn {
         position: absolute;
-        top: 8px;
-        right: 8px;
-        width: 28px;
-        height: 28px;
+        top: 10px;
+        left: 10px;
+        width: 30px;
+        height: 30px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(239, 68, 68, 0.1);
-        border: none;
-        border-radius: 6px;
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 8px;
         color: #f87171;
         cursor: pointer;
         opacity: 0;
         transition: all 0.2s ease;
+        z-index: 10;
     }
 
     .business-card:hover .card-action-btn {
@@ -718,8 +786,10 @@
     }
 
     .card-action-btn:hover {
-        background: rgba(239, 68, 68, 0.2);
+        background: rgba(239, 68, 68, 0.15);
+        border-color: rgba(239, 68, 68, 0.5);
         color: #ef4444;
+        transform: scale(1.05);
     }
 
     /* Confirm Overlay */
@@ -747,33 +817,61 @@
 
     /* Branches Section */
     .branches-section {
-        padding-top: 20px;
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding-top: 24px;
+        margin-top: 24px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .branches-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 12px;
+    }
+
+    @media (max-width: 768px) {
+        .branches-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     .branch-card {
         display: flex;
+        flex-direction: column;
         align-items: center;
         gap: 12px;
         width: 100%;
-        padding: 12px 14px;
-        background: rgba(30, 41, 59, 0.4);
+        padding: 18px 16px;
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(30, 41, 59, 0.3) 100%);
         border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 10px;
-        text-align: left;
+        border-radius: 12px;
+        text-align: center;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .branch-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
     }
 
     .branch-card:hover {
-        background: rgba(30, 41, 59, 0.7);
-        border-color: rgba(255, 255, 255, 0.1);
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
+        border-color: rgba(99, 102, 241, 0.25);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .branch-card:hover::before {
+        opacity: 1;
     }
 
     .branch-card:hover .chevron-icon {
@@ -781,17 +879,23 @@
         color: #a5b4fc;
     }
 
+    .branch-card:hover .branch-avatar {
+        transform: scale(1.05);
+    }
+
     .branch-avatar {
-        width: 36px;
-        height: 36px;
+        width: 48px;
+        height: 48px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(99, 102, 241, 0.15);
-        border-radius: 8px;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%);
+        border: 1px solid rgba(99, 102, 241, 0.25);
+        border-radius: 12px;
         overflow: hidden;
         flex-shrink: 0;
-        color: #818cf8;
+        color: #a5b4fc;
+        transition: transform 0.3s ease;
     }
 
     .branch-avatar img {
@@ -800,21 +904,28 @@
         object-fit: cover;
     }
 
-    .branch-details {
+    .branch-content {
         flex: 1;
-        min-width: 0;
+        width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 8px;
+    }
+
+    .branch-details {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
     }
 
     .branch-name {
-        font-size: 13px;
-        font-weight: 500;
+        font-size: 14px;
+        font-weight: 600;
         color: #e2e8f0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        letter-spacing: -0.01em;
     }
 
     .branch-address {
@@ -823,16 +934,21 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        line-height: 1.4;
     }
 
     .branch-meta {
-        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
     }
 
     .chevron-icon {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
         color: #64748b;
         flex-shrink: 0;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
     }
 
     /* Loading State */
