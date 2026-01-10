@@ -1283,12 +1283,12 @@
 
   /* Single Panel Layout */
   .panel-single {
-    max-width: 560px;
+    width: 100%;
     margin: 0 auto;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: var(--radius-2xl);
-    padding: var(--spacing-xl);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
   }
 
   .panel-actions {
