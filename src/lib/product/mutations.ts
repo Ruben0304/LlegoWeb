@@ -6,7 +6,7 @@ import { gql } from 'graphql-request';
 
 export const CREATE_PRODUCT = gql`
   mutation CreateProduct($input: CreateProductInput!, $jwt: String) {
-    create_product(input: $input, jwt: $jwt) {
+    createProduct(input: $input, jwt: $jwt) {
       id
       name
       description
@@ -31,8 +31,8 @@ export const CREATE_PRODUCT = gql`
 `;
 
 export const UPDATE_PRODUCT = gql`
-  mutation UpdateProduct($productId: String!, $input: UpdateProductInput!) {
-    update_product(product_id: $productId, input: $input) {
+  mutation UpdateProduct($productId: String!, $input: UpdateProductInput!, $jwt: String) {
+    updateProduct(productId: $productId, input: $input, jwt: $jwt) {
       id
       name
       price

@@ -125,13 +125,13 @@ export async function createProduct(
   input: CreateProductInput,
   jwt: string
 ): Promise<Product> {
-  const result = await mutation<{ create_product: Product }>(CREATE_PRODUCT, { input, jwt });
-  return result.create_product;
+  const result = await mutation<{ createProduct: Product }>(CREATE_PRODUCT, { input, jwt });
+  return result.createProduct;
 }
 
 export async function updateProduct(productId: string, input: UpdateProductInput, jwt?: string) {
-  const result = await mutation<{ update_product: Product }>(UPDATE_PRODUCT, { productId, input, jwt });
-  return result.update_product;
+  const result = await mutation<{ updateProduct: Product }>(UPDATE_PRODUCT, { productId, input, jwt });
+  return result.updateProduct;
 }
 
 export async function deleteProduct(id: string) {
