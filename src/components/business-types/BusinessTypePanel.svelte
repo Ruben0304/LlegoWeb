@@ -18,10 +18,16 @@
   let activeView = $state<"list" | "form">("list");
   let loadError = $state("");
 
+  // Auth storage keys (same as BusinessPanel)
+  const AUTH_TOKEN_KEY = "llego.auth.accessToken";
+  const AUTH_USER_KEY = "llego.auth.user";
+
   onMount(async () => {
-    // Check auth from localStorage
-    const storedJwt = localStorage.getItem("jwt");
-    if (storedJwt) {
+    // Check auth from localStorage (same keys as BusinessPanel)
+    const storedJwt = localStorage.getItem(AUTH_TOKEN_KEY);
+    const storedUser = localStorage.getItem(AUTH_USER_KEY);
+    
+    if (storedJwt && storedUser) {
       jwt = storedJwt;
       isAuthenticated = true;
       await loadBusinessTypes();
