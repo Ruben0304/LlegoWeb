@@ -289,9 +289,9 @@
   }
 </script>
 
-<div class="form-container">
-  <div class="form-header">
-    <div class="form-icon">
+<div class="bt-form-container">
+  <div class="bt-form-header">
+    <div class="bt-form-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         {#if isEditMode}
           <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -303,13 +303,13 @@
       </svg>
     </div>
     <div>
-      <h2 class="form-title">{isEditMode ? "Editar BusinessType" : "Crear BusinessType"}</h2>
-      <p class="form-subtitle">{isEditMode ? "Modifica los datos" : "Completa los datos del nuevo tipo"}</p>
+      <h2 class="bt-form-title">{isEditMode ? "Editar BusinessType" : "Crear BusinessType"}</h2>
+      <p class="bt-form-subtitle">{isEditMode ? "Modifica los datos" : "Completa los datos del nuevo tipo"}</p>
     </div>
   </div>
 
   {#if successMessage}
-    <div class="success-message">
+    <div class="bt-success-message">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polyline points="20 6 9 17 4 12" />
       </svg>
@@ -318,7 +318,7 @@
   {/if}
 
   {#if errorMessage}
-    <div class="error-message">
+    <div class="bt-error-message">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="10" />
         <line x1="12" y1="8" x2="12" y2="12" />
@@ -328,32 +328,32 @@
     </div>
   {/if}
 
-  <form class="business-type-form" onsubmit={handleSubmit}>
+  <form class="bt-business-type-form" onsubmit={handleSubmit}>
     <!-- Basic Info Section -->
-    <div class="section">
-      <h3 class="section-title">Información Básica</h3>
+    <div class="bt-section">
+      <h3 class="bt-section-title">Información Básica</h3>
       
       {#if !isEditMode}
-        <div class="form-group">
-          <label for="bt-key">Key <span class="required">*</span></label>
+        <div class="bt-form-group">
+          <label for="bt-key">Key <span class="bt-required">*</span></label>
           <input type="text" id="bt-key" bind:value={key} placeholder="Ej: FARMACIA" required />
-          <span class="field-hint">Identificador único (no editable después)</span>
+          <span class="bt-field-hint">Identificador único (no editable después)</span>
         </div>
       {/if}
 
-      <div class="form-group">
-        <label for="bt-name">Nombre <span class="required">*</span></label>
+      <div class="bt-form-group">
+        <label for="bt-name">Nombre <span class="bt-required">*</span></label>
         <input type="text" id="bt-name" bind:value={name} placeholder="Ej: Farmacias" required />
       </div>
 
-      <div class="form-group">
-        <label for="bt-description">Descripción <span class="required">*</span></label>
+      <div class="bt-form-group">
+        <label for="bt-description">Descripción <span class="bt-required">*</span></label>
         <textarea id="bt-description" bind:value={description} placeholder="Describe este tipo de negocio..." rows="3" required></textarea>
       </div>
 
-      <div class="form-row">
+      <div class="bt-form-row">
         <div class="form-group flex-1">
-          <label for="bt-icon">Icono <span class="required">*</span></label>
+          <label for="bt-icon">Icono <span class="bt-required">*</span></label>
           <input type="text" id="bt-icon" bind:value={icon} placeholder="Ej: 💊" required />
         </div>
         <div class="form-group flex-1">
@@ -362,9 +362,9 @@
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="bt-form-group">
         <label for="bt-glow">Glow Color</label>
-        <div class="color-input-wrapper">
+        <div class="bt-color-input-wrapper">
           <input type="color" id="bt-glow" bind:value={glowColor} />
           <input type="text" bind:value={glowColor} placeholder="#FFFFFF" />
         </div>
@@ -372,32 +372,32 @@
     </div>
 
     <!-- Model 3D Section -->
-    <div class="section">
-      <h3 class="section-title">Modelo 3D</h3>
+    <div class="bt-section">
+      <h3 class="bt-section-title">Modelo 3D</h3>
       
-      <div class="form-group">
-        <label for="bt-model-name">Nombre del archivo <span class="required">*</span></label>
+      <div class="bt-form-group">
+        <label for="bt-model-name">Nombre del archivo <span class="bt-required">*</span></label>
         <input type="text" id="bt-model-name" bind:value={model3dFileName} placeholder="Ej: farmacia.usdz" required />
       </div>
 
-      <div class="form-group">
-        <label>Archivo del modelo {#if !isEditMode}<span class="required">*</span>{/if}</label>
+      <div class="bt-form-group">
+        <label>Archivo del modelo {#if !isEditMode}<span class="bt-required">*</span>{/if}</label>
         {#if isEditMode}
-          <p class="field-hint">Deja en blanco para mantener el modelo actual</p>
+          <p class="bt-field-hint">Deja en blanco para mantener el modelo actual</p>
         {/if}
-        <input type="file" accept=".usdz,.glb" bind:this={fileInputRef} onchange={handleInputChange} class="file-input-hidden" />
+        <input type="file" accept=".usdz,.glb" bind:this={fileInputRef} onchange={handleInputChange} class="bt-file-input-hidden" />
 
         {#if model3dPreview}
-          <div class="file-preview-container">
-            <div class="file-preview">
+          <div class="bt-file-preview-container">
+            <div class="bt-file-preview">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                 <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
                 <line x1="12" y1="22.08" x2="12" y2="12" />
               </svg>
-              <span class="file-name">{model3dFileName || model3dPreview}</span>
+              <span class="bt-file-name">{model3dFileName || model3dPreview}</span>
             </div>
-            <button type="button" class="remove-file-btn" onclick={removeModel}>
+            <button type="button" class="bt-remove-file-btn" onclick={removeModel}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
@@ -406,62 +406,62 @@
             </button>
           </div>
         {:else}
-          <button type="button" class="upload-area" class:dragging={isDragging} ondragover={handleDragOver} ondragleave={handleDragLeave} ondrop={handleDrop} onclick={triggerFileInput}>
-            <div class="upload-icon">
+          <button type="button" class="bt-upload-area" class:dragging={isDragging} ondragover={handleDragOver} ondragleave={handleDragLeave} ondrop={handleDrop} onclick={triggerFileInput}>
+            <div class="bt-upload-icon">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
             </div>
-            <span class="upload-text">Arrastra un modelo 3D aquí</span>
-            <span class="upload-subtext">o haz clic para seleccionar</span>
-            <span class="upload-hint">.usdz, .glb hasta 50MB</span>
+            <span class="bt-upload-text">Arrastra un modelo 3D aquí</span>
+            <span class="bt-upload-subtext">o haz clic para seleccionar</span>
+            <span class="bt-upload-hint">.usdz, .glb hasta 50MB</span>
           </button>
         {/if}
       </div>
     </div>
 
     <!-- Gradient Section -->
-    <div class="section">
-      <h3 class="section-title">Gradiente</h3>
-      <div class="gradient-preview" style="background: linear-gradient(135deg, {gradientDarkColor}, {gradientMediumColor}, {gradientLightColor}, {gradientVeryLightColor})"></div>
+    <div class="bt-section">
+      <h3 class="bt-section-title">Gradiente</h3>
+      <div class="bt-gradient-preview" style="background: linear-gradient(135deg, {gradientDarkColor}, {gradientMediumColor}, {gradientLightColor}, {gradientVeryLightColor})"></div>
       
-      <div class="form-row">
+      <div class="bt-form-row">
         <div class="form-group flex-1">
           <label>Dark Color</label>
-          <div class="color-input-wrapper">
+          <div class="bt-color-input-wrapper">
             <input type="color" bind:value={gradientDarkColor} />
             <input type="text" bind:value={gradientDarkColor} />
           </div>
         </div>
         <div class="form-group flex-1">
           <label>Medium Color</label>
-          <div class="color-input-wrapper">
+          <div class="bt-color-input-wrapper">
             <input type="color" bind:value={gradientMediumColor} />
             <input type="text" bind:value={gradientMediumColor} />
           </div>
         </div>
       </div>
-      <div class="form-row">
+      <div class="bt-form-row">
         <div class="form-group flex-1">
           <label>Light Color</label>
-          <div class="color-input-wrapper">
+          <div class="bt-color-input-wrapper">
             <input type="color" bind:value={gradientLightColor} />
             <input type="text" bind:value={gradientLightColor} />
           </div>
         </div>
         <div class="form-group flex-1">
           <label>Very Light Color</label>
-          <div class="color-input-wrapper">
+          <div class="bt-color-input-wrapper">
             <input type="color" bind:value={gradientVeryLightColor} />
             <input type="text" bind:value={gradientVeryLightColor} />
           </div>
         </div>
       </div>
-      <div class="form-group">
+      <div class="bt-form-group">
         <label>Overlay Color</label>
-        <div class="color-input-wrapper">
+        <div class="bt-color-input-wrapper">
           <input type="color" bind:value={gradientOverlayColor} />
           <input type="text" bind:value={gradientOverlayColor} />
         </div>
@@ -469,9 +469,9 @@
     </div>
 
     <!-- Camera Section -->
-    <div class="section">
-      <h3 class="section-title">Cámara</h3>
-      <div class="form-row">
+    <div class="bt-section">
+      <h3 class="bt-section-title">Cámara</h3>
+      <div class="bt-form-row">
         <div class="form-group flex-1">
           <label>Position X</label>
           <input type="number" bind:value={cameraPositionX} step="0.1" />
@@ -485,7 +485,7 @@
           <input type="number" bind:value={cameraPositionZ} step="0.1" />
         </div>
       </div>
-      <div class="form-row">
+      <div class="bt-form-row">
         <div class="form-group flex-1">
           <label>Euler X</label>
           <input type="number" bind:value={cameraEulerX} step="0.1" placeholder="Opcional" />
@@ -502,21 +502,21 @@
     </div>
 
     <!-- Features Section -->
-    <div class="section">
-      <h3 class="section-title">Features</h3>
+    <div class="bt-section">
+      <h3 class="bt-section-title">Features</h3>
       
       {#each features as feature, index}
-        <div class="feature-item">
-          <div class="feature-header">
-            <span class="feature-number">#{index + 1}</span>
-            <button type="button" class="remove-feature-btn" onclick={() => removeFeature(index)}>
+        <div class="bt-feature-item">
+          <div class="bt-feature-header">
+            <span class="bt-feature-number">#{index + 1}</span>
+            <button type="button" class="bt-remove-feature-btn" onclick={() => removeFeature(index)}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
           </div>
-          <div class="form-row">
+          <div class="bt-form-row">
             <div class="form-group flex-1">
               <label>Icono</label>
               <input type="text" value={feature.icon} oninput={(e) => updateFeature(index, 'icon', (e.target as HTMLInputElement).value)} placeholder="Ej: ⭐" />
@@ -526,14 +526,14 @@
               <input type="text" value={feature.title} oninput={(e) => updateFeature(index, 'title', (e.target as HTMLInputElement).value)} placeholder="Título del feature" />
             </div>
           </div>
-          <div class="form-group">
+          <div class="bt-form-group">
             <label>Subtítulo</label>
             <input type="text" value={feature.subtitle} oninput={(e) => updateFeature(index, 'subtitle', (e.target as HTMLInputElement).value)} placeholder="Descripción breve" />
           </div>
         </div>
       {/each}
 
-      <button type="button" class="add-feature-btn" onclick={addFeature}>
+      <button type="button" class="bt-add-feature-btn" onclick={addFeature}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />
@@ -544,15 +544,15 @@
 
     <!-- Push Notifications (solo crear) -->
     {#if !isEditMode}
-      <div class="section">
-        <h3 class="section-title">Push Notification (Opcional)</h3>
-        <p class="field-hint">Se enviará una notificación push al crear este tipo de negocio</p>
+      <div class="bt-section">
+        <h3 class="bt-section-title">Push Notification (Opcional)</h3>
+        <p class="bt-field-hint">Se enviará una notificación push al crear este tipo de negocio</p>
         
-        <div class="form-group">
+        <div class="bt-form-group">
           <label for="bt-push-title">Título</label>
           <input type="text" id="bt-push-title" bind:value={pushTitle} placeholder="Título de la notificación" />
         </div>
-        <div class="form-group">
+        <div class="bt-form-group">
           <label for="bt-push-body">Mensaje</label>
           <textarea id="bt-push-body" bind:value={pushBody} placeholder="Cuerpo de la notificación" rows="2"></textarea>
         </div>
@@ -561,22 +561,22 @@
 
     <!-- Active Toggle (solo editar) -->
     {#if isEditMode}
-      <div class="form-group-toggle">
-        <div class="toggle-info">
+      <div class="bt-form-group-toggle">
+        <div class="bt-toggle-info">
           <label for="bt-active">Estado</label>
-          <span class="toggle-description">El tipo de negocio estará visible</span>
+          <span class="bt-toggle-description">El tipo de negocio estará visible</span>
         </div>
-        <label class="toggle-switch">
+        <label class="bt-toggle-switch">
           <input type="checkbox" id="bt-active" bind:checked={isActive} />
-          <span class="toggle-slider"></span>
+          <span class="bt-toggle-slider"></span>
         </label>
       </div>
     {/if}
 
     <!-- Submit Button -->
-    <button type="submit" class="submit-btn" disabled={isSubmitting}>
+    <button type="submit" class="bt-submit-btn" disabled={isSubmitting}>
       {#if isSubmitting}
-        <span class="spinner"></span>
+        <span class="bt-spinner"></span>
         {isEditMode ? "Guardando..." : "Creando..."}
       {:else}
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -596,455 +596,3 @@
 </div>
 
 
-<style>
-  .form-container {
-    height: 100%;
-  }
-
-  .form-header {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-xl);
-  }
-
-  .form-icon {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, rgba(90, 132, 103, 0.2) 0%, rgba(178, 214, 154, 0.2) 100%);
-    border-radius: var(--radius-lg);
-    color: var(--color-accent);
-    flex-shrink: 0;
-  }
-
-  .form-title {
-    font-size: var(--font-size-xl);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    margin-bottom: 2px;
-  }
-
-  .form-subtitle {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-variant);
-  }
-
-  .success-message {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md);
-    background: rgba(52, 199, 89, 0.1);
-    border: 1px solid rgba(52, 199, 89, 0.3);
-    border-radius: var(--radius-md);
-    color: #34c759;
-    font-size: var(--font-size-sm);
-    margin-bottom: var(--spacing-lg);
-    animation: slideIn 0.3s ease;
-  }
-
-  .error-message {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md);
-    background: rgba(255, 59, 48, 0.1);
-    border: 1px solid rgba(255, 59, 48, 0.3);
-    border-radius: var(--radius-md);
-    color: #ff6b6b;
-    font-size: var(--font-size-sm);
-    margin-bottom: var(--spacing-lg);
-    animation: slideIn 0.3s ease;
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .business-type-form {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
-  }
-
-  .section {
-    padding: var(--spacing-lg);
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: var(--radius-xl);
-  }
-
-  .section-title {
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    margin-bottom: var(--spacing-md);
-    color: var(--color-secondary);
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-md);
-  }
-
-  .form-group:last-child {
-    margin-bottom: 0;
-  }
-
-  .form-group label {
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    color: var(--color-text-variant);
-  }
-
-  .required {
-    color: #ff6b6b;
-    margin-left: 2px;
-  }
-
-  .field-hint {
-    font-size: var(--font-size-xs);
-    color: rgba(255, 255, 255, 0.5);
-    margin-top: var(--spacing-xs);
-  }
-
-  .form-group input,
-  .form-group textarea,
-  .form-group select {
-    width: 100%;
-    padding: var(--spacing-md) var(--spacing-lg);
-    font-size: var(--font-size-base);
-    font-family: inherit;
-    color: var(--color-text);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-lg);
-    transition: all var(--transition-base);
-  }
-
-  .form-group input::placeholder,
-  .form-group textarea::placeholder {
-    color: rgba(255, 255, 255, 0.3);
-  }
-
-  .form-group input:focus,
-  .form-group textarea:focus {
-    outline: none;
-    border-color: var(--color-secondary);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 4px rgba(225, 199, 142, 0.1);
-  }
-
-  .form-group textarea {
-    resize: vertical;
-    min-height: 80px;
-  }
-
-  .form-row {
-    display: flex;
-    gap: var(--spacing-md);
-  }
-
-  .flex-1 { flex: 1; }
-  .flex-2 { flex: 2; }
-
-  .color-input-wrapper {
-    display: flex;
-    gap: var(--spacing-sm);
-    align-items: center;
-  }
-
-  .color-input-wrapper input[type="color"] {
-    width: 44px;
-    height: 44px;
-    padding: 2px;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-  }
-
-  .color-input-wrapper input[type="text"] {
-    flex: 1;
-  }
-
-  .gradient-preview {
-    height: 40px;
-    border-radius: var(--radius-md);
-    margin-bottom: var(--spacing-md);
-  }
-
-  .file-input-hidden {
-    display: none;
-  }
-
-  .upload-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-2xl) var(--spacing-lg);
-    background: rgba(255, 255, 255, 0.03);
-    border: 2px dashed rgba(255, 255, 255, 0.15);
-    border-radius: var(--radius-xl);
-    cursor: pointer;
-    transition: all var(--transition-base);
-  }
-
-  .upload-area:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.25);
-  }
-
-  .upload-area.dragging {
-    background: rgba(225, 199, 142, 0.1);
-    border-color: var(--color-secondary);
-    border-style: solid;
-  }
-
-  .upload-icon {
-    width: 64px;
-    height: 64px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 50%;
-    color: var(--color-text-variant);
-    transition: all var(--transition-base);
-  }
-
-  .upload-area:hover .upload-icon {
-    background: rgba(225, 199, 142, 0.15);
-    color: var(--color-secondary);
-    transform: scale(1.05);
-  }
-
-  .upload-text {
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    color: var(--color-text);
-  }
-
-  .upload-subtext {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-variant);
-  }
-
-  .upload-hint {
-    font-size: var(--font-size-xs);
-    color: rgba(255, 255, 255, 0.4);
-    margin-top: var(--spacing-xs);
-  }
-
-  .file-preview-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--spacing-md);
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-lg);
-  }
-
-  .file-preview {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    color: var(--color-text-variant);
-  }
-
-  .file-name {
-    font-size: var(--font-size-sm);
-    color: var(--color-text);
-  }
-
-  .remove-file-btn {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-    color: #ff6b6b;
-    background: rgba(255, 59, 48, 0.1);
-    border-radius: var(--radius-md);
-    transition: all var(--transition-base);
-  }
-
-  .remove-file-btn:hover {
-    background: rgba(255, 59, 48, 0.2);
-  }
-
-  .feature-item {
-    padding: var(--spacing-md);
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--spacing-md);
-  }
-
-  .feature-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-sm);
-  }
-
-  .feature-number {
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    color: var(--color-secondary);
-  }
-
-  .remove-feature-btn {
-    padding: var(--spacing-xs);
-    color: #ff6b6b;
-    background: rgba(255, 59, 48, 0.1);
-    border-radius: var(--radius-sm);
-    transition: all var(--transition-base);
-  }
-
-  .remove-feature-btn:hover {
-    background: rgba(255, 59, 48, 0.2);
-  }
-
-  .add-feature-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-sm);
-    width: 100%;
-    padding: var(--spacing-md);
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    color: var(--color-secondary);
-    background: rgba(225, 199, 142, 0.1);
-    border: 1px dashed rgba(225, 199, 142, 0.3);
-    border-radius: var(--radius-lg);
-    transition: all var(--transition-base);
-  }
-
-  .add-feature-btn:hover {
-    background: rgba(225, 199, 142, 0.15);
-    border-color: var(--color-secondary);
-  }
-
-  .form-group-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--spacing-md);
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  .toggle-info label {
-    display: block;
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    color: var(--color-text);
-    margin-bottom: 2px;
-  }
-
-  .toggle-description {
-    font-size: var(--font-size-xs);
-    color: var(--color-text-variant);
-  }
-
-  .toggle-switch {
-    position: relative;
-    width: 51px;
-    height: 31px;
-    flex-shrink: 0;
-  }
-
-  .toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 34px;
-    transition: all 0.3s ease;
-  }
-
-  .toggle-slider::before {
-    position: absolute;
-    content: "";
-    height: 27px;
-    width: 27px;
-    left: 2px;
-    bottom: 2px;
-    background: #fff;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  .toggle-switch input:checked + .toggle-slider {
-    background: #34c759;
-  }
-
-  .toggle-switch input:checked + .toggle-slider::before {
-    transform: translateX(20px);
-  }
-
-  .submit-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-sm);
-    width: 100%;
-    padding: var(--spacing-md) var(--spacing-xl);
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    color: var(--color-primary);
-    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 100%);
-    border-radius: var(--radius-full);
-    transition: all var(--transition-base);
-    margin-top: var(--spacing-sm);
-  }
-
-  .submit-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(225, 199, 142, 0.3);
-  }
-
-  .submit-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .spinner {
-    width: 18px;
-    height: 18px;
-    border: 2px solid transparent;
-    border-top-color: currentColor;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
-  @media (max-width: 480px) {
-    .form-row {
-      flex-direction: column;
-    }
-  }
-</style>
