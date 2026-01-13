@@ -1,0 +1,26 @@
+---
+export const prerender = false;
+
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/common/Navbar.svelte';
+import BusinessTypePanel from '../components/business-types/BusinessTypePanel.svelte';
+import Footer from '../components/common/Footer.svelte';
+
+const title = "Gestión de Business Types | Llegó";
+const description = "Panel de administración para gestionar los tipos de negocio en Llegó.";
+---
+
+<Layout title={title} description={description}>
+  <Navbar client:load />
+  <main class="business-types-page">
+    <BusinessTypePanel client:load />
+  </main>
+  <Footer client:visible />
+</Layout>
+
+<style>
+  .business-types-page {
+    min-height: 100vh;
+    padding-top: 100px;
+  }
+</style>
