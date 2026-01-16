@@ -17,7 +17,6 @@ export const REGISTER_BUSINESS = gql`
     ) {
       id
       name
-      type
       avatarUrl
       coverUrl
       isActive
@@ -34,7 +33,6 @@ export const UPDATE_BUSINESS = gql`
     updateBusiness(businessId: $businessId, input: $input, jwt: $jwt) {
       id
       name
-      type
       description
       avatarUrl
       coverUrl

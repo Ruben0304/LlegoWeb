@@ -9,7 +9,6 @@ export const GET_BUSINESSES = gql`
     businesses(jwt: $jwt) {
       id
       name
-      type
       avatarUrl
       coverUrl
       globalRating
@@ -25,7 +24,6 @@ export const GET_BUSINESS = gql`
     business(id: $id, jwt: $jwt) {
       id
       name
-      type
       description
       avatarUrl
       coverUrl
@@ -114,7 +112,6 @@ export const GET_MY_BUSINESSES = gql`
     businesses(jwt: $jwt) {
       id
       name
-      type
       avatarUrl
       isActive
       description

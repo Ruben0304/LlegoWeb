@@ -51,16 +51,16 @@ export const BRANCH_TIPO_LABELS: Record<BranchTipo, string> = {
 export interface Business {
   id: string;
   name: string;
-  type: string;
-  ownerId: string;
-  globalRating: number;
+  type?: string;  // Optional - backend BusinessType doesn't include this field
+  ownerId?: string;
+  globalRating?: number;
   avatar?: string;
   coverImage?: string;
   description?: string;
   socialMedia?: Record<string, string>;
-  tags: string[];
+  tags?: string[];
   isActive: boolean;
-  createdAt: string;
+  createdAt?: string;
   avatarUrl?: string;
   coverUrl?: string;
 }
@@ -88,9 +88,7 @@ export interface Branch {
 // Input types para mutations
 export interface CreateBusinessInput {
   name: string;
-  type: string;
   avatar?: string;
-  coverImage?: string;
   description?: string;
   socialMedia?: Record<string, string>;
   tags?: string[];
@@ -126,13 +124,11 @@ export interface CreateBranchInput {
 
 export interface UpdateBusinessInput {
   name?: string;
-  type?: string;
   description?: string;
   socialMedia?: Record<string, string>;
   tags?: string[];
   isActive?: boolean;
   avatar?: string;
-  coverImage?: string;
 }
 
 export interface UpdateBranchInput {

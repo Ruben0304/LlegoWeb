@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { BUSINESS_TYPES, type Business, type RegisterBranchInput, BranchTipo, BRANCH_TIPO_LABELS } from '@/lib/business';
+  import { type Business, type RegisterBranchInput, BranchTipo, BRANCH_TIPO_LABELS } from '@/lib/business';
   import ImageUploader from './ImageUploader.svelte';
   import LocationPicker from './LocationPicker.svelte';
 
@@ -18,7 +18,6 @@
 
   // Business fields - initialize with existing data if in edit mode
   let name = $state(business?.name ?? '');
-  let type = $state(business?.type ?? 'restaurant');
   let description = $state(business?.description ?? '');
   
   // Image paths for mutations
@@ -41,7 +40,6 @@
   // Track original values for detecting changes in edit mode
   const originalValues = business ? {
     name: business.name,
-    type: business.type,
     description: business.description ?? '',
     avatar: business.avatar ?? '',
   } : null;
@@ -69,14 +67,13 @@
   // Get only changed fields for update mutation
   function getChangedFields(): Record<string, unknown> {
     if (!originalValues) return {};
-    
+
     const changes: Record<string, unknown> = {};
-    
+
     if (name !== originalValues.name) changes.name = name;
-    if (type !== originalValues.type) changes.type = type;
     if (description !== originalValues.description) changes.description = description || undefined;
     if (avatarPath !== originalValues.avatar) changes.avatar = avatarPath || undefined;
-    
+
     return changes;
   }
 
@@ -119,7 +116,6 @@
                 updateBusiness(businessId: $businessId, input: $input, jwt: $jwt) {
                   id
                   name
-                  type
                   description
                   avatarUrl
                   coverUrl
@@ -192,7 +188,6 @@
                 ) {
                   id
                   name
-                  type
                   avatarUrl
                   coverUrl
                   isActive
@@ -203,7 +198,6 @@
               jwt,
               businessInput: {
                 name,
-                type,
                 description: description || undefined,
                 avatar: avatarPath || undefined,
               },
@@ -283,24 +277,6 @@
           placeholder="Ej: Mi Restaurante"
           required
         />
-      </div>
-
-      <!-- Type -->
-      <div class="form-group">
-        <label for="business-type">
-          Tipo de negocio
-          <span class="required">*</span>
-        </label>
-        <div class="select-wrapper">
-          <select id="business-type" bind:value={type} required>
-            {#each BUSINESS_TYPES as businessType}
-              <option value={businessType.id}>{businessType.label}</option>
-            {/each}
-          </select>
-          <svg class="select-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-        </div>
       </div>
 
       <!-- Description -->

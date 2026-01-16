@@ -309,7 +309,6 @@
               businesses(jwt: $jwt) {
                 id
                 name
-                type
                 avatarUrl
                 isActive
                 description
