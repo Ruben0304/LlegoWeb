@@ -364,6 +364,11 @@
         font-weight: 700;
         color: #ffffff;
     }
+    .avatar-letter {
+        font-size: 24px;
+        font-weight: 700;
+        color: #ffffff;
+    }
 
     .business-info {
         flex: 1;
