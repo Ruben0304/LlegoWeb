@@ -353,6 +353,11 @@
         transform: scale(1.08);
     }
 
+     .business-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
     .business-avatar img {
         width: 100%;
         height: 100%;
