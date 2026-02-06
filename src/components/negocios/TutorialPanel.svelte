@@ -596,9 +596,30 @@
       </div>
     {/if}
   </div>
+
+  <!-- Hidden render to force style inclusion during SSR -->
+  <div class="style-preload" aria-hidden="true">
+    <TutorialForm
+      jwt=""
+      onTutorialAdded={(tutorial) => void tutorial}
+    />
+    <TutorialList
+      tutorials={[]}
+      onDelete={() => {}}
+      onToggleActive={() => {}}
+      onEdit={(tutorial) => void tutorial}
+    />
+  </div>
 </section>
 
 <style>
+  .style-preload {
+    display: none !important;
+    visibility: hidden;
+    position: absolute;
+    pointer-events: none;
+  }
+
   .tutorial-panel {
     padding: var(--spacing-xl) 0 var(--spacing-4xl);
     min-height: 100vh;

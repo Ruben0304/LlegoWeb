@@ -270,7 +270,7 @@
             value="CUSTOMER"
             bind:group={appTarget}
           />
-          <span class="radio-label">Clientes</span>
+          <span class="radio-label">Cliente</span>
         </label>
         <label class="radio-option">
           <input
@@ -279,16 +279,7 @@
             value="MERCHANT"
             bind:group={appTarget}
           />
-          <span class="radio-label">Comerciantes</span>
-        </label>
-        <label class="radio-option">
-          <input
-            type="radio"
-            name="app-target"
-            value="BOTH"
-            bind:group={appTarget}
-          />
-          <span class="radio-label">Ambos</span>
+          <span class="radio-label">Negocios</span>
         </label>
       </div>
     </div>
