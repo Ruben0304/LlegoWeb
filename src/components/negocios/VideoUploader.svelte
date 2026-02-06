@@ -33,6 +33,7 @@
   let videoName = $state('');
   let fileInputRef: HTMLInputElement;
   let uploadProgress = $state(0);
+  let playbackError = $state('');
 
   // Allowed MIME types
   const ALLOWED_TYPES = accept.split(',').map(t => t.trim());
@@ -114,6 +115,7 @@
     }
 
     errorMessage = '';
+    playbackError = '';
     videoFile = file;
     videoName = file.name;
 
@@ -160,6 +162,7 @@
     videoPath = '';
     videoName = '';
     errorMessage = '';
+    playbackError = '';
     uploadProgress = 0;
     if (fileInputRef) {
       fileInputRef.value = '';
@@ -176,6 +179,26 @@
     if (videoFile) {
       uploadVideo(videoFile);
     }
+  }
+
+  function handleVideoPlaybackError(event: Event) {
+    const video = event.currentTarget as HTMLVideoElement;
+    const code = video.error?.code;
+
+    const messageByCode: Record<number, string> = {
+      1: 'La reproducción fue interrumpida por el navegador.',
+      2: 'Error de red al cargar el video.',
+      3: 'El formato o códec del video no es compatible.',
+      4: 'No se pudo cargar la fuente del video.',
+    };
+
+    playbackError =
+      (code && messageByCode[code]) ||
+      'No se pudo reproducir este video. Prueba con MP4 (H.264 + AAC).';
+  }
+
+  function clearPlaybackError() {
+    playbackError = '';
   }
 </script>
 
@@ -206,6 +229,17 @@
     </div>
   {/if}
 
+  {#if playbackError}
+    <div class="error-message">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>{playbackError}</span>
+    </div>
+  {/if}
+
   {#if videoPreview}
     <div class="video-preview-container">
       <div class="video-preview">
@@ -218,9 +252,14 @@
             </div>
           </div>
         {/if}
-        <video src={videoPreview} controls preload="metadata">
-          <track kind="captions" />
-        </video>
+        <video
+          src={videoPreview}
+          controls
+          playsinline
+          preload="metadata"
+          onerror={handleVideoPlaybackError}
+          onloadeddata={clearPlaybackError}
+        ></video>
       </div>
       <div class="video-info">
         <span class="video-name">{videoName || 'Video actual'}</span>
