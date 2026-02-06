@@ -1,0 +1,26 @@
+---
+export const prerender = false;
+
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/common/Navbar.svelte';
+import TutorialPanel from '../components/negocios/TutorialPanel.svelte';
+import Footer from '../components/common/Footer.svelte';
+
+const title = "Tutoriales | Llegó";
+const description = "Gestiona los tutoriales para clientes y comerciantes de Llegó.";
+---
+
+<Layout title={title} description={description}>
+  <Navbar client:load />
+  <main class="tutorial-page">
+    <TutorialPanel client:load />
+  </main>
+  <Footer client:visible />
+</Layout>
+
+<style>
+  .tutorial-page {
+    min-height: 100vh;
+    padding-top: 100px;
+  }
+</style>

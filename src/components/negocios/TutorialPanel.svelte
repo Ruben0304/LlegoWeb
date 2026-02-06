@@ -1,12 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { Product } from "@/lib/product";
-  import type { Business, Branch } from "@/lib/business";
-  import BusinessBranchSelector from "./BusinessBranchSelector.svelte";
-  import BusinessForm from "./BusinessForm.svelte";
-  import BranchForm from "./BranchForm.svelte";
-  import ProductForm from "./ProductForm.svelte";
-  import ProductList from "./ProductList.svelte";
+  import type { Tutorial } from "@/lib/tutorial";
+  import {
+    getTutorials,
+    deleteTutorial,
+    toggleTutorialActive,
+  } from "@/lib/tutorial";
+  import TutorialForm from "./TutorialForm.svelte";
+  import TutorialList from "./TutorialList.svelte";
 
   type AuthUser = {
     id: string;
@@ -25,26 +26,13 @@
   let currentUser = $state<AuthUser | null>(null);
   let jwt = $state("");
 
-  // Products state
-  let products = $state<Product[]>([]);
-  let branchId = $state("");
-
-  // Business/branch state
-  let businesses = $state<Business[]>([]);
-  let selectedBusiness = $state<Business | null>(null);
-  let selectedBranch = $state<Branch | null>(null);
-  let isLoadingBusinesses = $state(false);
-  let businessError = $state("");
-  let showBusinessForm = $state(false);
-  let showBranchForm = $state(false);
-
-  // Edit mode state
-  let editingBusiness = $state<Business | null>(null);
-  let editingBranch = $state<Branch | null>(null);
-  let editingProduct = $state<Product | null>(null);
+  // Tutorials state
+  let tutorials = $state<Tutorial[]>([]);
+  let editingTutorial = $state<Tutorial | null>(null);
+  let isLoadingTutorials = $state(false);
+  let tutorialError = $state("");
 
   // Loading states
-  let isLoadingProducts = $state(false);
   let googleInitialized = $state(false);
   let googleButtonRef: HTMLDivElement | null = $state(null);
   let isLoading = $state(false);
@@ -85,7 +73,6 @@
   }
 
   function restoreSession() {
-    // Solo ejecutar en el navegador, no en SSR
     if (typeof window === "undefined") {
       console.log("restoreSession: No se ejecuta en SSR");
       return;
@@ -179,8 +166,8 @@
         email: data.user.email,
       });
 
-      // Load businesses after authentication
-      await loadBusinesses();
+      // Load tutorials after authentication
+      await loadTutorials();
     } catch (error) {
       console.error("Error en autenticacion social:", error);
       errorMessage = "Ocurrió un error al autenticar.";
@@ -209,14 +196,12 @@
       return;
     }
 
-    // Click the hidden Google button
     const googleBtn = googleButtonRef.querySelector(
       'div[role="button"]',
     ) as HTMLElement;
     if (googleBtn) {
       googleBtn.click();
     } else {
-      // Fallback to prompt if button not found
       window.google?.accounts?.id?.prompt();
     }
   }
@@ -228,8 +213,7 @@
     try {
       console.log("🍎 Iniciando Apple Sign In...");
       console.log("Backend URL:", BACKEND_URL);
-      
-      // Call backend to get Apple auth URL
+
       const response = await fetch(`${BACKEND_URL}/apple/start`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -245,23 +229,19 @@
 
       const data = await response.json();
       console.log("Backend response:", data);
-      
+
       if (!data.auth_url) {
         throw new Error("No se recibió la URL de autenticación");
       }
 
       console.log("Auth URL recibida:", data.auth_url);
 
-      // Store state for validation (optional)
       if (data.state) {
         sessionStorage.setItem("apple_auth_state", data.state);
         console.log("State guardado:", data.state);
       }
 
-      // Redirect to Apple's auth page
       console.log("🚀 Redirigiendo a Apple...");
-      
-      // Try using window.location.assign as it's more reliable
       window.location.assign(data.auth_url);
     } catch (error) {
       console.error("❌ Error en Apple Sign In:", error);
@@ -274,285 +254,70 @@
     isAuthenticated = false;
     currentUser = null;
     jwt = "";
-    products = [];
-    isLoadingProducts = false;
-    businesses = [];
-    selectedBusiness = null;
-    selectedBranch = null;
-    branchId = "";
-    isLoadingBusinesses = false;
-    businessError = "";
-    showBusinessForm = false;
-    showBranchForm = false;
-    editingBusiness = null;
-    editingBranch = null;
+    tutorials = [];
+    editingTutorial = null;
+    isLoadingTutorials = false;
+    tutorialError = "";
     clearAuth();
   }
 
-  // Load businesses for the current user
-  async function loadBusinesses() {
+  // Load tutorials for the current user
+  async function loadTutorials() {
     if (!jwt) return;
 
-    isLoadingBusinesses = true;
-    businessError = "";
+    isLoadingTutorials = true;
+    tutorialError = "";
 
     try {
-      const response = await fetch(`${BACKEND_URL}/graphql`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: JSON.stringify({
-          query: `
-            query GetMyBusinesses($jwt: String!) {
-              businesses(jwt: $jwt) {
-                id
-                name
-                avatarUrl
-                isActive
-                description
-              }
-            }
-          `,
-          variables: { jwt },
-        }),
-      });
-
-      const result = await response.json();
-
-      if (result.errors) {
-        throw new Error(
-          result.errors[0]?.message || "Error al cargar negocios",
-        );
-      }
-
-      businesses = result.data?.businesses || [];
+      tutorials = await getTutorials(jwt);
     } catch (error) {
-      console.error("Error loading businesses:", error);
-      businessError =
-        error instanceof Error ? error.message : "Error al cargar negocios";
-      businesses = [];
+      console.error("Error loading tutorials:", error);
+      tutorialError =
+        error instanceof Error ? error.message : "Error al cargar tutoriales";
+      tutorials = [];
     } finally {
-      isLoadingBusinesses = false;
+      isLoadingTutorials = false;
     }
   }
 
-  // Load products for a branch
-  async function loadProducts(branchId: string) {
-    if (!jwt || !branchId) return;
+  // Tutorial handlers
+  function handleTutorialAdded(tutorial: Tutorial) {
+    editingTutorial = null;
+    loadTutorials();
+  }
 
-    isLoadingProducts = true;
+  async function handleTutorialDeleted(tutorialId: string) {
     try {
-      const response = await fetch(`${BACKEND_URL}/graphql`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: JSON.stringify({
-          query: `
-            query GetProducts($first: Int!, $branchId: String!, $availableOnly: Boolean!, $jwt: String!) {
-              products(first: $first, branchId: $branchId, availableOnly: $availableOnly, jwt: $jwt) {
-                edges {
-                  node {
-                    id
-                    name
-                    description
-                    weight
-                    price
-                    currency
-                    image
-                    imageUrl
-                    availability
-                    categoryId
-                    category {
-                      id
-                      branchType
-                      name
-                      iconIos
-                      iconWeb
-                      iconAndroid
-                    }
-                  }
-                }
-                pageInfo {
-                  hasNextPage
-                  endCursor
-                  totalCount
-                }
-              }
-            }
-          `,
-          variables: { first: 100, branchId, availableOnly: false, jwt },
-        }),
-      });
-
-      const result = await response.json();
-
-      if (result.data?.products?.edges) {
-        products = result.data.products.edges.map((edge: any) => edge.node);
-      }
+      await deleteTutorial(tutorialId, jwt);
+      tutorials = tutorials.filter((t) => t.id !== tutorialId);
     } catch (error) {
-      console.error("Error loading products:", error);
-      products = [];
-    } finally {
-      isLoadingProducts = false;
+      console.error("Error deleting tutorial:", error);
+      tutorialError =
+        error instanceof Error ? error.message : "Error al eliminar tutorial";
     }
   }
 
-  // Product handlers
-  function handleProductAdded(product: Product) {
-    editingProduct = null; // Clear editing state after save
-    // Reload products to ensure we have the latest data
-    loadProducts(branchId);
-  }
-
-  function handleProductDeleted(productId: string) {
-    products = products.filter((p) => p.id !== productId);
-  }
-
-  function handleProductToggleAvailability(productId: string) {
-    products = products.map((p) =>
-      p.id === productId ? { ...p, availability: !p.availability } : p,
-    );
-  }
-
-  function handleProductEdit(product: Product) {
-    editingProduct = product;
-  }
-
-  function handleBusinessSelected(business: Business) {
-    selectedBusiness = business;
-    selectedBranch = null;
-    branchId = "";
-    products = [];
-    showBusinessForm = false;
-    showBranchForm = false;
-    editingBusiness = null;
-    editingBranch = null;
-  }
-
-  function handleBranchSelected(branch: Branch) {
-    selectedBranch = branch;
-    const matchedBusiness = businesses.find(
-      (business) => business.id === branch.businessId,
-    );
-    if (matchedBusiness) {
-      selectedBusiness = matchedBusiness;
-    }
-    branchId = branch.id;
-    products = [];
-    loadProducts(branch.id);
-  }
-
-  function handleCreateBusiness() {
-    showBusinessForm = true;
-    showBranchForm = false;
-    editingBusiness = null;
-    editingBranch = null;
-  }
-
-  function handleCreateBranch(business: Business) {
-    selectedBusiness = business;
-    showBranchForm = true;
-    showBusinessForm = false;
-    editingBusiness = null;
-    editingBranch = null;
-  }
-
-  function handleEditBusiness(business: Business) {
-    editingBusiness = business;
-    showBusinessForm = true;
-    showBranchForm = false;
-    editingBranch = null;
-  }
-
-  function handleEditBranch(branch: Branch) {
-    editingBranch = branch;
-    showBranchForm = true;
-    showBusinessForm = false;
-    editingBusiness = null;
-  }
-
-  function handleBusinessCreated() {
-    showBusinessForm = false;
-    editingBusiness = null;
-    loadBusinesses();
-  }
-
-  function handleBusinessUpdated(updatedBusiness: Business) {
-    showBusinessForm = false;
-    editingBusiness = null;
-    // Update the business in the list
-    businesses = businesses.map((b) =>
-      b.id === updatedBusiness.id ? { ...b, ...updatedBusiness } : b,
-    );
-    // Update selected business if it's the one being edited
-    if (selectedBusiness?.id === updatedBusiness.id) {
-      selectedBusiness = { ...selectedBusiness, ...updatedBusiness };
+  async function handleTutorialToggleActive(tutorialId: string) {
+    try {
+      const updatedTutorial = await toggleTutorialActive(tutorialId, jwt);
+      tutorials = tutorials.map((t) =>
+        t.id === tutorialId ? updatedTutorial : t,
+      );
+    } catch (error) {
+      console.error("Error toggling tutorial:", error);
+      tutorialError =
+        error instanceof Error
+          ? error.message
+          : "Error al cambiar estado del tutorial";
     }
   }
 
-  function handleBusinessDeleted(deletedBusiness: Business) {
-    // Remove the business from the list
-    businesses = businesses.filter((b) => b.id !== deletedBusiness.id);
-    // Clear selection if deleted business was selected
-    if (selectedBusiness?.id === deletedBusiness.id) {
-      selectedBusiness = null;
-      selectedBranch = null;
-      branchId = "";
-      products = [];
-    }
-  }
-
-  function handleBranchCreated(branch: Branch) {
-    showBranchForm = false;
-    editingBranch = null;
-    selectedBranch = branch;
-    branchId = branch.id;
-    products = [];
-    loadProducts(branch.id);
-  }
-
-  function handleBranchUpdated(updatedBranch: Branch) {
-    showBranchForm = false;
-    editingBranch = null;
-    // Update selected branch if it's the one being edited
-    if (selectedBranch?.id === updatedBranch.id) {
-      selectedBranch = { ...selectedBranch, ...updatedBranch };
-    }
-  }
-
-  function handleBackToSelector() {
-    showBusinessForm = false;
-    showBranchForm = false;
-    editingBusiness = null;
-    editingBranch = null;
-  }
-
-  function handleChangeBranch() {
-    selectedBranch = null;
-    selectedBusiness = null;
-    branchId = "";
-    products = [];
-    showBusinessForm = false;
-    showBranchForm = false;
-    editingBusiness = null;
-    editingBranch = null;
+  function handleTutorialEdit(tutorial: Tutorial) {
+    editingTutorial = tutorial;
   }
 
   function renderHiddenGoogleButton() {
-    console.log("renderHiddenGoogleButton: iniciando...");
-    console.log("- googleButtonRef:", !!googleButtonRef);
-    console.log("- window.google:", !!window.google);
-    console.log("- window.google.accounts:", !!window.google?.accounts);
-    console.log("- window.google.accounts.id:", !!window.google?.accounts?.id);
-
     if (!googleButtonRef || !window.google?.accounts?.id) {
-      console.log(
-        "❌ renderHiddenGoogleButton: No se puede renderizar, falta googleButtonRef o Google SDK",
-      );
       return;
     }
 
@@ -566,25 +331,15 @@
       width: 300,
     });
     googleInitialized = true;
-    console.log(
-      "✅ renderHiddenGoogleButton: Botón de Google renderizado, googleInitialized =",
-      googleInitialized,
-    );
   }
 
   onMount(async () => {
-    console.log("BusinessPanel onMount iniciado");
+    console.log("TutorialPanel onMount iniciado");
     restoreSession();
 
-    console.log("Estado después de restoreSession:", {
-      isAuthenticated,
-      hasJwt: !!jwt,
-      hasUser: !!currentUser,
-    });
-
     if (isAuthenticated && jwt) {
-      console.log("Cargando negocios...");
-      await loadBusinesses();
+      console.log("Cargando tutoriales...");
+      await loadTutorials();
     } else {
       console.log("No hay sesión activa, mostrando login");
     }
@@ -630,7 +385,7 @@
   }
 </script>
 
-<section class="business-panel">
+<section class="tutorial-panel">
   <div class="container">
     {#if !isAuthenticated}
       <div class="auth-container">
@@ -644,13 +399,13 @@
               stroke="currentColor"
               stroke-width="1.5"
             >
-              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
+              <polygon points="23 7 16 12 23 17 23 7" />
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
             </svg>
           </div>
-          <h1 class="auth-title">Panel de Negocios</h1>
+          <h1 class="auth-title">Gestión de Tutoriales</h1>
           <p class="auth-subtitle">
-            Gestiona tus productos y llega a más clientes
+            Administra los tutoriales de Llegó
           </p>
         </div>
 
@@ -758,44 +513,24 @@
             <div>
               <h1 class="user-name">{currentUser?.name || "Usuario"}</h1>
               <p class="user-meta">
-                {#if selectedBranch}
-                  {products.length}
-                  {products.length === 1 ? "producto" : "productos"}
-                {:else}
-                  Selecciona un negocio y una sucursal
-                {/if}
+                {tutorials.length}
+                {tutorials.length === 1 ? "tutorial" : "tutoriales"}
               </p>
             </div>
           </div>
           <div class="header-actions">
-            {#if selectedBranch}
-              <button class="back-btn" onclick={handleChangeBranch}>
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <polyline points="15 18 9 12 15 6" />
-                </svg>
-                Cambiar sucursal
-              </button>
-            {/if}
-            <a href="/tutoriales" class="tutorials-btn">
+            <a href="/negocios" class="back-btn">
               <svg
-                width="18"
-                height="18"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
               >
-                <polygon points="23 7 16 12 23 17 23 7" />
-                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                <polyline points="15 18 9 12 15 6" />
               </svg>
-              Tutoriales
+              Panel de Negocios
             </a>
             <button class="logout-btn" onclick={handleLogout}>
               <svg
@@ -816,190 +551,43 @@
         </header>
 
         <div class="dashboard-content">
-          {#if showBusinessForm}
-            <div class="panel-single">
-              <div class="panel-actions">
-                <button
-                  class="back-btn"
-                  type="button"
-                  onclick={handleBackToSelector}
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <polyline points="15 18 9 12 15 6" />
-                  </svg>
-                  Volver
-                </button>
-              </div>
-              <BusinessForm
-                {jwt}
-                business={editingBusiness ?? undefined}
-                onBusinessCreated={handleBusinessCreated}
-                onBusinessUpdated={handleBusinessUpdated}
-                onCancel={handleBackToSelector}
-              />
+          {#if tutorialError}
+            <div class="error-message">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              {tutorialError}
             </div>
-          {:else if showBranchForm && selectedBusiness}
-            <div class="panel-single">
-              <div class="panel-actions">
-                <button
-                  class="back-btn"
-                  type="button"
-                  onclick={handleBackToSelector}
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <polyline points="15 18 9 12 15 6" />
-                  </svg>
-                  Volver
-                </button>
-              </div>
-              <BranchForm
-                {jwt}
-                business={selectedBusiness}
-                branch={editingBranch ?? undefined}
-                onBranchCreated={handleBranchCreated}
-                onBranchUpdated={handleBranchUpdated}
-                onCancel={handleBackToSelector}
-              />
-            </div>
-          {:else if !selectedBranch}
-            <div class="panel-single">
-              {#if businessError}
-                <div class="error-message">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                  </svg>
-                  {businessError}
-                </div>
-              {/if}
-              {#if isLoadingBusinesses}
-                <div class="loading-container">
-                  <span class="spinner-lg"></span>
-                  <p>Cargando negocios...</p>
-                </div>
-              {:else}
-                <BusinessBranchSelector
-                  {jwt}
-                  {businesses}
-                  onBusinessSelected={handleBusinessSelected}
-                  onBranchSelected={handleBranchSelected}
-                  onCreateBusiness={handleCreateBusiness}
-                  onCreateBranch={handleCreateBranch}
-                  onDeleteBusiness={handleBusinessDeleted}
-                />
-              {/if}
-            </div>
-          {:else if isLoadingProducts}
+          {/if}
+          {#if isLoadingTutorials}
             <div class="loading-container">
               <span class="spinner-lg"></span>
-              <p>Cargando productos...</p>
+              <p>Cargando tutoriales...</p>
             </div>
           {:else}
             <div class="dashboard-grid">
               <div class="form-section">
-                <div class="section-header">
-                  <div class="section-badge">
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"
-                      />
-                      <line x1="3" y1="6" x2="21" y2="6" />
-                      <path d="M16 10a4 4 0 0 1-8 0" />
-                    </svg>
-                    Mis Productos
-                  </div>
-                  <div class="edit-actions">
-                    {#if selectedBusiness}
-                      <button
-                        class="edit-btn"
-                        type="button"
-                        onclick={() => handleEditBusiness(selectedBusiness!)}
-                        title="Editar negocio"
-                      >
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <path
-                            d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
-                          />
-                          <polyline points="9 22 9 12 15 12 15 22" />
-                        </svg>
-                        Editar Negocio
-                      </button>
-                    {/if}
-                    {#if selectedBranch}
-                      <button
-                        class="edit-btn"
-                        type="button"
-                        onclick={() => handleEditBranch(selectedBranch!)}
-                        title="Editar sucursal"
-                      >
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <path
-                            d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
-                          />
-                          <circle cx="12" cy="10" r="3" />
-                        </svg>
-                        Editar Sucursal
-                      </button>
-                    {/if}
-                  </div>
-                </div>
-                <ProductForm
-                  {branchId}
-                  branchTypes={selectedBranch?.tipos || []}
+                <TutorialForm
                   {jwt}
-                  onProductAdded={handleProductAdded}
-                  product={editingProduct}
+                  onTutorialAdded={handleTutorialAdded}
+                  tutorial={editingTutorial}
                 />
               </div>
               <div class="list-section">
-                <ProductList
-                  {products}
-                  onDelete={handleProductDeleted}
-                  onToggleAvailability={handleProductToggleAvailability}
-                  onEdit={handleProductEdit}
+                <TutorialList
+                  {tutorials}
+                  onDelete={handleTutorialDeleted}
+                  onToggleActive={handleTutorialToggleActive}
+                  onEdit={handleTutorialEdit}
                 />
               </div>
             </div>
@@ -1008,56 +596,10 @@
       </div>
     {/if}
   </div>
-
-  <!-- Hidden render to force style inclusion during SSR -->
-  <div class="style-preload" aria-hidden="true">
-    <BusinessBranchSelector
-      jwt=""
-      businesses={[]}
-      onBusinessSelected={(business) => void business}
-      onBranchSelected={(branch) => void branch}
-      onCreateBusiness={() => {}}
-      onCreateBranch={(business) => void business}
-    />
-    <BusinessForm jwt="" onBusinessCreated={(business) => void business} />
-    <BranchForm
-      jwt=""
-      business={{
-        id: "",
-        name: "",
-        type: "",
-        ownerId: "",
-        globalRating: 0,
-        tags: [],
-        isActive: false,
-        createdAt: "",
-      }}
-      onBranchCreated={(branch) => void branch}
-    />
-    <ProductForm
-      branchId=""
-      branchTypes={[]}
-      jwt=""
-      onProductAdded={() => {}}
-    />
-    <ProductList
-      products={[]}
-      onDelete={() => {}}
-      onToggleAvailability={() => {}}
-      onEdit={() => {}}
-    />
-  </div>
 </section>
 
 <style>
-  .style-preload {
-    display: none !important;
-    visibility: hidden;
-    position: absolute;
-    pointer-events: none;
-  }
-
-  .business-panel {
+  .tutorial-panel {
     padding: var(--spacing-xl) 0 var(--spacing-4xl);
     min-height: 100vh;
     display: flex;
@@ -1097,7 +639,7 @@
     );
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 24px;
-    color: var(--color-secondary);
+    color: var(--color-accent);
     backdrop-filter: blur(20px);
   }
 
@@ -1137,7 +679,7 @@
     gap: var(--spacing-xl);
   }
 
-  /* Google Sign In Button - Apple Style */
+  /* Google Sign In Button */
   .google-signin-btn {
     display: flex;
     align-items: center;
@@ -1191,7 +733,7 @@
     white-space: nowrap;
   }
 
-  /* Apple Sign In Button - Apple Style */
+  /* Apple Sign In Button */
   .apple-signin-btn {
     display: flex;
     align-items: center;
@@ -1301,7 +843,7 @@
     width: 32px;
     height: 32px;
     border: 3px solid rgba(255, 255, 255, 0.1);
-    border-top-color: var(--color-secondary);
+    border-top-color: var(--color-accent);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -1365,8 +907,8 @@
     color: var(--color-primary);
     background: linear-gradient(
       135deg,
-      var(--color-secondary) 0%,
-      var(--color-accent) 100%
+      var(--color-accent) 0%,
+      var(--color-secondary) 100%
     );
     border-radius: var(--radius-xl);
   }
@@ -1400,30 +942,12 @@
     background: rgba(255, 255, 255, 0.05);
     border-radius: var(--radius-full);
     transition: all var(--transition-base);
+    text-decoration: none;
   }
 
   .back-btn:hover {
     color: var(--color-text);
     background: rgba(255, 255, 255, 0.1);
-  }
-
-  .tutorials-btn {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-lg);
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    color: var(--color-text-variant);
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: var(--radius-full);
-    transition: all var(--transition-base);
-    text-decoration: none;
-  }
-
-  .tutorials-btn:hover {
-    color: var(--color-accent);
-    background: rgba(178, 214, 154, 0.1);
   }
 
   .logout-btn {
@@ -1449,22 +973,6 @@
     min-height: 400px;
   }
 
-  /* Single Panel Layout */
-  .panel-single {
-    width: 100%;
-    margin: 0 auto;
-    background: transparent;
-    border: none;
-    border-radius: 0;
-    padding: 0;
-  }
-
-  .panel-actions {
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: var(--spacing-lg);
-  }
-
   /* Dashboard Grid */
   .dashboard-grid {
     display: grid;
@@ -1478,60 +986,6 @@
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: var(--radius-2xl);
     padding: var(--spacing-xl);
-  }
-
-  .section-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-xs) var(--spacing-md);
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-    color: var(--color-secondary);
-    background: rgba(225, 199, 142, 0.1);
-    border-radius: var(--radius-full);
-    margin-bottom: var(--spacing-lg);
-  }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-  }
-
-  .section-header .section-badge {
-    margin-bottom: 0;
-  }
-
-  .edit-actions {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-  }
-
-  .edit-btn {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-xs) var(--spacing-md);
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-    color: var(--color-text-variant);
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: var(--radius-full);
-    transition: all var(--transition-base);
-  }
-
-  .edit-btn:hover {
-    color: var(--color-secondary);
-    background: rgba(225, 199, 142, 0.1);
-  }
-
-  .edit-btn svg {
-    flex-shrink: 0;
   }
 
   @media (max-width: 968px) {
@@ -1556,7 +1010,6 @@
       justify-content: flex-end;
     }
 
-    .panel-single,
     .form-section,
     .list-section {
       padding: var(--spacing-lg);
