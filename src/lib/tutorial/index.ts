@@ -176,7 +176,11 @@ export async function updateTutorial(
   input: UpdateTutorialInput,
   jwt: string
 ): Promise<Tutorial> {
-  const result = await mutation<UpdateTutorialResponse>(UPDATE_TUTORIAL, { tutorialId, input, jwt });
+  const result = await mutation<UpdateTutorialResponse>(UPDATE_TUTORIAL, {
+    id: tutorialId,
+    input,
+    jwt,
+  });
   return result.updateTutorial;
 }
 

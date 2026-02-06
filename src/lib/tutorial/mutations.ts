@@ -32,8 +32,8 @@ export const CREATE_TUTORIAL = gql`
  * Actualiza un tutorial existente
  */
 export const UPDATE_TUTORIAL = gql`
-  mutation UpdateTutorial($tutorialId: String!, $input: UpdateTutorialInput!, $jwt: String!) {
-    updateTutorial(tutorialId: $tutorialId, input: $input, jwt: $jwt) {
+  mutation UpdateTutorial($id: String!, $input: UpdateTutorialInput!, $jwt: String!) {
+    updateTutorial(id: $id, input: $input, jwt: $jwt) {
       id
       title
       description

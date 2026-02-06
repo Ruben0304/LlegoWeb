@@ -1,8 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { backendUrl } from "@/lib/shared/graphql";
   import {
-    uploadTutorialVideo,
-    uploadTutorialThumbnail,
     createTutorial,
     updateTutorial,
   } from "@/lib/tutorial";
@@ -34,6 +33,14 @@
 
   // Modo de edición
   let isEditMode = $derived(tutorial !== null);
+
+  function resolveMediaUrl(url?: string | null): string {
+    if (!url) return "";
+    if (/^https?:\/\//i.test(url)) return url;
+    const base = backendUrl.endsWith("/") ? backendUrl.slice(0, -1) : backendUrl;
+    const path = url.startsWith("/") ? url.slice(1) : url;
+    return `${base}/${path}`;
+  }
 
   // Initialize form with tutorial data if in edit mode
   $effect(() => {
@@ -330,7 +337,7 @@
         endpoint="/upload/tutorial/video"
         {jwt}
         label="Video del tutorial {isEditMode ? '' : '*'}"
-        currentVideoUrl={tutorial?.videoUrlSigned}
+        currentVideoUrl={resolveMediaUrl(tutorial?.videoUrlSigned || tutorial?.videoUrl)}
         onUploadComplete={handleVideoUploadComplete}
         onError={handleVideoUploadError}
         maxSizeMB={100}
@@ -346,7 +353,9 @@
         endpoint="/upload/tutorial/thumbnail"
         {jwt}
         label="Miniatura (opcional)"
-        currentImageUrl={tutorial?.thumbnailUrlSigned}
+        currentImageUrl={resolveMediaUrl(
+          tutorial?.thumbnailUrlSigned || tutorial?.thumbnailUrl,
+        )}
         aspectRatio="wide"
         onUploadComplete={handleThumbnailUploadComplete}
         onError={handleThumbnailUploadError}

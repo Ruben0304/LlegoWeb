@@ -78,8 +78,17 @@
       }
 
       const data = await response.json();
-      imagePath = data.image_path;
-      onUploadComplete(data.image_path);
+      // Compatibilidad con distintos endpoints:
+      // - /upload/.../image -> image_path
+      // - /upload/tutorial/thumbnail -> thumbnail_path
+      const uploadedPath = data.image_path || data.thumbnail_path || '';
+
+      if (!uploadedPath) {
+        throw new Error('El servidor no devolvió la ruta de la imagen');
+      }
+
+      imagePath = uploadedPath;
+      onUploadComplete(uploadedPath);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error al subir la imagen';
       errorMessage = message;

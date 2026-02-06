@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Tutorial, AppTarget } from "@/lib/tutorial";
+  import { backendUrl } from "@/lib/shared/graphql";
 
   interface Props {
     tutorials: Tutorial[];
@@ -37,6 +38,18 @@
     return remainingSeconds > 0
       ? `${minutes}m ${remainingSeconds}s`
       : `${minutes}m`;
+  }
+
+  function resolveMediaUrl(url?: string | null): string {
+    if (!url) return "";
+    if (/^https?:\/\//i.test(url)) return url;
+    const base = backendUrl.endsWith("/") ? backendUrl.slice(0, -1) : backendUrl;
+    const path = url.startsWith("/") ? url.slice(1) : url;
+    return `${base}/${path}`;
+  }
+
+  function getThumbnailUrl(tutorial: Tutorial): string {
+    return resolveMediaUrl(tutorial.thumbnailUrlSigned || tutorial.thumbnailUrl);
   }
 
   function getAppTargetLabel(appTarget: AppTarget): string {
@@ -200,10 +213,10 @@
       <div class="tutorials-list">
         {#each filteredTutorials as tutorial (tutorial.id)}
           <div class="tutorial-card" class:inactive={!tutorial.isActive}>
-            {#if tutorial.thumbnailUrlSigned}
+            {#if getThumbnailUrl(tutorial)}
               <div class="tutorial-thumbnail">
                 <img
-                  src={tutorial.thumbnailUrlSigned}
+                  src={getThumbnailUrl(tutorial)}
                   alt={tutorial.title}
                   onerror={(e) => (e.currentTarget.style.display = "none")}
                 />
