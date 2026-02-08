@@ -2,9 +2,21 @@
  * API de productos - Funciones helper para queries y mutations
  */
 
-import { query, mutation, backendUrl } from '@/lib/shared/graphql';
-import { GET_PRODUCTS, GET_PRODUCT_BY_ID, GET_CATEGORIES, GET_PRODUCT_CATEGORIES, GET_PRODUCT_CATEGORY, SEARCH_PRODUCTS } from './queries';
-import { CREATE_PRODUCT, UPDATE_PRODUCT, DELETE_PRODUCT, UPDATE_PRODUCT_STOCK } from './mutations';
+import { query, mutation, backendUrl } from "@/lib/shared/graphql";
+import {
+  GET_PRODUCTS,
+  GET_PRODUCT_BY_ID,
+  GET_CATEGORIES,
+  GET_PRODUCT_CATEGORIES,
+  GET_PRODUCT_CATEGORY,
+  SEARCH_PRODUCTS,
+} from "./queries";
+import {
+  CREATE_PRODUCT,
+  UPDATE_PRODUCT,
+  DELETE_PRODUCT,
+  UPDATE_PRODUCT_STOCK,
+} from "./mutations";
 import type {
   Product,
   ProductsResponse,
@@ -15,14 +27,15 @@ import type {
   ProductCategory,
   CreateProductInput,
   UpdateProductInput,
-  UploadImageResponse
-} from './types';
+  UploadImageResponse,
+  DetectedProductList,
+} from "./types";
 
 // ==================== QUERIES ====================
 
 export async function getProducts(
   filters: ProductFilters = {},
-  pagination: ProductPaginationParams = { first: 20 }
+  pagination: ProductPaginationParams = { first: 20 },
 ) {
   const variables = {
     ...pagination,
@@ -49,8 +62,14 @@ export async function getCategories() {
  * @returns Lista de categorías de productos
  */
 export async function getProductCategories(branchType?: string, jwt?: string) {
-  const normalizedBranchType = branchType ? branchType.toLowerCase() : branchType;
-  return query<{ productCategories: ProductCategory[] }>(GET_PRODUCT_CATEGORIES, { branchType: normalizedBranchType }, jwt);
+  const normalizedBranchType = branchType
+    ? branchType.toLowerCase()
+    : branchType;
+  return query<{ productCategories: ProductCategory[] }>(
+    GET_PRODUCT_CATEGORIES,
+    { branchType: normalizedBranchType },
+    jwt,
+  );
 }
 
 /**
@@ -59,7 +78,9 @@ export async function getProductCategories(branchType?: string, jwt?: string) {
  * @returns Categoría de producto
  */
 export async function getProductCategory(id: string) {
-  return query<{ productCategory: ProductCategory }>(GET_PRODUCT_CATEGORY, { id });
+  return query<{ productCategory: ProductCategory }>(GET_PRODUCT_CATEGORY, {
+    id,
+  });
 }
 
 export async function searchProducts(
@@ -70,7 +91,7 @@ export async function searchProducts(
     branchTipo?: string;
     radiusKm?: number;
     jwt?: string;
-  } = {}
+  } = {},
 ) {
   const variables = {
     query: searchQuery,
@@ -81,7 +102,10 @@ export async function searchProducts(
     jwt: options.jwt,
   };
 
-  return query<{ searchProducts: ProductConnection }>(SEARCH_PRODUCTS, variables);
+  return query<{ searchProducts: ProductConnection }>(
+    SEARCH_PRODUCTS,
+    variables,
+  );
 }
 
 // ==================== MUTATIONS ====================
@@ -94,15 +118,15 @@ export async function searchProducts(
  */
 export async function uploadProductImage(
   imageFile: File,
-  jwt: string
+  jwt: string,
 ): Promise<UploadImageResponse> {
   const formData = new FormData();
-  formData.append('image', imageFile);
+  formData.append("image", imageFile);
 
   const response = await fetch(`${backendUrl}/upload/product/image`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Authorization': `Bearer ${jwt}`,
+      Authorization: `Bearer ${jwt}`,
     },
     body: formData,
   });
@@ -116,6 +140,66 @@ export async function uploadProductImage(
 }
 
 /**
+ * Detecta productos desde una imagen de vitrina usando IA
+ */
+export async function detectFromShowcase(
+  imageFile: File,
+  jwt: string,
+): Promise<DetectedProductList> {
+  const formData = new FormData();
+  formData.append("file", imageFile);
+
+  const response = await fetch(`${backendUrl}/products/detect-from-showcase`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ detail: "Error desconocido" }));
+    throw new Error(
+      error.detail || `Error al analizar la imagen (${response.status})`,
+    );
+  }
+
+  return response.json();
+}
+
+/**
+ * Detecta productos desde una imagen de menú usando IA
+ */
+export async function detectFromMenu(
+  imageFile: File,
+  jwt: string,
+): Promise<DetectedProductList> {
+  const formData = new FormData();
+  formData.append("file", imageFile);
+
+  const response = await fetch(`${backendUrl}/products/detect-from-menu`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ detail: "Error desconocido" }));
+    throw new Error(
+      error.detail || `Error al analizar la imagen (${response.status})`,
+    );
+  }
+
+  return response.json();
+}
+
+/**
  * Crea un nuevo producto
  * @param input - Datos del producto
  * @param jwt - Token JWT de autenticación
@@ -123,30 +207,44 @@ export async function uploadProductImage(
  */
 export async function createProduct(
   input: CreateProductInput,
-  jwt: string
+  jwt: string,
 ): Promise<Product> {
-  const result = await mutation<{ createProduct: Product }>(CREATE_PRODUCT, { input, jwt });
+  const result = await mutation<{ createProduct: Product }>(CREATE_PRODUCT, {
+    input,
+    jwt,
+  });
   return result.createProduct;
 }
 
-export async function updateProduct(productId: string, input: UpdateProductInput, jwt?: string) {
-  const result = await mutation<{ updateProduct: Product }>(UPDATE_PRODUCT, { productId, input, jwt });
+export async function updateProduct(
+  productId: string,
+  input: UpdateProductInput,
+  jwt?: string,
+) {
+  const result = await mutation<{ updateProduct: Product }>(UPDATE_PRODUCT, {
+    productId,
+    input,
+    jwt,
+  });
   return result.updateProduct;
 }
 
 export async function deleteProduct(id: string) {
   return mutation<{ deleteProduct: { success: boolean; message: string } }>(
     DELETE_PRODUCT,
-    { id }
+    { id },
   );
 }
 
 export async function updateProductStock(id: string, stock: number) {
-  return mutation<{ updateProductStock: Product }>(UPDATE_PRODUCT_STOCK, { id, stock });
+  return mutation<{ updateProductStock: Product }>(UPDATE_PRODUCT_STOCK, {
+    id,
+    stock,
+  });
 }
 
 // ==================== EXPORTS ====================
 
-export * from './types';
-export * from './queries';
-export * from './mutations';
+export * from "./types";
+export * from "./queries";
+export * from "./mutations";

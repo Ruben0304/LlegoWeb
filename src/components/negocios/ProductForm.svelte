@@ -6,7 +6,9 @@
     updateProduct,
     getProductCategories,
   } from "@/lib/product";
-  import type { Product, ProductCategory } from "@/lib/product";
+  import type { Product, ProductCategory, DetectedProduct } from "@/lib/product";
+  import BulkProductDetector from "./BulkProductDetector.svelte";
+  import DraftProductList from "./DraftProductList.svelte";
 
   interface Props {
     branchId: string;
@@ -23,6 +25,27 @@
     onProductAdded,
     product = null,
   }: Props = $props();
+
+  // Mode: "single" for individual product, "bulk" for AI detection
+  type FormMode = "single" | "bulk";
+  let formMode = $state<FormMode>("single");
+
+  // Bulk detection state
+  let detectedProducts = $state<DetectedProduct[]>([]);
+  let showDrafts = $derived(detectedProducts.length > 0);
+
+  function handleProductsDetected(products: DetectedProduct[]) {
+    detectedProducts = products;
+  }
+
+  function handleBulkCreated() {
+    detectedProducts = [];
+    onProductAdded({} as Product); // Trigger reload in parent
+  }
+
+  function handleBulkCancel() {
+    detectedProducts = [];
+  }
 
   // Estado para tipo de branch seleccionado (cuando hay múltiples)
   let selectedBranchType = $state(
@@ -312,38 +335,87 @@
 </script>
 
 <div class="product-form-container">
-  <div class="form-header">
-    <div class="form-icon">
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
+  <!-- Mode tabs (only show when not editing) -->
+  {#if !isEditMode}
+    <div class="form-mode-tabs">
+      <button
+        type="button"
+        class="mode-tab"
+        class:active={formMode === "single"}
+        onclick={() => { formMode = "single"; detectedProducts = []; }}
       >
-        {#if isEditMode}
-          <path
-            d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-          />
-          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-        {:else}
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        {/if}
-      </svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Agregar Producto
+      </button>
+      <button
+        type="button"
+        class="mode-tab"
+        class:active={formMode === "bulk"}
+        onclick={() => (formMode = "bulk")}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        Cargar con IA
+      </button>
     </div>
-    <div>
-      <h2 class="form-title">
-        {isEditMode ? "Editar Producto" : "Agregar Producto"}
-      </h2>
-      <p class="form-subtitle">
-        {isEditMode
-          ? "Modifica los datos del producto"
-          : "Completa los datos del nuevo producto"}
-      </p>
+  {/if}
+
+  {#if formMode === "bulk" && !isEditMode}
+    <!-- Bulk detection flow -->
+    {#if showDrafts}
+      <DraftProductList
+        {detectedProducts}
+        {branchId}
+        {branchTypes}
+        {jwt}
+        onAllCreated={handleBulkCreated}
+        onCancel={handleBulkCancel}
+      />
+    {:else}
+      <BulkProductDetector
+        {jwt}
+        onProductsDetected={handleProductsDetected}
+      />
+    {/if}
+  {:else}
+    <!-- Single product form -->
+    <div class="form-header">
+      <div class="form-icon">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          {#if isEditMode}
+            <path
+              d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+            />
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+          {:else}
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          {/if}
+        </svg>
+      </div>
+      <div>
+        <h2 class="form-title">
+          {isEditMode ? "Editar Producto" : "Agregar Producto"}
+        </h2>
+        <p class="form-subtitle">
+          {isEditMode
+            ? "Modifica los datos del producto"
+            : "Completa los datos del nuevo producto"}
+        </p>
+      </div>
     </div>
-  </div>
 
   {#if successMessage}
     <div class="success-message">
@@ -663,11 +735,49 @@
       {/if}
     </button>
   </form>
+  {/if}
 </div>
 
 <style>
   .product-form-container {
     height: 100%;
+  }
+
+  .form-mode-tabs {
+    display: flex;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .mode-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text-variant);
+    background: transparent;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+  }
+
+  .mode-tab:hover {
+    color: var(--color-text);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .mode-tab.active {
+    color: var(--color-text);
+    background: rgba(255, 255, 255, 0.08);
+    font-weight: 600;
   }
 
   .form-header {
