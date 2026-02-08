@@ -5,17 +5,18 @@
     createProduct,
     updateProduct,
     getProductCategories,
+    detectFromMenu,
+    detectFromShowcase,
   } from "@/lib/product";
-  import type { Product, ProductCategory, DetectedProduct } from "@/lib/product";
-  import BulkProductDetector from "./BulkProductDetector.svelte";
+  import type { Product, ProductCategory, DetectedProduct, DraftProduct } from "@/lib/product";
   import DraftProductList from "./DraftProductList.svelte";
 
   interface Props {
     branchId: string;
-    branchTypes: string[]; // Array de tipos de branch: ["RESTAURANTE"], ["DULCERIA"], etc.
+    branchTypes: string[];
     jwt: string;
     onProductAdded: (product: Product) => void;
-    product?: Product | null; // Optional: for edit mode
+    product?: Product | null;
   }
 
   let {
@@ -33,14 +34,93 @@
   // Bulk detection state
   let detectedProducts = $state<DetectedProduct[]>([]);
   let showDrafts = $derived(detectedProducts.length > 0);
+  let bulkImageFile = $state<File | null>(null);
+  let bulkImagePreview = $state("");
+  let isBulkDragging = $state(false);
+  let isDetecting = $state(false);
+  let bulkErrorMessage = $state("");
+  let bulkFileInputRef: HTMLInputElement;
 
-  function handleProductsDetected(products: DetectedProduct[]) {
-    detectedProducts = products;
+  function handleBulkFileSelect(file: File) {
+    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!validTypes.includes(file.type)) {
+      bulkErrorMessage = "Solo se permiten imágenes JPEG, PNG o WebP";
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      bulkErrorMessage = "La imagen debe ser menor a 10MB";
+      return;
+    }
+    bulkErrorMessage = "";
+    bulkImageFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      bulkImagePreview = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleBulkInputChange(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) handleBulkFileSelect(file);
+  }
+
+  function handleBulkDragOver(e: DragEvent) {
+    e.preventDefault();
+    isBulkDragging = true;
+  }
+
+  function handleBulkDragLeave(e: DragEvent) {
+    e.preventDefault();
+    isBulkDragging = false;
+  }
+
+  function handleBulkDrop(e: DragEvent) {
+    e.preventDefault();
+    isBulkDragging = false;
+    const file = e.dataTransfer?.files[0];
+    if (file) handleBulkFileSelect(file);
+  }
+
+  function removeBulkImage() {
+    bulkImageFile = null;
+    bulkImagePreview = "";
+    if (bulkFileInputRef) bulkFileInputRef.value = "";
+  }
+
+  function triggerBulkFileInput() {
+    bulkFileInputRef?.click();
+  }
+
+  async function handleDetect(type: "menu" | "showcase") {
+    if (!bulkImageFile) {
+      bulkErrorMessage = "Selecciona una imagen primero";
+      return;
+    }
+    isDetecting = true;
+    bulkErrorMessage = "";
+    try {
+      const detectFn = type === "menu" ? detectFromMenu : detectFromShowcase;
+      const result = await detectFn(bulkImageFile, jwt);
+      if (!result.products || result.products.length === 0) {
+        bulkErrorMessage = "No se detectaron productos en la imagen. Intenta con otra foto.";
+        return;
+      }
+      detectedProducts = result.products;
+    } catch (error) {
+      console.error("Error detecting products:", error);
+      bulkErrorMessage = error instanceof Error ? error.message : "Error al analizar la imagen";
+    } finally {
+      isDetecting = false;
+    }
   }
 
   function handleBulkCreated() {
     detectedProducts = [];
-    onProductAdded({} as Product); // Trigger reload in parent
+    bulkImageFile = null;
+    bulkImagePreview = "";
+    onProductAdded({} as Product);
   }
 
   function handleBulkCancel() {
@@ -116,17 +196,12 @@
     categoriesError = "";
 
     try {
-      // Si hay múltiples tipos pero no se ha seleccionado ninguno, cargamos todos
       const typesToLoad = branchTypes;
-
-      // Load categories for all branch types
       const categoryPromises = typesToLoad.map((branchType) =>
         getProductCategories(branchType, jwt),
       );
 
       const results = await Promise.all(categoryPromises);
-
-      // Combine and deduplicate categories by ID
       const allCategories = results.flatMap(
         (result) => result.productCategories || [],
       );
@@ -144,13 +219,11 @@
     }
   }
 
-  // Load categories when component mounts or branchTypes change
   onMount(() => {
     loadCategories();
   });
 
   $effect(() => {
-    // Reload categories if branchTypes or selectedBranchType change
     loadCategories();
   });
 
@@ -160,7 +233,6 @@
       return;
     }
 
-    // Max 5MB
     if (file.size > 5 * 1024 * 1024) {
       errorMessage = "La imagen debe ser menor a 5MB";
       return;
@@ -235,17 +307,12 @@
     }
   }
 
-  // Función para extraer el path de imagen desde imageUrl
   function extractImagePathFromUrl(imageUrl: string | undefined): string | undefined {
     if (!imageUrl) return undefined;
-    // El imageUrl tiene formato: https://domain.com/products/filename.jpg
-    // Necesitamos extraer: products/filename.jpg
     try {
       const url = new URL(imageUrl);
-      // Remover el slash inicial del pathname
       return url.pathname.startsWith('/') ? url.pathname.slice(1) : url.pathname;
     } catch {
-      // Si no es una URL válida, intentar extraer el path directamente
       const match = imageUrl.match(/products\/[^?#]+/);
       return match ? match[0] : undefined;
     }
@@ -254,14 +321,12 @@
   async function handleSubmit(e: Event) {
     e.preventDefault();
 
-    // Validar que hay tipo de branch seleccionado si hay múltiples
     if (branchTypes.length > 1 && !selectedBranchType) {
       errorMessage =
         "Por favor selecciona el tipo de negocio para este producto";
       return;
     }
 
-    // En modo creación, la imagen es obligatoria
     if (!isEditMode && !imageFile) {
       errorMessage = "Por favor selecciona una imagen para el producto";
       return;
@@ -272,17 +337,14 @@
     successMessage = "";
 
     try {
-      // En edición, usar la imagen existente por defecto (extraer path de imageUrl si no hay image)
       let imagePath = product?.image || extractImagePathFromUrl(product?.imageUrl);
 
-      // Si hay una nueva imagen, subirla
       if (imageFile) {
         const uploadResponse = await uploadProductImage(imageFile, jwt);
         imagePath = uploadResponse.image_path;
       }
 
       if (isEditMode && product) {
-        // Modo edición: actualizar producto existente
         const updateInput = {
           name,
           description,
@@ -302,7 +364,6 @@
         onProductAdded(updatedProduct);
         successMessage = "Producto actualizado correctamente";
       } else {
-        // Modo creación: crear nuevo producto
         const productInput = {
           branchId,
           name,
@@ -320,7 +381,6 @@
         resetForm();
       }
 
-      // Clear success message after 3 seconds
       setTimeout(() => {
         successMessage = "";
       }, 3000);
@@ -342,7 +402,7 @@
         type="button"
         class="mode-tab"
         class:active={formMode === "single"}
-        onclick={() => { formMode = "single"; detectedProducts = []; }}
+        onclick={() => { formMode = "single"; detectedProducts = []; bulkErrorMessage = ""; }}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"/>
@@ -377,10 +437,118 @@
         onCancel={handleBulkCancel}
       />
     {:else}
-      <BulkProductDetector
-        {jwt}
-        onProductsDetected={handleProductsDetected}
-      />
+      <div class="form-header">
+        <div class="form-icon bulk-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="form-title">Cargar productos con IA</h2>
+          <p class="form-subtitle">Sube una foto y detectaremos los productos automáticamente</p>
+        </div>
+      </div>
+
+      {#if bulkErrorMessage}
+        <div class="error-message">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          {bulkErrorMessage}
+        </div>
+      {/if}
+
+      <!-- Image upload for bulk -->
+      <div class="form-group">
+        <label>Foto del menú o vitrina <span class="required">*</span></label>
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          bind:this={bulkFileInputRef}
+          onchange={handleBulkInputChange}
+          class="file-input-hidden"
+        />
+
+        {#if bulkImagePreview}
+          <div class="image-preview-container">
+            <div class="image-preview">
+              <img src={bulkImagePreview} alt="Imagen a analizar" />
+            </div>
+            <div class="image-info">
+              <span class="image-name">{bulkImageFile?.name || "Imagen"}</span>
+              <button type="button" class="remove-image-btn" onclick={removeBulkImage}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                Cambiar
+              </button>
+            </div>
+          </div>
+        {:else}
+          <button
+            type="button"
+            class="upload-area"
+            class:dragging={isBulkDragging}
+            ondragover={handleBulkDragOver}
+            ondragleave={handleBulkDragLeave}
+            ondrop={handleBulkDrop}
+            onclick={triggerBulkFileInput}
+          >
+            <div class="upload-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <span class="upload-text">Arrastra una foto aquí</span>
+            <span class="upload-subtext">o haz clic para seleccionar</span>
+            <span class="upload-hint">JPEG, PNG o WebP hasta 10MB</span>
+          </button>
+        {/if}
+      </div>
+
+      <!-- Two detect buttons -->
+      <div class="bulk-actions">
+        <button
+          type="button"
+          class="detect-btn detect-menu"
+          disabled={!bulkImageFile || isDetecting}
+          onclick={() => handleDetect("menu")}
+        >
+          {#if isDetecting}
+            <span class="spinner"></span>
+            Analizando...
+          {:else}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+            Enviar como Menú
+          {/if}
+        </button>
+        <button
+          type="button"
+          class="detect-btn detect-showcase"
+          disabled={!bulkImageFile || isDetecting}
+          onclick={() => handleDetect("showcase")}
+        >
+          {#if isDetecting}
+            <span class="spinner"></span>
+            Analizando...
+          {:else}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+            </svg>
+            Enviar como Vitrina
+          {/if}
+        </button>
+      </div>
     {/if}
   {:else}
     <!-- Single product form -->
@@ -417,97 +585,178 @@
       </div>
     </div>
 
-  {#if successMessage}
-    <div class="success-message">
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <polyline points="20 6 9 17 4 12" />
-      </svg>
-      {successMessage}
-    </div>
-  {/if}
+    {#if successMessage}
+      <div class="success-message">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+        {successMessage}
+      </div>
+    {/if}
 
-  {#if errorMessage}
-    <div class="error-message">
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="8" x2="12" y2="12" />
-        <line x1="12" y1="16" x2="12.01" y2="16" />
-      </svg>
-      {errorMessage}
-    </div>
-  {/if}
+    {#if errorMessage}
+      <div class="error-message">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        {errorMessage}
+      </div>
+    {/if}
 
-  <form class="product-form" onsubmit={handleSubmit}>
-    <!-- Name -->
-    <div class="form-group">
-      <label for="product-name">
-        Nombre del producto
-        <span class="required">*</span>
-      </label>
-      <input
-        type="text"
-        id="product-name"
-        bind:value={name}
-        placeholder="Ej: Hamburguesa Clásica"
-        required
-      />
-    </div>
-
-    <!-- Description -->
-    <div class="form-group">
-      <label for="product-description">
-        Descripción
-        <span class="required">*</span>
-      </label>
-      <textarea
-        id="product-description"
-        bind:value={description}
-        placeholder="Describe tu producto..."
-        rows="3"
-        required
-      ></textarea>
-    </div>
-
-    <!-- Price and Currency -->
-    <div class="form-row">
-      <div class="form-group flex-2">
-        <label for="product-price">
-          Precio
+    <form class="product-form" onsubmit={handleSubmit}>
+      <!-- Name -->
+      <div class="form-group">
+        <label for="product-name">
+          Nombre del producto
           <span class="required">*</span>
         </label>
-        <div class="input-with-icon">
-          <span class="input-icon">$</span>
-          <input
-            type="number"
-            id="product-price"
-            bind:value={price}
-            placeholder="0.00"
-            step="0.01"
-            min="0"
-            required
-          />
+        <input
+          type="text"
+          id="product-name"
+          bind:value={name}
+          placeholder="Ej: Hamburguesa Clásica"
+          required
+        />
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="product-description">
+          Descripción
+          <span class="required">*</span>
+        </label>
+        <textarea
+          id="product-description"
+          bind:value={description}
+          placeholder="Describe tu producto..."
+          rows="3"
+          required
+        ></textarea>
+      </div>
+
+      <!-- Price and Currency -->
+      <div class="form-row">
+        <div class="form-group flex-2">
+          <label for="product-price">
+            Precio
+            <span class="required">*</span>
+          </label>
+          <div class="input-with-icon">
+            <span class="input-icon">$</span>
+            <input
+              type="number"
+              id="product-price"
+              bind:value={price}
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              required
+            />
+          </div>
+        </div>
+        <div class="form-group flex-1">
+          <label for="product-currency">Moneda</label>
+          <div class="select-wrapper">
+            <select id="product-currency" bind:value={currency}>
+              <option value="USD">USD</option>
+              <option value="CUP">CUP</option>
+            </select>
+            <svg
+              class="select-arrow"
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
         </div>
       </div>
-      <div class="form-group flex-1">
-        <label for="product-currency">Moneda</label>
+
+      <!-- Weight -->
+      <div class="form-group">
+        <label for="product-weight">Peso / Unidad</label>
+        <input
+          type="text"
+          id="product-weight"
+          bind:value={weight}
+          placeholder="Ej: 500g, 1kg, 1 unidad"
+        />
+      </div>
+
+      <!-- Branch Type Selector (only if multiple types) -->
+      {#if branchTypes.length > 1}
+        <div class="form-group">
+          <label for="branch-type-selector">
+            Tipo de Negocio
+            <span class="required">*</span>
+          </label>
+          <p class="field-hint">
+            Selecciona en qué categoría de negocio aparecerá este producto
+          </p>
+          <div class="radio-group">
+            {#each branchTypes as branchType}
+              <label class="radio-option">
+                <input
+                  type="radio"
+                  name="branch-type"
+                  value={branchType}
+                  bind:group={selectedBranchType}
+                />
+                <span class="radio-label">
+                  {branchType === "RESTAURANTE"
+                    ? "Restaurante"
+                    : branchType === "DULCERIA"
+                      ? "Dulcería"
+                      : branchType === "TIENDA"
+                        ? "Tienda"
+                        : branchType}
+                </span>
+              </label>
+            {/each}
+          </div>
+        </div>
+      {/if}
+
+      <!-- Category -->
+      <div class="form-group">
+        <label for="product-category">
+          Categoría
+          {#if isLoadingCategories}
+            <span class="loading-text">(cargando...)</span>
+          {/if}
+        </label>
         <div class="select-wrapper">
-          <select id="product-currency" bind:value={currency}>
-            <option value="USD">USD</option>
-            <option value="CUP">CUP</option>
+          <select
+            id="product-category"
+            bind:value={categoryId}
+            disabled={isLoadingCategories ||
+              filteredCategories.length === 0 ||
+              (branchTypes.length > 1 && !selectedBranchType)}
+          >
+            <option value="">Sin categoría</option>
+            {#each filteredCategories as cat}
+              <option value={cat.id}>{cat.name}</option>
+            {/each}
           </select>
           <svg
             class="select-arrow"
@@ -521,220 +770,139 @@
             <polyline points="6 9 12 15 18 9" />
           </svg>
         </div>
-      </div>
-    </div>
-
-    <!-- Weight -->
-    <div class="form-group">
-      <label for="product-weight">Peso / Unidad</label>
-      <input
-        type="text"
-        id="product-weight"
-        bind:value={weight}
-        placeholder="Ej: 500g, 1kg, 1 unidad"
-      />
-    </div>
-
-    <!-- Branch Type Selector (only if multiple types) -->
-    {#if branchTypes.length > 1}
-      <div class="form-group">
-        <label for="branch-type-selector">
-          Tipo de Negocio
-          <span class="required">*</span>
-        </label>
-        <p class="field-hint">
-          Selecciona en qué categoría de negocio aparecerá este producto
-        </p>
-        <div class="radio-group">
-          {#each branchTypes as branchType}
-            <label class="radio-option">
-              <input
-                type="radio"
-                name="branch-type"
-                value={branchType}
-                bind:group={selectedBranchType}
-              />
-              <span class="radio-label">
-                {branchType === "RESTAURANTE"
-                  ? "Restaurante"
-                  : branchType === "DULCERIA"
-                    ? "Dulcería"
-                    : branchType === "TIENDA"
-                      ? "Tienda"
-                      : branchType}
-              </span>
-            </label>
-          {/each}
-        </div>
-      </div>
-    {/if}
-
-    <!-- Category -->
-    <div class="form-group">
-      <label for="product-category">
-        Categoría
-        {#if isLoadingCategories}
-          <span class="loading-text">(cargando...)</span>
+        {#if categoriesError}
+          <span class="field-error">{categoriesError}</span>
         {/if}
-      </label>
-      <div class="select-wrapper">
-        <select
-          id="product-category"
-          bind:value={categoryId}
-          disabled={isLoadingCategories ||
-            filteredCategories.length === 0 ||
-            (branchTypes.length > 1 && !selectedBranchType)}
-        >
-          <option value="">Sin categoría</option>
-          {#each filteredCategories as cat}
-            <option value={cat.id}>{cat.name}</option>
-          {/each}
-        </select>
-        <svg
-          class="select-arrow"
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
+        {#if branchTypes.length > 1 && !selectedBranchType}
+          <span class="field-hint">Primero selecciona el tipo de negocio</span>
+        {/if}
       </div>
-      {#if categoriesError}
-        <span class="field-error">{categoriesError}</span>
-      {/if}
-      {#if branchTypes.length > 1 && !selectedBranchType}
-        <span class="field-hint">Primero selecciona el tipo de negocio</span>
-      {/if}
-    </div>
 
-    <!-- Image Upload -->
-    <div class="form-group">
-      <label
-        >Imagen del producto {#if !isEditMode}<span class="required">*</span
-          >{/if}</label
-      >
-      {#if isEditMode}
-        <p class="field-hint">Deja en blanco para mantener la imagen actual</p>
-      {/if}
-      <input
-        type="file"
-        accept="image/*"
-        bind:this={fileInputRef}
-        onchange={handleInputChange}
-        class="file-input-hidden"
-      />
+      <!-- Image Upload -->
+      <div class="form-group">
+        <label
+          >Imagen del producto {#if !isEditMode}<span class="required">*</span
+            >{/if}</label
+        >
+        {#if isEditMode}
+          <p class="field-hint">Deja en blanco para mantener la imagen actual</p>
+        {/if}
+        <input
+          type="file"
+          accept="image/*"
+          bind:this={fileInputRef}
+          onchange={handleInputChange}
+          class="file-input-hidden"
+        />
 
-      {#if imagePreview}
-        <div class="image-preview-container">
-          <div class="image-preview">
-            <img src={imagePreview} alt="Vista previa" />
+        {#if imagePreview}
+          <div class="image-preview-container">
+            <div class="image-preview">
+              <img src={imagePreview} alt="Vista previa" />
+            </div>
+            <div class="image-info">
+              <span class="image-name">{imageName}</span>
+              <button
+                type="button"
+                class="remove-image-btn"
+                onclick={removeImage}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+                Eliminar
+              </button>
+            </div>
           </div>
-          <div class="image-info">
-            <span class="image-name">{imageName}</span>
-            <button
-              type="button"
-              class="remove-image-btn"
-              onclick={removeImage}
-            >
+        {:else}
+          <button
+            type="button"
+            class="upload-area"
+            class:dragging={isDragging}
+            ondragover={handleDragOver}
+            ondragleave={handleDragLeave}
+            ondrop={handleDrop}
+            onclick={triggerFileInput}
+          >
+            <div class="upload-icon">
               <svg
-                width="16"
-                height="16"
+                width="32"
+                height="32"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
+                stroke-width="1.5"
               >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
-              Eliminar
-            </button>
-          </div>
-        </div>
-      {:else}
-        <button
-          type="button"
-          class="upload-area"
-          class:dragging={isDragging}
-          ondragover={handleDragOver}
-          ondragleave={handleDragLeave}
-          ondrop={handleDrop}
-          onclick={triggerFileInput}
-        >
-          <div class="upload-icon">
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="17 8 12 3 7 8" />
-              <line x1="12" y1="3" x2="12" y2="15" />
-            </svg>
-          </div>
-          <span class="upload-text">Arrastra una imagen aquí</span>
-          <span class="upload-subtext">o haz clic para seleccionar</span>
-          <span class="upload-hint">PNG, JPG hasta 5MB</span>
-        </button>
-      {/if}
-    </div>
-
-    <!-- Availability Toggle -->
-    <div class="form-group-toggle">
-      <div class="toggle-info">
-        <label for="product-availability">Disponibilidad</label>
-        <span class="toggle-description"
-          >El producto estará visible para los clientes</span
-        >
+            </div>
+            <span class="upload-text">Arrastra una imagen aquí</span>
+            <span class="upload-subtext">o haz clic para seleccionar</span>
+            <span class="upload-hint">PNG, JPG hasta 5MB</span>
+          </button>
+        {/if}
       </div>
-      <label class="toggle-switch">
-        <input
-          type="checkbox"
-          id="product-availability"
-          bind:checked={availability}
-        />
-        <span class="toggle-slider"></span>
-      </label>
-    </div>
 
-    <!-- Hidden branchId -->
-    <input type="hidden" value={branchId} />
+      <!-- Availability Toggle -->
+      <div class="form-group-toggle">
+        <div class="toggle-info">
+          <label for="product-availability">Disponibilidad</label>
+          <span class="toggle-description"
+            >El producto estará visible para los clientes</span
+          >
+        </div>
+        <label class="toggle-switch">
+          <input
+            type="checkbox"
+            id="product-availability"
+            bind:checked={availability}
+          />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
 
-    <!-- Submit Button -->
-    <button type="submit" class="submit-btn" disabled={isSubmitting}>
-      {#if isSubmitting}
-        <span class="spinner"></span>
-        {isEditMode ? "Guardando..." : "Agregando..."}
-      {:else}
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          {#if isEditMode}
-            <path
-              d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
-            />
-            <polyline points="17 21 17 13 7 13 7 21" />
-            <polyline points="7 3 7 8 15 8" />
-          {:else}
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          {/if}
-        </svg>
-        {isEditMode ? "Guardar Cambios" : "Agregar Producto"}
-      {/if}
-    </button>
-  </form>
+      <!-- Hidden branchId -->
+      <input type="hidden" value={branchId} />
+
+      <!-- Submit Button -->
+      <button type="submit" class="submit-btn" disabled={isSubmitting}>
+        {#if isSubmitting}
+          <span class="spinner"></span>
+          {isEditMode ? "Guardando..." : "Agregando..."}
+        {:else}
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            {#if isEditMode}
+              <path
+                d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+              />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            {:else}
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            {/if}
+          </svg>
+          {isEditMode ? "Guardar Cambios" : "Agregar Producto"}
+        {/if}
+      </button>
+    </form>
   {/if}
 </div>
 
@@ -801,6 +969,11 @@
     border-radius: var(--radius-lg);
     color: var(--color-accent);
     flex-shrink: 0;
+  }
+
+  .form-icon.bulk-icon {
+    background: linear-gradient(135deg, rgba(90, 200, 250, 0.2) 0%, rgba(100, 210, 255, 0.2) 100%);
+    color: #5ac8fa;
   }
 
   .form-title {
@@ -1089,6 +1262,54 @@
 
   .remove-image-btn:hover {
     background: rgba(255, 59, 48, 0.2);
+  }
+
+  /* Bulk Actions - Two buttons */
+  .bulk-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+  }
+
+  .detect-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    border-radius: var(--radius-full);
+    transition: all var(--transition-base);
+  }
+
+  .detect-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+
+  .detect-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .detect-menu {
+    color: var(--color-primary);
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 100%);
+  }
+
+  .detect-menu:hover:not(:disabled) {
+    box-shadow: 0 10px 30px rgba(225, 199, 142, 0.3);
+  }
+
+  .detect-showcase {
+    color: #fff;
+    background: linear-gradient(135deg, #5ac8fa 0%, #007aff 100%);
+  }
+
+  .detect-showcase:hover:not(:disabled) {
+    box-shadow: 0 10px 30px rgba(90, 200, 250, 0.3);
   }
 
   /* Toggle Switch */

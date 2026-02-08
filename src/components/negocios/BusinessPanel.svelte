@@ -7,6 +7,7 @@
   import BranchForm from "./BranchForm.svelte";
   import ProductForm from "./ProductForm.svelte";
   import ProductList from "./ProductList.svelte";
+  import DraftProductList from "./DraftProductList.svelte";
 
   type AuthUser = {
     id: string;
@@ -228,7 +229,7 @@
     try {
       console.log("🍎 Iniciando Apple Sign In...");
       console.log("Backend URL:", BACKEND_URL);
-      
+
       // Call backend to get Apple auth URL
       const response = await fetch(`${BACKEND_URL}/apple/start`, {
         method: "GET",
@@ -245,7 +246,7 @@
 
       const data = await response.json();
       console.log("Backend response:", data);
-      
+
       if (!data.auth_url) {
         throw new Error("No se recibió la URL de autenticación");
       }
@@ -260,7 +261,7 @@
 
       // Redirect to Apple's auth page
       console.log("🚀 Redirigiendo a Apple...");
-      
+
       // Try using window.location.assign as it's more reliable
       window.location.assign(data.auth_url);
     } catch (error) {
@@ -1045,6 +1046,14 @@
       onDelete={() => {}}
       onToggleAvailability={() => {}}
       onEdit={() => {}}
+    />
+    <DraftProductList
+      detectedProducts={[]}
+      branchId=""
+      branchTypes={[]}
+      jwt=""
+      onAllCreated={() => {}}
+      onCancel={() => {}}
     />
   </div>
 </section>
