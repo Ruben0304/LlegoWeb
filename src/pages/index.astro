@@ -1,25 +1,27 @@
 ---
 export const prerender = true;
 
-import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/common/Navbar.svelte';
-import Hero from '../components/home/Hero.svelte';
-import FeatureShowcase from '../components/home/FeatureShowcase.svelte';
-import ScrollytellingHowItWorks from '../components/home/ScrollytellingHowItWorks.svelte';
-import DeliveryShowcase from '../components/home/DeliveryShowcase.svelte';
-import Footer from '../components/common/Footer.svelte';
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/common/Navbar.svelte";
+import Hero from "../components/home/Hero.svelte";
+import FeatureShowcase from "../components/home/FeatureShowcase.svelte";
+import ScrollytellingHowItWorks from "../components/home/ScrollytellingHowItWorks.svelte";
+import DeliveryShowcase from "../components/home/DeliveryShowcase.svelte";
+import Footer from "../components/common/Footer.svelte";
 
-const title = "Llegó | Compra inteligente con IA en restaurantes, ropa y mercado";
-const description = "Descubre Llegó, la app de compras inteligentes con IA conversacional. Encuentra restaurantes, ropa, mercado y agro en segundos. Prueba Llegó+ y compra mas rapido.";
+const title =
+    "Llegó | Compra inteligente con IA en restaurantes, ropa y mercado";
+const description =
+    "Descubre Llegó, la app de compras inteligentes con IA conversacional. Encuentra restaurantes, ropa, mercado y agro en segundos. Prueba Llegó+ y compra mas rapido.";
 ---
 
 <Layout title={title} description={description}>
-  <Navbar client:load />
-  <main>
-    <Hero client:load />
-    <FeatureShowcase client:visible />
-    <ScrollytellingHowItWorks client:load />
-    <DeliveryShowcase client:visible />
-  </main>
-  <Footer client:visible />
+    <Navbar client:load />
+    <main>
+        <Hero client:load />
+        <FeatureShowcase client:visible />
+        <ScrollytellingHowItWorks client:visible />
+        <DeliveryShowcase client:visible />
+    </main>
+    <Footer />
 </Layout>
