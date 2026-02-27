@@ -4,6 +4,7 @@
     import BranchSelector from "./BranchSelector.svelte";
 
     interface Props {
+        jwt: string;
         businesses: Business[];
         onBusinessSelected: (business: Business) => void;
         onBranchSelected: (branch: Branch) => void;
@@ -13,6 +14,7 @@
     }
 
     let {
+        jwt,
         businesses,
         onBusinessSelected,
         onBranchSelected,
