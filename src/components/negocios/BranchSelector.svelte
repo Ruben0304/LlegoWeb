@@ -18,7 +18,7 @@
     }: Props = $props();
 
     const filteredBranches = $derived(
-        showInactive ? branches : branches.filter(b => b.status === "active")
+        showInactive ? branches.filter(b => b.status !== "active") : branches.filter(b => b.status === "active")
     );
 </script>
 
