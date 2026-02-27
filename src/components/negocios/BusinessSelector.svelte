@@ -22,8 +22,6 @@
     let deletingBusinessId = $state<string | null>(null);
     let confirmDeleteId = $state<string | null>(null);
 
-    const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL || "";
-
     const filteredBusinesses = $derived(
         showInactive ? businesses : businesses.filter(b => b.isActive)
     );
@@ -41,7 +39,7 @@
         deletingBusinessId = business.id;
 
         try {
-            const response = await fetch(`${BACKEND_URL}/graphql`, {
+            const response = await fetch(`/api/graphql`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

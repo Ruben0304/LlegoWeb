@@ -35,7 +35,6 @@
   let errorMessage = $state('');
   let successMessage = $state('');
 
-  const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL || '';
 
   // Track original values for detecting changes in edit mode
   const originalValues = business ? {
@@ -100,7 +99,7 @@
           return;
         }
 
-        const response = await fetch(`${BACKEND_URL}/graphql`, {
+        const response = await fetch(`/api/graphql`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -168,7 +167,7 @@
           address: branchAddress,
         };
 
-        const response = await fetch(`${BACKEND_URL}/graphql`, {
+        const response = await fetch(`/api/graphql`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

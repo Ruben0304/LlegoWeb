@@ -29,14 +29,12 @@
     let errorMessage = $state("");
     let showInactive = $state(false);
 
-    const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL || "";
-
     async function loadBranches(businessId: string) {
         isLoadingBranches = true;
         errorMessage = "";
 
         try {
-            const response = await fetch(`${BACKEND_URL}/graphql`, {
+            const response = await fetch(`/api/graphql`, {
                 method: "POST",
                 cache: "no-store",
                 headers: {

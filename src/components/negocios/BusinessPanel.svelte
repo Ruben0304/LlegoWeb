@@ -306,7 +306,7 @@
         businessError = "";
 
         try {
-            const response = await fetch(`${BACKEND_URL}/graphql`, {
+            const response = await fetch(`/api/graphql`, {
                 method: "POST",
                 cache: "no-store",
                 headers: {
@@ -358,7 +358,7 @@
 
         isLoadingProducts = true;
         try {
-            const response = await fetch(`${BACKEND_URL}/graphql`, {
+            const response = await fetch(`/api/graphql`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
