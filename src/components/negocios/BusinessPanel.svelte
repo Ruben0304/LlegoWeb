@@ -1039,7 +1039,6 @@
                                 </div>
                             {:else}
                                 <BusinessBranchSelector
-                                    {jwt}
                                     {businesses}
                                     onBusinessSelected={handleBusinessSelected}
                                     onBranchSelected={handleBranchSelected}
@@ -1167,7 +1166,6 @@
     <!-- Hidden render to force style inclusion during SSR -->
     <div class="style-preload" aria-hidden="true">
         <BusinessBranchSelector
-            jwt=""
             businesses={[]}
             onBusinessSelected={(business) => void business}
             onBranchSelected={(branch) => void branch}

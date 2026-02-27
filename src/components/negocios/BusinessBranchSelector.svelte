@@ -4,7 +4,6 @@
     import BranchSelector from "./BranchSelector.svelte";
 
     interface Props {
-        jwt: string;
         businesses: Business[];
         onBusinessSelected: (business: Business) => void;
         onBranchSelected: (branch: Branch) => void;
@@ -14,7 +13,6 @@
     }
 
     let {
-        jwt,
         businesses,
         onBusinessSelected,
         onBranchSelected,
@@ -28,196 +26,27 @@
     let isLoadingBranches = $state(false);
     let errorMessage = $state("");
     let showInactive = $state(false);
-    const GET_BRANCHES_QUERY = `
-        query GetBranches(
-          $first: Int
-          $after: String
-          $businessId: String
-          $tipo: BranchTipo
-          $radiusKm: Float
-          $jwt: String
-        ) {
-          branches(
-            first: $first
-            after: $after
-            businessId: $businessId
-            tipo: $tipo
-            radiusKm: $radiusKm
-            jwt: $jwt
-          ) {
-            edges {
-              cursor
-              node {
-                ...ScoredBranchCoreFields
-              }
-            }
-            pageInfo {
-              hasNextPage
-              hasPreviousPage
-              startCursor
-              endCursor
-              totalCount
-            }
-          }
+    function resolveBranchStatus(branch: any) {
+        if (typeof branch?.status === "string") {
+            return branch.status;
         }
-
-        fragment ScoredBranchCoreFields on ScoredBranchType {
-          id
-          businessId
-          name
-          address
-          phone
-          isActive
-          tipos
-          useAppMessaging
-          vehicles
-          accounts {
-            cardNumber
-            cardHolderName
-            bankName
-            isActive
-          }
-          qrPayments {
-            value
-            isActive
-          }
-          phones {
-            phone
-            isActive
-          }
-          paymentMethodIds
-          avatar
-          coverImage
-          socialMedia
-          coordinates {
-            ...CoordinatesFields
-          }
-          schedule
-          managerIds
-          createdAt
-          avatarUrl
-          coverUrl
-          wallet {
-            ...WalletBalanceFields
-          }
-          walletStatus
-        }
-
-        fragment CoordinatesFields on CoordinatesType {
-          type
-          coordinates
-        }
-
-        fragment WalletBalanceFields on WalletBalanceType {
-          local
-          usd
-        }
-    `;
-
-    function maskJwt(token: string) {
-        if (!token) return "";
-        if (token.length <= 12) return `${token.slice(0, 3)}...`;
-        return `${token.slice(0, 6)}...${token.slice(-6)}`;
-    }
-
-    async function loadBranches(businessId: string) {
-        isLoadingBranches = true;
-        errorMessage = "";
-
-        try {
-            console.info(
-                "[GraphQL] → GetBranches",
-                JSON.stringify({
-                    variables: {
-                        first: 100,
-                        after: null,
-                        businessId,
-                        tipo: null,
-                        radiusKm: null,
-                        jwt: maskJwt(jwt),
-                    },
-                }),
-            );
-            const response = await fetch(`/api/graphql`, {
-                method: "POST",
-                cache: "no-store",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-cache, no-store, max-age=0",
-                    Pragma: "no-cache",
-                    Authorization: `Bearer ${jwt}`,
-                },
-                body: JSON.stringify({
-                    query: GET_BRANCHES_QUERY,
-                    variables: {
-                        first: 100,
-                        after: null,
-                        businessId,
-                        tipo: null,
-                        radiusKm: null,
-                        jwt,
-                    },
-                }),
-            });
-
-            const result = await response.json();
-
-            const rawBranches = result.data?.branches;
-            const edgeNodes = Array.isArray(rawBranches?.edges)
-                ? rawBranches.edges
-                      .map((edge: any) => edge?.node)
-                      .filter(Boolean)
-                : [];
-            const directNodes = Array.isArray(rawBranches)
-                ? rawBranches.filter(Boolean)
-                : Array.isArray(rawBranches?.nodes)
-                  ? rawBranches.nodes.filter(Boolean)
-                  : [];
-            const pageInfoTotalCount =
-                typeof rawBranches?.pageInfo?.totalCount === "number"
-                    ? rawBranches.pageInfo.totalCount
-                    : edgeNodes.length;
-
-            console.info(
-                `[GraphQL] ← GetBranches status=${response.status} businessId=${businessId} edges=${edgeNodes.length} direct=${directNodes.length} totalCount=${pageInfoTotalCount}`,
-            );
-
-            if (
-                result.errors &&
-                edgeNodes.length === 0 &&
-                directNodes.length === 0
-            ) {
-                throw new Error(
-                    result.errors[0]?.message || "Error al cargar sucursales",
-                );
-            }
-
-            const resolvedBranches = edgeNodes.length > 0 ? edgeNodes : directNodes;
-            branches = resolvedBranches.map((branch: any) => ({
-                ...branch,
-                status:
-                    typeof branch?.status === "string"
-                        ? branch.status
-                        : branch?.isActive === false
-                          ? "inactive"
-                          : "active",
-            }));
-        } catch (error) {
-            console.error("Error loading branches:", error);
-            errorMessage =
-                error instanceof Error
-                    ? error.message
-                    : "Error al cargar sucursales";
-            branches = [];
-        } finally {
-            isLoadingBranches = false;
-        }
+        return branch?.isActive === false ? "inactive" : "active";
     }
 
     function handleBusinessSelect(business: Business) {
         selectedBusiness = business;
         onBusinessSelected(business);
-        loadBranches(business.id);
+        errorMessage = "";
+        const businessBranches = Array.isArray(business?.branches)
+            ? business.branches
+            : [];
+        branches = businessBranches.map((branch: any) => ({
+            ...branch,
+            status: resolveBranchStatus(branch),
+        }));
+        console.info(
+            `[BusinessBranchSelector] negocio=${business.id} sucursales_precargadas=${branches.length}`,
+        );
     }
 
     function handleBranchSelect(branch: Branch) {
