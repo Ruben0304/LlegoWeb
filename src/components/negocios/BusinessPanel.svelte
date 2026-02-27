@@ -417,6 +417,31 @@
             console.info(
                 `[GraphQL] ← GetMyBusinessesWithBranches status=${response.status} negocios=${loadedBusinesses.length} sucursales=${loadedBranches}`,
             );
+            console.info(
+                "[GraphQL] ← GetMyBusinessesWithBranches detalle",
+                loadedBusinesses.map((business: any) => ({
+                    id: business?.id,
+                    name: business?.name,
+                    isActive: business?.isActive,
+                    branchesCount: Array.isArray(business?.branches)
+                        ? business.branches.length
+                        : 0,
+                    branchesPreview: Array.isArray(business?.branches)
+                        ? business.branches.slice(0, 3).map((branchLike: any) => {
+                              const branch = branchLike?.node ?? branchLike;
+                              return {
+                                  rawKeys: branchLike
+                                      ? Object.keys(branchLike).slice(0, 6)
+                                      : [],
+                                  id: branch?.id,
+                                  name: branch?.name,
+                                  isActive: branch?.isActive,
+                                  status: branch?.status,
+                              };
+                          })
+                        : [],
+                })),
+            );
 
             if (result.errors) {
                 throw new Error(

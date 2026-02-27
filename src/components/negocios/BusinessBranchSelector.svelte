@@ -28,6 +28,63 @@
     let isLoadingBranches = $state(false);
     let errorMessage = $state("");
     let showInactive = $state(false);
+
+    const GET_BRANCHES_FALLBACK_QUERY = `
+        query GetBranches(
+          $first: Int
+          $after: String
+          $businessId: String
+          $tipo: BranchTipo
+          $radiusKm: Float
+          $jwt: String
+        ) {
+          branches(
+            first: $first
+            after: $after
+            businessId: $businessId
+            tipo: $tipo
+            radiusKm: $radiusKm
+            jwt: $jwt
+          ) {
+            edges {
+              cursor
+              node {
+                id
+                businessId
+                name
+                address
+                phone
+                isActive
+                tipos
+                avatarUrl
+                createdAt
+              }
+            }
+            pageInfo {
+              totalCount
+            }
+          }
+        }
+    `;
+
+    function extractBranchLikeArray(branchesLike: any): any[] {
+        if (Array.isArray(branchesLike)) return branchesLike;
+        if (Array.isArray(branchesLike?.edges)) return branchesLike.edges;
+        if (Array.isArray(branchesLike?.nodes)) return branchesLike.nodes;
+        return [];
+    }
+
+    function normalizeBranchesInput(branchesLike: any): Branch[] {
+        const rawArray = extractBranchLikeArray(branchesLike);
+        return rawArray
+            .map((branchLike: any) => branchLike?.node ?? branchLike)
+            .filter((branchLike: any) => branchLike && typeof branchLike === "object")
+            .map((branch: any) => ({
+                ...branch,
+                status: resolveBranchStatus(branch),
+            }));
+    }
+
     function resolveBranchStatus(branch: any) {
         if (typeof branch?.status === "string") {
             return branch.status;
@@ -35,20 +92,102 @@
         return branch?.isActive === false ? "inactive" : "active";
     }
 
-    function handleBusinessSelect(business: Business) {
+    async function loadBranchesFallback(businessId: string): Promise<Branch[]> {
+        if (!jwt || !businessId) return [];
+        console.info(
+            `[GraphQL] → GetBranches (fallback) businessId=${businessId}`,
+        );
+        const response = await fetch(`/api/graphql`, {
+            method: "POST",
+            cache: "no-store",
+            headers: {
+                "Content-Type": "application/json",
+                "Cache-Control": "no-cache, no-store, max-age=0",
+                Pragma: "no-cache",
+                Authorization: `Bearer ${jwt}`,
+            },
+            body: JSON.stringify({
+                query: GET_BRANCHES_FALLBACK_QUERY,
+                variables: {
+                    first: 100,
+                    after: null,
+                    businessId,
+                    tipo: null,
+                    radiusKm: null,
+                    jwt,
+                },
+            }),
+        });
+        const result = await response.json();
+        if (result.errors) {
+            throw new Error(
+                result.errors[0]?.message || "Error al cargar sucursales",
+            );
+        }
+
+        const fallbackBranches = normalizeBranchesInput(result.data?.branches);
+        const totalCount =
+            typeof result.data?.branches?.pageInfo?.totalCount === "number"
+                ? result.data.branches.pageInfo.totalCount
+                : fallbackBranches.length;
+        console.info(
+            `[GraphQL] ← GetBranches (fallback) status=${response.status} businessId=${businessId} totalCount=${totalCount} normalizadas=${fallbackBranches.length}`,
+        );
+        return fallbackBranches;
+    }
+
+    async function handleBusinessSelect(business: Business) {
         selectedBusiness = business;
         onBusinessSelected(business);
         errorMessage = "";
-        const businessBranches = Array.isArray(business?.branches)
-            ? business.branches
-            : [];
-        branches = businessBranches.map((branch: any) => ({
-            ...branch,
-            status: resolveBranchStatus(branch),
-        }));
+        isLoadingBranches = true;
+
+        const fullBusiness =
+            businesses.find((currentBusiness) => currentBusiness.id === business.id) ||
+            business;
+        const businessBranchesRaw = extractBranchLikeArray(fullBusiness?.branches);
+        let normalizedBranches = normalizeBranchesInput(fullBusiness?.branches);
+
+        if (normalizedBranches.length === 0) {
+            try {
+                normalizedBranches = await loadBranchesFallback(business.id);
+            } catch (error) {
+                console.error(
+                    `[BusinessBranchSelector] fallback_error negocio=${business.id}`,
+                    error,
+                );
+                errorMessage =
+                    error instanceof Error
+                        ? error.message
+                        : "Error al cargar sucursales";
+            }
+        }
+
+        branches = normalizedBranches;
+
+        const activeCount = branches.filter(
+            (branch) => branch.status !== "inactive",
+        ).length;
+        const inactiveCount = branches.length - activeCount;
+        const hiddenByFilter = !showInactive && activeCount === 0 && branches.length > 0;
+        if (hiddenByFilter) {
+            showInactive = true;
+        }
+
         console.info(
-            `[BusinessBranchSelector] negocio=${business.id} sucursales_precargadas=${branches.length}`,
+            `[BusinessBranchSelector] negocio=${business.id} sucursales_raw=${businessBranchesRaw.length} sucursales_normalizadas=${normalizedBranches.length} sucursales_precargadas=${branches.length} activas=${activeCount} inactivas=${inactiveCount} showInactive=${showInactive}`,
         );
+        console.info(
+            "[BusinessBranchSelector] detalle_sucursales",
+            branches.map((branch) => ({
+                id: branch.id,
+                name: branch.name,
+                isActive: branch.isActive,
+                status: branch.status,
+                hasNodeWrapper: false,
+            })),
+        );
+        isLoadingBranches = false;
     }
 
     function handleBranchSelect(branch: Branch) {

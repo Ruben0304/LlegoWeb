@@ -31,6 +31,19 @@
 
     function isBranchActive(branch: Branch): boolean {
         if (!branch) return false;
+        if (typeof branch.isActive === "boolean") {
+            return branch.isActive;
+        }
+        if (typeof branch.isActive === "string") {
+            const normalizedIsActive = branch.isActive.trim().toLowerCase();
+            if (normalizedIsActive === "true" || normalizedIsActive === "1") {
+                return true;
+            }
+            if (normalizedIsActive === "false" || normalizedIsActive === "0") {
+                return false;
+            }
+        }
+
         const status = normalizeStatus(branch.status);
 
         if (!status) {
@@ -48,23 +61,37 @@
         return !inactiveStatuses.has(status);
     }
 
-    const filteredBranches = $derived(() => {
-        const safeBranches = Array.isArray(branches)
-            ? branches.filter(Boolean)
+    function getSafeBranches(): Branch[] {
+        return Array.isArray(branches) ? branches.filter(Boolean) : [];
+    }
+
+    $effect(() => {
+        const total = Array.isArray(branches) ? branches.length : 0;
+        const safeBranches = getSafeBranches();
+        const filtered = safeBranches.length;
+        const branchStatuses = Array.isArray(branches)
+            ? branches.map((branch) => ({
+                  id: branch?.id,
+                  name: branch?.name,
+                  isActive: (branch as any)?.isActive,
+                  status: (branch as any)?.status,
+                  activeComputed: isBranchActive(branch),
+              }))
             : [];
-        return showInactive
-            ? safeBranches
-            : safeBranches.filter(isBranchActive);
+        console.info(
+            `[BranchSelector] total=${total} filtradas=${filtered} showInactive=${showInactive} isLoading=${isLoading}`,
+        );
+        console.info("[BranchSelector] estado_sucursales", branchStatuses);
     });
 </script>
 
-<div class="branch-selector">
+    <div class="branch-selector">
     {#if isLoading}
         <div class="loading-state">
             <span class="spinner"></span>
             <span class="loading-text">Cargando sucursales...</span>
         </div>
-    {:else if filteredBranches.length === 0}
+    {:else if getSafeBranches().length === 0}
         <div class="empty-branches">
             <svg
                 width="48"
@@ -77,11 +104,7 @@
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                 <circle cx="12" cy="10" r="3" />
             </svg>
-            <p>
-                {showInactive
-                    ? "No hay sucursales registradas"
-                    : "No hay sucursales activas"}
-            </p>
+            <p>No hay sucursales registradas</p>
             <button class="btn-primary" onclick={onCreateBranch}>
                 <svg
                     width="16"
@@ -99,7 +122,7 @@
         </div>
     {:else}
         <div class="branches-grid">
-            {#each filteredBranches as branch}
+            {#each getSafeBranches() as branch}
                 <button
                     class="branch-card"
                     class:inactive={!isBranchActive(branch)}
