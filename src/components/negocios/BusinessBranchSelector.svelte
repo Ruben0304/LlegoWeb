@@ -38,8 +38,11 @@
         try {
             const response = await fetch(`${BACKEND_URL}/graphql`, {
                 method: "POST",
+                cache: "no-store",
                 headers: {
                     "Content-Type": "application/json",
+                    "Cache-Control": "no-cache, no-store, max-age=0",
+                    Pragma: "no-cache",
                     Authorization: `Bearer ${jwt}`,
                 },
                 body: JSON.stringify({

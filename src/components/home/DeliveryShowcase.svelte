@@ -58,15 +58,28 @@
 
   let sectionElement: HTMLElement;
   let isVisible = $state(false);
+  let isInView = $state(false);
   let activeFeature = $state(0);
+  let routeCanvas: SVGSVGElement | null = null;
 
   onMount(() => {
+    const syncRouteAnimationState = () => {
+      if (!routeCanvas) return;
+      if (isInView) {
+        routeCanvas.unpauseAnimations?.();
+      } else {
+        routeCanvas.pauseAnimations?.();
+      }
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          isInView = entry.isIntersecting;
           if (entry.isIntersecting) {
             isVisible = true;
           }
+          syncRouteAnimationState();
         });
       },
       { threshold: 0.2 },
@@ -78,8 +91,11 @@
 
     // Auto-rotate features
     const interval = setInterval(() => {
+      if (!isInView) return;
       activeFeature = (activeFeature + 1) % features.length;
     }, 4000);
+
+    syncRouteAnimationState();
 
     return () => {
       observer.disconnect();
@@ -88,7 +104,7 @@
   });
 </script>
 
-<section class="delivery-showcase" bind:this={sectionElement}>
+<section class="delivery-showcase" class:in-view={isInView} bind:this={sectionElement}>
   <!-- Background -->
   <div class="section-bg">
     <div class="bg-gradient"></div>
@@ -169,6 +185,7 @@
         <div class="route-container">
           <svg
             class="route-canvas"
+            bind:this={routeCanvas}
             viewBox="0 0 400 400"
             preserveAspectRatio="xMidYMid meet"
           >
@@ -988,6 +1005,12 @@
   /* Preview route (faint dotted line) */
   .route-preview {
     animation: previewPulse 5s ease-in-out infinite;
+  }
+
+  .delivery-showcase:not(.in-view) .float-icon,
+  .delivery-showcase:not(.in-view) .delivery-route,
+  .delivery-showcase:not(.in-view) .route-preview {
+    animation-play-state: paused;
   }
 
   @keyframes previewPulse {

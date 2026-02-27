@@ -50,8 +50,9 @@
 
     let sectionRef: HTMLElement;
     let windowHeight = $state(0);
-    let sectionTop = $state(0);
-    let sectionHeight = $state(0);
+    let sectionTop = 0;
+    let sectionHeight = 0;
+    let scrollRafId: number | null = null;
     let isReducedMotion = $state(false);
     let isMobile = $state(false);
     type ImageLoadState = "idle" | "loading" | "loaded" | "error";
@@ -62,9 +63,7 @@
     let loadedStepImageSources = $state<(string | null)[]>(
         steps.map(() => null),
     );
-    let stepImageLoadStates = $state<ImageLoadState[]>(
-        steps.map(() => "idle"),
-    );
+    let stepImageLoadStates = $state<ImageLoadState[]>(steps.map(() => "idle"));
     const stepImageLoadPromises = new Map<number, Promise<void>>();
 
     // Current active step (0, 1, 2)
@@ -104,35 +103,49 @@
 
         updateViewportState();
 
-        const updateMetrics = () => {
-            if (isMobile || isReducedMotion) return;
-            if (sectionRef) {
-                const rect = sectionRef.getBoundingClientRect();
-                sectionTop = rect.top + window.scrollY;
-                sectionHeight = sectionRef.offsetHeight;
+        const measureSection = () => {
+            if (!sectionRef) return;
+            const rect = sectionRef.getBoundingClientRect();
+            sectionTop = rect.top + window.scrollY;
+            sectionHeight = sectionRef.offsetHeight;
+        };
 
-                // Calculate how far we've scrolled into the section
-                const scrollIntoSection = window.scrollY - sectionTop;
-                const scrollableDistance = sectionHeight - windowHeight;
+        const updateProgress = () => {
+            if (isMobile || isReducedMotion || !sectionRef) return;
 
-                if (scrollIntoSection <= 0) {
-                    sectionProgress = 0;
-                } else if (scrollIntoSection >= scrollableDistance) {
-                    sectionProgress = 1;
-                } else {
-                    sectionProgress = scrollIntoSection / scrollableDistance;
-                }
+            // Calculate how far we've scrolled into the section using cached metrics.
+            const scrollIntoSection = window.scrollY - sectionTop;
+            const scrollableDistance = Math.max(
+                1,
+                sectionHeight - windowHeight,
+            );
+
+            if (scrollIntoSection <= 0) {
+                sectionProgress = 0;
+            } else if (scrollIntoSection >= scrollableDistance) {
+                sectionProgress = 1;
+            } else {
+                sectionProgress = scrollIntoSection / scrollableDistance;
             }
+        };
+
+        const requestProgressUpdate = () => {
+            if (scrollRafId !== null) return;
+            scrollRafId = window.requestAnimationFrame(() => {
+                scrollRafId = null;
+                updateProgress();
+            });
         };
 
         const handleScroll = () => {
             if (isMobile || isReducedMotion) return;
-            updateMetrics();
+            requestProgressUpdate();
         };
 
         const handleResize = () => {
             updateViewportState();
-            updateMetrics();
+            measureSection();
+            requestProgressUpdate();
         };
 
         const handleReducedMotionChange = () => {
@@ -140,7 +153,9 @@
             if (isReducedMotion) {
                 sectionProgress = 0;
             } else {
-                updateMetrics();
+                updateViewportState();
+                measureSection();
+                requestProgressUpdate();
             }
         };
 
@@ -157,7 +172,10 @@
 
         // Initial calculation
         if (!isMobile && !isReducedMotion) {
-            setTimeout(updateMetrics, 100);
+            setTimeout(() => {
+                measureSection();
+                updateProgress();
+            }, 100);
         }
 
         markVisibleStepRangeForLoad(activeStep);
@@ -182,6 +200,9 @@
         return () => {
             window.removeEventListener("scroll", handleScroll);
             window.removeEventListener("resize", handleResize);
+            if (scrollRafId !== null) {
+                window.cancelAnimationFrame(scrollRafId);
+            }
             if (typeof reducedMotionQuery.removeEventListener === "function") {
                 reducedMotionQuery.removeEventListener(
                     "change",
@@ -339,7 +360,8 @@
                         >
                             <div class="phone-frame">
                                 <img
-                                    src={loadedStepImageSources[index] ?? undefined}
+                                    src={loadedStepImageSources[index] ??
+                                        undefined}
                                     sizes="(min-width: 1280px) 304px, (min-width: 1024px) 280px, 240px"
                                     alt="Paso {step.number}"
                                     class="phone-screenshot"
@@ -349,9 +371,7 @@
                                     width="640"
                                     height="1390"
                                 />
-                                {#if activeStep === index &&
-                                    stepImageLoadStates[index] !== "loaded" &&
-                                    stepImageLoadStates[index] !== "error"}
+                                {#if activeStep === index && stepImageLoadStates[index] !== "loaded" && stepImageLoadStates[index] !== "error"}
                                     <div class="phone-loading-overlay">
                                         <div
                                             class="ios-spinner"
@@ -629,7 +649,9 @@
         border: none;
         border-radius: 50%;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition:
+            transform 0.3s ease,
+            background-color 0.3s ease;
         position: relative;
     }
 
@@ -728,7 +750,6 @@
             #5a8467 100%
         );
         border-radius: 1px;
-        transition: height 0.3s ease-out;
     }
 
     /* Timeline step */
@@ -738,7 +759,9 @@
         gap: 16px;
         opacity: 0.4;
         transform: translateX(0);
-        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        transition:
+            opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+            transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .timeline-step.completed {
@@ -763,7 +786,11 @@
         background: rgba(255, 255, 255, 0.05);
         border: 2px solid rgba(255, 255, 255, 0.15);
         border-radius: 50%;
-        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        transition:
+            transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+            background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+            box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .timeline-step.completed .step-indicator {
@@ -863,7 +890,10 @@
         max-height: 0;
         overflow: hidden;
         opacity: 0;
-        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        transition:
+            opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+            color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+            max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .timeline-step.active .step-description {
@@ -886,7 +916,12 @@
         letter-spacing: 0.05em;
         opacity: 0;
         transform: translateY(-8px);
-        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        transition:
+            opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+            transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+            background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+            border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+            color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         transition-delay: 0.1s;
     }
 
