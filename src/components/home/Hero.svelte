@@ -178,6 +178,9 @@
             }
         };
 
+        const handleHighlightDownload = () => triggerDownloadHighlight();
+        window.addEventListener("llego:highlight-download", handleHighlightDownload);
+
         window.addEventListener("scroll", handleScroll, { passive: true });
         window.addEventListener("resize", handleResize, { passive: true });
         if (typeof reducedMotionQuery.addEventListener === "function") {
@@ -193,6 +196,8 @@
             window.removeEventListener("scroll", handleScroll);
             window.removeEventListener("resize", handleResize);
             window.clearTimeout(idleWarmupTimer);
+            window.removeEventListener("llego:highlight-download", handleHighlightDownload);
+
             if (typeof reducedMotionQuery.removeEventListener === "function") {
                 reducedMotionQuery.removeEventListener(
                     "change",
@@ -203,6 +208,18 @@
             }
         };
     });
+
+    // Store download buttons highlight
+    let highlightDownload = $state(false);
+
+    function triggerDownloadHighlight() {
+        highlightDownload = false;
+        // Force reflow so the animation re-triggers even if already highlighted
+        requestAnimationFrame(() => {
+            highlightDownload = true;
+            setTimeout(() => { highlightDownload = false; }, 1400);
+        });
+    }
 
     // Parallax and fade calculations
     let lowMotionMode = $derived(isMobile || isReducedMotion);
@@ -259,24 +276,6 @@
         style="opacity: {opacity}; transform: translateY({translateY}px);"
     >
         <div class="content-wrapper" class:loaded={isLoaded}>
-            <!-- Badge -->
-            <div class="hero-badge">
-                <span class="badge-glow"></span>
-                <span class="badge-icon">
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                    >
-                        <path
-                            d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                        />
-                    </svg>
-                </span>
-                <span class="badge-text">Compras inteligentes con IA</span>
-            </div>
-
             <!-- Main title -->
             <h1 class="hero-title">
                 <span class="title-line title-line-1">
@@ -284,19 +283,35 @@
                 </span>
 
                 <span class="title-line title-line-3">
-                    <span class="word gradient-text">Llegó.</span>
+                    <span class="word gradient-text">Llegó.</span><div class="hero-badge">
+                        <span class="badge-glow"></span>
+                        <span class="badge-icon">
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                            >
+                                <path
+                                    d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                                />
+                            </svg>
+                        </span>
+                        <span class="badge-text">Delivery inteligente con IA · Cuba</span>
+                    </div>
                 </span>
             </h1>
 
             <!-- Subtitle -->
             <p class="hero-subtitle">
-                La primera app de compras con IA conversacional.<br />
-                Restaurantes, ropa, mercado y agro en un solo lugar.
+                La primera app de delivery en Cuba.<br />
+                Restaurantes, ropa, mercado, perfumerías y más —<br />
+                todo en un solo lugar, guiado por IA.&#32;<a href="/plus" class="subtitle-link">Conoce Llegó+&nbsp;→</a>
             </p>
 
             <!-- CTA Buttons -->
             <div class="hero-actions" id="descargar">
-                <a href="#" class="btn-primary">
+                <a href="#" class="btn-primary" class:highlight={highlightDownload}>
                     <svg
                         viewBox="0 0 24 24"
                         fill="currentColor"
@@ -312,7 +327,7 @@
                         <span class="btn-store">App Store</span>
                     </span>
                 </a>
-                <a href="#" class="btn-primary">
+                <a href="#" class="btn-primary" class:highlight={highlightDownload}>
                     <svg
                         viewBox="0 0 24 24"
                         fill="currentColor"
@@ -330,20 +345,6 @@
                 </a>
             </div>
 
-            <!-- Secondary link -->
-            <a href="/plus" class="hero-link">
-                <span>Conoce Llegó+</span>
-                <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                >
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-            </a>
         </div>
     </div>
 
@@ -427,26 +428,8 @@
             </svg>
         </button>
 
-        <!-- Carousel indicators -->
-        <div class="carousel-indicators">
-            {#each images as _, index}
-                <button
-                    class="indicator"
-                    class:active={currentImageIndex === index}
-                    onclick={() => goToImage(index)}
-                    aria-label="Ir a imagen {index + 1}"
-                ></button>
-            {/each}
-        </div>
     </div>
 
-    <!-- Scroll indicator -->
-    <div class="scroll-indicator" style="opacity: {opacity}">
-        <div class="scroll-line">
-            <div class="scroll-dot"></div>
-        </div>
-        <span class="scroll-text">Scroll</span>
-    </div>
 </section>
 
 <style>
@@ -567,7 +550,7 @@
         z-index: 2;
         width: 100%;
         max-width: 1400px;
-        padding: 120px 24px 60px;
+        padding: 100px 24px 60px;
         will-change: transform, opacity;
     }
 
@@ -588,20 +571,17 @@
         transform: translateY(0);
     }
 
-    .content-wrapper.loaded .hero-badge {
+    .content-wrapper.loaded .hero-title {
         transition-delay: 0.1s;
     }
-    .content-wrapper.loaded .hero-title {
-        transition-delay: 0.2s;
+    .content-wrapper.loaded .hero-badge {
+        transition-delay: 0.25s;
     }
     .content-wrapper.loaded .hero-subtitle {
         transition-delay: 0.4s;
     }
     .content-wrapper.loaded .hero-actions {
-        transition-delay: 0.5s;
-    }
-    .content-wrapper.loaded .hero-link {
-        transition-delay: 0.6s;
+        transition-delay: 0.55s;
     }
 
     /* Badge */
@@ -609,13 +589,14 @@
         position: relative;
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        padding: 8px 16px 8px 12px;
+        gap: 8px;
+        padding: 6px 14px 6px 10px;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 100px;
-        margin-bottom: 32px;
         backdrop-filter: blur(10px);
+        flex-shrink: 0;
+        align-self: center;
     }
 
     .badge-glow {
@@ -668,12 +649,19 @@
         overflow: visible;
     }
 
+    .title-line-3 {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
     .word {
         display: inline-block;
         font-size: clamp(3rem, 12vw, 7rem);
         font-weight: 700;
         letter-spacing: -0.04em;
-        line-height: 1.15;
+        line-height: 1.25;
         color: #fff;
         overflow: visible;
     }
@@ -688,6 +676,7 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
+        padding-bottom: 0.15em;
     }
 
     /* Subtitle */
@@ -726,6 +715,18 @@
         transform: translateY(-2px);
     }
 
+    .btn-primary.highlight {
+        animation: btnHighlight 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes btnHighlight {
+        0%   { transform: translateY(0) scale(1);    background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.15); }
+        15%  { transform: translateY(-6px) scale(1.04); background: rgba(225,199,142,0.25); border-color: rgba(225,199,142,0.6); box-shadow: 0 16px 40px rgba(225,199,142,0.25); }
+        45%  { transform: translateY(-6px) scale(1.04); background: rgba(225,199,142,0.20); border-color: rgba(225,199,142,0.5); }
+        70%  { transform: translateY(-2px) scale(1.01); background: rgba(255,255,255,0.13); border-color: rgba(255,255,255,0.25); }
+        100% { transform: translateY(0) scale(1);    background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.15); box-shadow: none; }
+    }
+
     .btn-content {
         display: flex;
         flex-direction: column;
@@ -744,27 +745,18 @@
         letter-spacing: -0.01em;
     }
 
-    /* Link */
-    .hero-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 15px;
+    /* Subtitle inline link */
+    .subtitle-link {
+        display: inline;
+        font-size: inherit;
         font-weight: 500;
         color: var(--color-secondary);
-        transition: all 0.3s ease;
+        white-space: nowrap;
+        transition: opacity 0.2s ease;
     }
 
-    .hero-link:hover {
-        gap: 12px;
-    }
-
-    .hero-link svg {
-        transition: transform 0.3s ease;
-    }
-
-    .hero-link:hover svg {
-        transform: translateX(4px);
+    .subtitle-link:hover {
+        opacity: 0.8;
     }
 
     /* Device */
@@ -772,7 +764,7 @@
         display: none;
         position: absolute;
         right: 8%;
-        top: 50%;
+        top: calc(50% + 36px);
         transform: translateY(-50%);
         z-index: 3;
         will-change: transform, opacity;
@@ -952,99 +944,10 @@
         height: 24px;
     }
 
-    /* Carousel indicators */
-    .carousel-indicators {
-        position: absolute;
-        bottom: -50px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 10px;
-        z-index: 10;
-    }
-
-    .indicator {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        padding: 0;
-    }
-
-    .indicator:hover {
-        background: rgba(255, 255, 255, 0.5);
-        transform: scale(1.2);
-    }
-
-    .indicator.active {
-        width: 24px;
-        border-radius: 4px;
-        background: linear-gradient(
-            135deg,
-            var(--color-primary),
-            var(--color-button)
-        );
-    }
-
-    /* Scroll indicator */
-    .scroll-indicator {
-        position: absolute;
-        bottom: 40px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        z-index: 10;
-    }
-
-    .scroll-line {
-        width: 1px;
-        height: 60px;
-        background: rgba(255, 255, 255, 0.2);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .scroll-dot {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 3px;
-        height: 10px;
-        background: var(--color-secondary);
-        border-radius: 2px;
-        animation: scrollDown 2s ease-in-out infinite;
-    }
-
-    @keyframes scrollDown {
-        0% {
-            top: 0;
-            opacity: 1;
-        }
-        100% {
-            top: 100%;
-            opacity: 0;
-        }
-    }
-
-    .scroll-text {
-        font-size: 11px;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.15em;
-        color: rgba(255, 255, 255, 0.4);
-    }
-
     /* Responsive */
     @media (min-width: 1024px) {
         .hero-content {
-            padding: 0 60px;
+            padding: 100px 60px 60px;
         }
 
         .hero-device {

@@ -16,32 +16,40 @@ import { GraphQLClient } from 'graphql-request';
  * para el endpoint GraphQL. Esto permite usar la misma variable base para
  * endpoints REST.
  */
-const SERVER_BACKEND_URL = import.meta.env.BACKEND_URL;
-const PUBLIC_BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL;
-const BACKEND_URL = import.meta.env.SSR ? SERVER_BACKEND_URL : PUBLIC_BACKEND_URL;
-
-if (!BACKEND_URL) {
-  const missingVar = import.meta.env.SSR ? 'BACKEND_URL' : 'PUBLIC_BACKEND_URL';
-  throw new Error(
-    `${missingVar} no está definida. Asegúrate de crear un archivo .env con esta variable.`
-  );
+function getBackendUrl(): string {
+  const SERVER_BACKEND_URL = import.meta.env.BACKEND_URL;
+  const PUBLIC_BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL;
+  const url = import.meta.env.SSR ? SERVER_BACKEND_URL : PUBLIC_BACKEND_URL;
+  if (!url) {
+    const missingVar = import.meta.env.SSR ? 'BACKEND_URL' : 'PUBLIC_BACKEND_URL';
+    throw new Error(
+      `${missingVar} no está definida. Asegúrate de crear un archivo .env con esta variable.`
+    );
+  }
+  return url;
 }
 
 // Exportar la URL base del backend para uso en endpoints REST
-export const backendUrl = BACKEND_URL;
+export function getBackendBaseUrl(): string {
+  return getBackendUrl();
+}
 
-// URL del endpoint GraphQL (concatena /graphql a la URL base)
-const GRAPHQL_ENDPOINT = `${BACKEND_URL}/graphql`;
+/** @deprecated usa getBackendBaseUrl() */
+export const backendUrl = import.meta.env.BACKEND_URL ?? import.meta.env.PUBLIC_BACKEND_URL ?? '';
 
-// Crear cliente GraphQL
-export const graphqlClient = new GraphQLClient(GRAPHQL_ENDPOINT, {
-  // Opciones adicionales que puedes configurar:
-  headers: {
-    // Ejemplo: agregar headers de autenticación si es necesario
-    // 'Authorization': `Bearer ${import.meta.env.API_TOKEN}`,
+function getGraphqlEndpoint(): string {
+  return `${getBackendUrl()}/graphql`;
+}
+
+function getClient(): GraphQLClient {
+  return new GraphQLClient(getGraphqlEndpoint());
+}
+
+// Crear cliente GraphQL (lazy - solo se instancia al usarse)
+export const graphqlClient = new Proxy({} as GraphQLClient, {
+  get(_target, prop) {
+    return getClient()[prop as keyof GraphQLClient];
   },
-  // timeout: 10000, // Timeout en ms
-  // credentials: 'include', // Para enviar cookies
 });
 
 /**
@@ -74,17 +82,14 @@ export async function query<T = any>(
   jwt?: string
 ): Promise<T> {
   try {
-    // Si se proporciona un JWT, crear un cliente con headers de autenticación
+    const endpoint = getGraphqlEndpoint();
     if (jwt) {
-      const authenticatedClient = new GraphQLClient(GRAPHQL_ENDPOINT, {
-        headers: {
-          'Authorization': `Bearer ${jwt}`,
-        },
+      const authenticatedClient = new GraphQLClient(endpoint, {
+        headers: { 'Authorization': `Bearer ${jwt}` },
       });
       return await authenticatedClient.request<T>(query, variables);
     }
-
-    return await graphqlClient.request<T>(query, variables);
+    return await getClient().request<T>(query, variables);
   } catch (error) {
     console.error('Error en GraphQL query:', error);
     throw error;
@@ -119,7 +124,7 @@ export async function mutation<T = any>(
   variables?: Record<string, any>
 ): Promise<T> {
   try {
-    return await graphqlClient.request<T>(mutation, variables);
+    return await getClient().request<T>(mutation, variables);
   } catch (error) {
     console.error('Error en GraphQL mutation:', error);
     throw error;

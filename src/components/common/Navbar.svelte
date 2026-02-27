@@ -22,12 +22,35 @@
         isMobileMenuOpen = false;
         document.body.style.overflow = "";
     }
+
+    function handleDescargar(e: MouseEvent) {
+        e.preventDefault();
+        closeMobileMenu();
+        const hero = document.getElementById("inicio");
+        const descargar = document.getElementById("descargar");
+        if (!hero || !descargar) return;
+
+        const heroVisible = hero.getBoundingClientRect().top >= -window.innerHeight * 0.5
+            && hero.getBoundingClientRect().bottom > 0;
+
+        const fireHighlight = () => {
+            window.dispatchEvent(new CustomEvent("llego:highlight-download"));
+        };
+
+        if (heroVisible) {
+            fireHighlight();
+        } else {
+            hero.scrollIntoView({ behavior: "smooth" });
+            // Wait for scroll to finish before firing the highlight
+            setTimeout(fireHighlight, 700);
+        }
+    }
 </script>
 
 <nav class="navbar" class:scrolled={isScrolled}>
     <div class="navbar-container">
         <a href="/" class="logo" aria-label="Llegó - Inicio">
-            <img src="/icon-nav-36.webp" srcset="/icon-nav-36.webp 1x, /icon-nav-72.webp 2x" width="36" height="36" loading="eager" decoding="async" alt="Llegó" class="logo-icon" />
+            <img src="/img/icon.png" width="36" height="36" loading="eager" decoding="async" alt="Llegó" class="logo-icon" />
             <span class="logo-text">Llegó</span>
         </a>
 
@@ -43,7 +66,7 @@
             <a href="/negocios" class="nav-link" onclick={closeMobileMenu}
                 >Negocios</a
             >
-            <a href="/#descargar" class="nav-cta" onclick={closeMobileMenu}>
+            <a href="/#descargar" class="nav-cta" onclick={handleDescargar}>
                 <span>Descargar</span>
                 <svg
                     width="16"
@@ -96,7 +119,7 @@
         background: rgba(0, 0, 0, 0.8);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: none;
         padding: 12px 0;
     }
 
@@ -121,6 +144,7 @@
         height: 36px;
         object-fit: contain;
         transition: transform 0.3s ease;
+        mix-blend-mode: screen;
     }
 
     .logo:hover .logo-icon {
