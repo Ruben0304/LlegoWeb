@@ -44,8 +44,8 @@
                 },
                 body: JSON.stringify({
                     query: `
-            query GetBranches($first: Int!, $businessId: String!, $jwt: String!) {
-              branches(first: $first, businessId: $businessId, jwt: $jwt) {
+            query GetBranches($first: Int!, $businessId: String!, $onlyActive: Boolean, $jwt: String!) {
+              branches(first: $first, businessId: $businessId, onlyActive: $onlyActive, jwt: $jwt) {
                 edges {
                   node {
                     id
@@ -61,7 +61,7 @@
               }
             }
           `,
-                    variables: { first: 100, businessId, jwt },
+                    variables: { first: 100, businessId, onlyActive: !showInactive, jwt },
                 }),
             });
 
@@ -84,8 +84,12 @@
     function handleBusinessSelect(business: Business) {
         selectedBusiness = business;
         onBusinessSelected(business);
-        loadBranches(business.id);
     }
+
+    $effect(() => {
+        if (!selectedBusiness) return;
+        void loadBranches(selectedBusiness.id);
+    });
 
     function handleBranchSelect(branch: Branch) {
         onBranchSelected(branch);

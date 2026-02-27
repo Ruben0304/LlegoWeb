@@ -16,9 +16,33 @@
         onBranchSelect,
         onCreateBranch,
     }: Props = $props();
+    function normalizeStatus(status: unknown): string {
+        if (typeof status === "string") {
+            return status.trim().toLowerCase();
+        }
+        if (typeof status === "boolean") {
+            return status ? "active" : "inactive";
+        }
+        if (typeof status === "number") {
+            return String(status);
+        }
+        return "";
+    }
+
+    function isBranchActive(branch: Branch): boolean {
+        const status = normalizeStatus(branch.status);
+
+        if (!status) {
+            // Evita ocultar sucursales validas cuando status viene vacio.
+            return true;
+        }
+
+        const inactiveStatuses = new Set(["inactive", "inactiva", "disabled", "false", "0"]);
+        return !inactiveStatuses.has(status);
+    }
 
     const filteredBranches = $derived(
-        showInactive ? branches.filter(b => b.status !== "active") : branches.filter(b => b.status === "active")
+        showInactive ? branches : branches.filter(isBranchActive)
     );
 </script>
 
@@ -34,7 +58,7 @@
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                 <circle cx="12" cy="10" r="3" />
             </svg>
-            <p>{branches.length === 0 ? "No hay sucursales registradas" : "No hay sucursales activas"}</p>
+            <p>{showInactive ? "No hay sucursales registradas" : "No hay sucursales activas"}</p>
             <button class="btn-primary" onclick={onCreateBranch}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <line x1="12" y1="5" x2="12" y2="19" />
@@ -48,7 +72,7 @@
             {#each filteredBranches as branch}
                 <button 
                     class="branch-card" 
-                    class:inactive={branch.status !== "active"}
+                    class:inactive={!isBranchActive(branch)}
                     onclick={() => onBranchSelect(branch)}
                 >
                     <div class="branch-left">
@@ -70,9 +94,9 @@
                         </div>
                     </div>
                     <div class="branch-right">
-                        <span class="status-badge" class:active={branch.status === "active"}>
+                        <span class="status-badge" class:active={isBranchActive(branch)}>
                             <span class="status-dot"></span>
-                            {branch.status === "active" ? "Activa" : "Inactiva"}
+                            {isBranchActive(branch) ? "Activa" : "Inactiva"}
                         </span>
                         <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="9 18 15 12 9 6" />
