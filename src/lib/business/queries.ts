@@ -38,40 +38,26 @@ export const GET_BUSINESS = gql`
 
 export const GET_BRANCHES = gql`
   query GetBranches(
-    $first: Int!
+    $first: Int
     $after: String
     $businessId: String
-    $onlyActive: Boolean
     $tipo: BranchTipo
+    $radiusKm: Float
     $jwt: String
   ) {
     branches(
       first: $first
       after: $after
       businessId: $businessId
-      onlyActive: $onlyActive
       tipo: $tipo
+      radiusKm: $radiusKm
       jwt: $jwt
     ) {
       edges {
-        node {
-          id
-          businessId
-          name
-          tipos
-          address
-          phone
-          status
-          avatarUrl
-          coverUrl
-          deliveryRadius
-          facilities
-          schedule
-          coordinates {
-            coordinates
-          }
-        }
         cursor
+        node {
+          ...ScoredBranchCoreFields
+        }
       }
       pageInfo {
         hasNextPage
@@ -81,6 +67,58 @@ export const GET_BRANCHES = gql`
         totalCount
       }
     }
+  }
+
+  fragment ScoredBranchCoreFields on ScoredBranchType {
+    id
+    businessId
+    name
+    address
+    phone
+    isActive
+    tipos
+    useAppMessaging
+    vehicles
+    accounts {
+      cardNumber
+      cardHolderName
+      bankName
+      isActive
+    }
+    qrPayments {
+      value
+      isActive
+    }
+    phones {
+      phone
+      isActive
+    }
+    paymentMethodIds
+    avatar
+    coverImage
+    socialMedia
+    coordinates {
+      ...CoordinatesFields
+    }
+    schedule
+    managerIds
+    createdAt
+    avatarUrl
+    coverUrl
+    wallet {
+      ...WalletBalanceFields
+    }
+    walletStatus
+  }
+
+  fragment CoordinatesFields on CoordinatesType {
+    type
+    coordinates
+  }
+
+  fragment WalletBalanceFields on WalletBalanceType {
+    local
+    usd
   }
 `;
 
@@ -108,14 +146,80 @@ export const GET_BRANCH = gql`
 `;
 
 export const GET_MY_BUSINESSES = gql`
-  query GetMyBusinesses($jwt: String!) {
-    businesses(jwt: $jwt) {
-      id
-      name
-      avatarUrl
-      isActive
-      description
+  query GetMyBusinessesWithBranches($jwt: String!) {
+    getMyBusinessesWithBranches(jwt: $jwt) {
+      ...BusinessRoleFields
+      branches {
+        ...BranchCoreFields
+      }
     }
+  }
+
+  fragment BusinessRoleFields on BusinessWithBranchesType {
+    id
+    name
+    ownerId
+    avatar
+    description
+    tags
+    globalRating
+    isActive
+    createdAt
+    avatarUrl
+    isOwner
+    role
+  }
+
+  fragment BranchCoreFields on BranchType {
+    id
+    businessId
+    name
+    address
+    phone
+    tipos
+    useAppMessaging
+    vehicles
+    accounts {
+      cardNumber
+      cardHolderName
+      bankName
+      isActive
+    }
+    qrPayments {
+      value
+      isActive
+    }
+    phones {
+      phone
+      isActive
+    }
+    paymentMethodIds
+    managerIds
+    avatar
+    coverImage
+    avatarUrl
+    coverUrl
+    isActive
+    socialMedia
+    coordinates {
+      ...CoordinatesFields
+    }
+    schedule
+    createdAt
+    wallet {
+      ...WalletBalanceFields
+    }
+    walletStatus
+  }
+
+  fragment CoordinatesFields on CoordinatesType {
+    type
+    coordinates
+  }
+
+  fragment WalletBalanceFields on WalletBalanceType {
+    local
+    usd
   }
 `;
 

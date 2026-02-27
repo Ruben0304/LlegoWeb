@@ -57,6 +57,83 @@
 
     const GOOGLE_CLIENT_ID = import.meta.env.PUBLIC_GOOGLE_CLIENT_ID;
     const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL || "";
+    const GET_MY_BUSINESSES_WITH_BRANCHES_QUERY = `
+        query GetMyBusinessesWithBranches($jwt: String!) {
+          getMyBusinessesWithBranches(jwt: $jwt) {
+            ...BusinessRoleFields
+            branches {
+              ...BranchCoreFields
+            }
+          }
+        }
+
+        fragment BusinessRoleFields on BusinessWithBranchesType {
+          id
+          name
+          ownerId
+          avatar
+          description
+          tags
+          globalRating
+          isActive
+          createdAt
+          avatarUrl
+          isOwner
+          role
+        }
+
+        fragment BranchCoreFields on BranchType {
+          id
+          businessId
+          name
+          address
+          phone
+          tipos
+          useAppMessaging
+          vehicles
+          accounts {
+            cardNumber
+            cardHolderName
+            bankName
+            isActive
+          }
+          qrPayments {
+            value
+            isActive
+          }
+          phones {
+            phone
+            isActive
+          }
+          paymentMethodIds
+          managerIds
+          avatar
+          coverImage
+          avatarUrl
+          coverUrl
+          isActive
+          socialMedia
+          coordinates {
+            ...CoordinatesFields
+          }
+          schedule
+          createdAt
+          wallet {
+            ...WalletBalanceFields
+          }
+          walletStatus
+        }
+
+        fragment CoordinatesFields on CoordinatesType {
+          type
+          coordinates
+        }
+
+        fragment WalletBalanceFields on WalletBalanceType {
+          local
+          usd
+        }
+    `;
 
     function storeAuth(data: AuthResponse) {
         if (typeof window === "undefined") return;
@@ -306,6 +383,10 @@
         businessError = "";
 
         try {
+            console.info(
+                "[GraphQL] → GetMyBusinessesWithBranches",
+                JSON.stringify({ variables: { jwt: maskToken(jwt) } }),
+            );
             const response = await fetch(`/api/graphql`, {
                 method: "POST",
                 cache: "no-store",
@@ -316,22 +397,26 @@
                     Authorization: `Bearer ${jwt}`,
                 },
                 body: JSON.stringify({
-                    query: `
-            query GetMyBusinesses($jwt: String!) {
-              businesses(jwt: $jwt) {
-                id
-                name
-                avatarUrl
-                isActive
-                description
-              }
-            }
-          `,
+                    query: GET_MY_BUSINESSES_WITH_BRANCHES_QUERY,
                     variables: { jwt },
                 }),
             });
 
             const result = await response.json();
+            const loadedBusinesses =
+                result.data?.getMyBusinessesWithBranches ?? [];
+            const loadedBranches = loadedBusinesses.reduce(
+                (acc: number, business: any) =>
+                    acc +
+                    (Array.isArray(business?.branches)
+                        ? business.branches.length
+                        : 0),
+                0,
+            );
+
+            console.info(
+                `[GraphQL] ← GetMyBusinessesWithBranches status=${response.status} negocios=${loadedBusinesses.length} sucursales=${loadedBranches}`,
+            );
 
             if (result.errors) {
                 throw new Error(
@@ -339,7 +424,7 @@
                 );
             }
 
-            businesses = result.data?.businesses || [];
+            businesses = loadedBusinesses;
         } catch (error) {
             console.error("Error loading businesses:", error);
             businessError =

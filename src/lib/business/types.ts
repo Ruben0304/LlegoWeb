@@ -63,6 +63,9 @@ export interface Business {
   createdAt?: string;
   avatarUrl?: string;
   coverUrl?: string;
+  isOwner?: boolean;
+  role?: string;
+  branches?: Branch[];
 }
 
 export interface Branch {
@@ -75,7 +78,8 @@ export interface Branch {
   phone: string;
   schedule: Record<string, string | string[]>;  // Backend may return string or string[]
   managerIds: string[];
-  status: 'active' | 'inactive' | 'pending';
+  status?: 'active' | 'inactive' | 'pending';
+  isActive?: boolean;
   avatar?: string;
   coverImage?: string;
   deliveryRadius?: number;

@@ -28,12 +28,116 @@
     let isLoadingBranches = $state(false);
     let errorMessage = $state("");
     let showInactive = $state(false);
+    const GET_BRANCHES_QUERY = `
+        query GetBranches(
+          $first: Int
+          $after: String
+          $businessId: String
+          $tipo: BranchTipo
+          $radiusKm: Float
+          $jwt: String
+        ) {
+          branches(
+            first: $first
+            after: $after
+            businessId: $businessId
+            tipo: $tipo
+            radiusKm: $radiusKm
+            jwt: $jwt
+          ) {
+            edges {
+              cursor
+              node {
+                ...ScoredBranchCoreFields
+              }
+            }
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+              startCursor
+              endCursor
+              totalCount
+            }
+          }
+        }
+
+        fragment ScoredBranchCoreFields on ScoredBranchType {
+          id
+          businessId
+          name
+          address
+          phone
+          isActive
+          tipos
+          useAppMessaging
+          vehicles
+          accounts {
+            cardNumber
+            cardHolderName
+            bankName
+            isActive
+          }
+          qrPayments {
+            value
+            isActive
+          }
+          phones {
+            phone
+            isActive
+          }
+          paymentMethodIds
+          avatar
+          coverImage
+          socialMedia
+          coordinates {
+            ...CoordinatesFields
+          }
+          schedule
+          managerIds
+          createdAt
+          avatarUrl
+          coverUrl
+          wallet {
+            ...WalletBalanceFields
+          }
+          walletStatus
+        }
+
+        fragment CoordinatesFields on CoordinatesType {
+          type
+          coordinates
+        }
+
+        fragment WalletBalanceFields on WalletBalanceType {
+          local
+          usd
+        }
+    `;
+
+    function maskJwt(token: string) {
+        if (!token) return "";
+        if (token.length <= 12) return `${token.slice(0, 3)}...`;
+        return `${token.slice(0, 6)}...${token.slice(-6)}`;
+    }
 
     async function loadBranches(businessId: string) {
         isLoadingBranches = true;
         errorMessage = "";
 
         try {
+            console.info(
+                "[GraphQL] → GetBranches",
+                JSON.stringify({
+                    variables: {
+                        first: 100,
+                        after: null,
+                        businessId,
+                        tipo: null,
+                        radiusKm: null,
+                        jwt: maskJwt(jwt),
+                    },
+                }),
+            );
             const response = await fetch(`/api/graphql`, {
                 method: "POST",
                 cache: "no-store",
@@ -44,25 +148,15 @@
                     Authorization: `Bearer ${jwt}`,
                 },
                 body: JSON.stringify({
-                    query: `
-            query GetBranches($first: Int!, $businessId: String!, $jwt: String!) {
-              branches(first: $first, businessId: $businessId, jwt: $jwt) {
-                edges {
-                  node {
-                    id
-                    businessId
-                    name
-                    tipos
-                    address
-                    phone
-                    status
-                    avatarUrl
-                  }
-                }
-              }
-            }
-          `,
-                    variables: { first: 100, businessId, jwt },
+                    query: GET_BRANCHES_QUERY,
+                    variables: {
+                        first: 100,
+                        after: null,
+                        businessId,
+                        tipo: null,
+                        radiusKm: null,
+                        jwt,
+                    },
                 }),
             });
 
@@ -79,6 +173,14 @@
                 : Array.isArray(rawBranches?.nodes)
                   ? rawBranches.nodes.filter(Boolean)
                   : [];
+            const pageInfoTotalCount =
+                typeof rawBranches?.pageInfo?.totalCount === "number"
+                    ? rawBranches.pageInfo.totalCount
+                    : edgeNodes.length;
+
+            console.info(
+                `[GraphQL] ← GetBranches status=${response.status} businessId=${businessId} edges=${edgeNodes.length} direct=${directNodes.length} totalCount=${pageInfoTotalCount}`,
+            );
 
             if (
                 result.errors &&
@@ -90,7 +192,16 @@
                 );
             }
 
-            branches = edgeNodes.length > 0 ? edgeNodes : directNodes;
+            const resolvedBranches = edgeNodes.length > 0 ? edgeNodes : directNodes;
+            branches = resolvedBranches.map((branch: any) => ({
+                ...branch,
+                status:
+                    typeof branch?.status === "string"
+                        ? branch.status
+                        : branch?.isActive === false
+                          ? "inactive"
+                          : "active",
+            }));
         } catch (error) {
             console.error("Error loading branches:", error);
             errorMessage =
