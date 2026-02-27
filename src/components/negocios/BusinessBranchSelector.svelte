@@ -44,8 +44,8 @@
                 },
                 body: JSON.stringify({
                     query: `
-            query GetBranches($first: Int!, $businessId: String!, $onlyActive: Boolean, $jwt: String!) {
-              branches(first: $first, businessId: $businessId, onlyActive: $onlyActive, jwt: $jwt) {
+            query GetBranches($first: Int!, $businessId: String!, $jwt: String!) {
+              branches(first: $first, businessId: $businessId, jwt: $jwt) {
                 edges {
                   node {
                     id
@@ -61,20 +61,27 @@
               }
             }
           `,
-                    variables: { first: 100, businessId, onlyActive: !showInactive, jwt },
+                    variables: { first: 100, businessId, jwt },
                 }),
             });
 
             const result = await response.json();
 
             if (result.errors) {
-                throw new Error(result.errors[0]?.message || "Error al cargar sucursales");
+                throw new Error(
+                    result.errors[0]?.message || "Error al cargar sucursales",
+                );
             }
 
-            branches = result.data?.branches?.edges?.map((edge: any) => edge.node) || [];
+            branches =
+                result.data?.branches?.edges?.map((edge: any) => edge.node) ||
+                [];
         } catch (error) {
             console.error("Error loading branches:", error);
-            errorMessage = error instanceof Error ? error.message : "Error al cargar sucursales";
+            errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : "Error al cargar sucursales";
             branches = [];
         } finally {
             isLoadingBranches = false;
@@ -84,12 +91,8 @@
     function handleBusinessSelect(business: Business) {
         selectedBusiness = business;
         onBusinessSelected(business);
+        loadBranches(business.id);
     }
-
-    $effect(() => {
-        if (!selectedBusiness) return;
-        void loadBranches(selectedBusiness.id);
-    });
 
     function handleBranchSelect(branch: Branch) {
         onBranchSelected(branch);
@@ -112,19 +115,41 @@
     <div class="panel-header">
         <div class="header-left">
             {#if selectedBusiness}
-                <button class="back-btn" onclick={handleBackToBusinesses} aria-label="Volver a negocios">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button
+                    class="back-btn"
+                    onclick={handleBackToBusinesses}
+                    aria-label="Volver a negocios"
+                >
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
                         <polyline points="15 18 9 12 15 6" />
                     </svg>
                 </button>
             {/if}
             <div class="header-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
                     {#if selectedBusiness}
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                        <path
+                            d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                        />
                         <circle cx="12" cy="10" r="3" />
                     {:else}
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <path
+                            d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+                        />
                         <polyline points="9 22 9 12 15 12 15 22" />
                     {/if}
                 </svg>
@@ -147,26 +172,44 @@
             </div>
         </div>
         <div class="header-actions">
-            <button 
-                class="toggle-btn" 
+            <button
+                class="toggle-btn"
                 class:active={showInactive}
-                onclick={() => showInactive = !showInactive}
+                onclick={() => (showInactive = !showInactive)}
                 title={showInactive ? "Ocultar inactivos" : "Mostrar inactivos"}
             >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
                     {#if showInactive}
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                        <circle cx="12" cy="12" r="3"/>
+                        <path
+                            d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                        />
+                        <circle cx="12" cy="12" r="3" />
                     {:else}
-                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                        <line x1="1" y1="1" x2="23" y2="23"/>
+                        <path
+                            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                        />
+                        <line x1="1" y1="1" x2="23" y2="23" />
                     {/if}
                 </svg>
                 <span>{showInactive ? "Ocultar" : "Mostrar"} inactivos</span>
             </button>
             {#if selectedBusiness}
                 <button class="btn-create-primary" onclick={handleCreateBranch}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                    >
                         <line x1="12" y1="5" x2="12" y2="19" />
                         <line x1="5" y1="12" x2="19" y2="12" />
                     </svg>
@@ -174,7 +217,14 @@
                 </button>
             {:else}
                 <button class="btn-create-primary" onclick={onCreateBusiness}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                    >
                         <line x1="12" y1="5" x2="12" y2="19" />
                         <line x1="5" y1="12" x2="19" y2="12" />
                     </svg>
@@ -186,7 +236,14 @@
 
     {#if errorMessage}
         <div class="alert alert-error">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -199,7 +256,7 @@
     <div class="panel-content">
         {#if selectedBusiness}
             <BranchSelector
-                branches={branches}
+                {branches}
                 {showInactive}
                 isLoading={isLoadingBranches}
                 onBranchSelect={handleBranchSelect}
@@ -211,13 +268,12 @@
                 {businesses}
                 {showInactive}
                 onBusinessSelect={handleBusinessSelect}
-                onCreateBusiness={onCreateBusiness}
-                onDeleteBusiness={onDeleteBusiness}
+                {onCreateBusiness}
+                {onDeleteBusiness}
             />
         {/if}
     </div>
 </div>
-
 
 <style>
     /* Container - NO MAX-WIDTH RESTRICTION */
@@ -225,7 +281,11 @@
         width: 100%;
         min-height: 500px;
         padding: 28px;
-        background: linear-gradient(180deg, rgba(15, 23, 42, 0.6) 0%, rgba(15, 23, 42, 0.4) 100%);
+        background: linear-gradient(
+            180deg,
+            rgba(15, 23, 42, 0.6) 0%,
+            rgba(15, 23, 42, 0.4) 100%
+        );
         border-radius: 16px;
         border: 1px solid rgba(255, 255, 255, 0.06);
     }
@@ -278,7 +338,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+        background: linear-gradient(
+            135deg,
+            rgba(99, 102, 241, 0.2) 0%,
+            rgba(139, 92, 246, 0.2) 100%
+        );
         border: 2px solid rgba(99, 102, 241, 0.3);
         border-radius: 16px;
         color: #a5b4fc;
