@@ -30,6 +30,7 @@
     }
 
     function isBranchActive(branch: Branch): boolean {
+        if (!branch) return false;
         const status = normalizeStatus(branch.status);
 
         if (!status) {
@@ -37,13 +38,24 @@
             return true;
         }
 
-        const inactiveStatuses = new Set(["inactive", "inactiva", "disabled", "false", "0"]);
+        const inactiveStatuses = new Set([
+            "inactive",
+            "inactiva",
+            "disabled",
+            "false",
+            "0",
+        ]);
         return !inactiveStatuses.has(status);
     }
 
-    const filteredBranches = $derived(
-        showInactive ? branches : branches.filter(isBranchActive)
-    );
+    const filteredBranches = $derived(() => {
+        const safeBranches = Array.isArray(branches)
+            ? branches.filter(Boolean)
+            : [];
+        return showInactive
+            ? safeBranches
+            : safeBranches.filter(isBranchActive);
+    });
 </script>
 
 <div class="branch-selector">
@@ -54,13 +66,31 @@
         </div>
     {:else if filteredBranches.length === 0}
         <div class="empty-branches">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+            >
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                 <circle cx="12" cy="10" r="3" />
             </svg>
-            <p>{showInactive ? "No hay sucursales registradas" : "No hay sucursales activas"}</p>
+            <p>
+                {showInactive
+                    ? "No hay sucursales registradas"
+                    : "No hay sucursales activas"}
+            </p>
             <button class="btn-primary" onclick={onCreateBranch}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                >
                     <line x1="12" y1="5" x2="12" y2="19" />
                     <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
@@ -70,8 +100,8 @@
     {:else}
         <div class="branches-grid">
             {#each filteredBranches as branch}
-                <button 
-                    class="branch-card" 
+                <button
+                    class="branch-card"
                     class:inactive={!isBranchActive(branch)}
                     onclick={() => onBranchSelect(branch)}
                 >
@@ -80,8 +110,17 @@
                             {#if branch.avatarUrl}
                                 <img src={branch.avatarUrl} alt={branch.name} />
                             {:else}
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                <svg
+                                    width="22"
+                                    height="22"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                                    />
                                     <circle cx="12" cy="10" r="3" />
                                 </svg>
                             {/if}
@@ -94,11 +133,22 @@
                         </div>
                     </div>
                     <div class="branch-right">
-                        <span class="status-badge" class:active={isBranchActive(branch)}>
+                        <span
+                            class="status-badge"
+                            class:active={isBranchActive(branch)}
+                        >
                             <span class="status-dot"></span>
                             {isBranchActive(branch) ? "Activa" : "Inactiva"}
                         </span>
-                        <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg
+                            class="chevron"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
                             <polyline points="9 18 15 12 9 6" />
                         </svg>
                     </div>
@@ -137,7 +187,9 @@
     }
 
     @keyframes spin {
-        to { transform: rotate(360deg); }
+        to {
+            transform: rotate(360deg);
+        }
     }
 
     /* Empty Branches */
@@ -212,7 +264,11 @@
         gap: 14px;
         width: 100%;
         padding: 16px 18px;
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(30, 41, 59, 0.4) 100%);
+        background: linear-gradient(
+            135deg,
+            rgba(30, 41, 59, 0.6) 0%,
+            rgba(30, 41, 59, 0.4) 100%
+        );
         border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 12px;
         text-align: left;
@@ -224,7 +280,7 @@
     }
 
     .branch-card::before {
-        content: '';
+        content: "";
         position: absolute;
         top: 0;
         left: 0;
@@ -236,7 +292,11 @@
     }
 
     .branch-card:hover {
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.85) 0%, rgba(30, 41, 59, 0.7) 100%);
+        background: linear-gradient(
+            135deg,
+            rgba(30, 41, 59, 0.85) 0%,
+            rgba(30, 41, 59, 0.7) 100%
+        );
         border-color: rgba(99, 102, 241, 0.25);
         transform: translateY(-2px);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -273,7 +333,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.15) 100%);
+        background: linear-gradient(
+            135deg,
+            rgba(99, 102, 241, 0.2) 0%,
+            rgba(139, 92, 246, 0.15) 100%
+        );
         border: 1px solid rgba(99, 102, 241, 0.3);
         border-radius: 10px;
         overflow: hidden;
@@ -351,8 +415,13 @@
     }
 
     @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
+        0%,
+        100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
     }
 
     .chevron {

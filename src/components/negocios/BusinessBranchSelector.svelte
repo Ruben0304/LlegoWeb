@@ -67,15 +67,29 @@
 
             const result = await response.json();
 
-            if (result.errors) {
+            const rawBranches = result.data?.branches;
+            const edgeNodes = Array.isArray(rawBranches?.edges)
+                ? rawBranches.edges
+                      .map((edge: any) => edge?.node)
+                      .filter(Boolean)
+                : [];
+            const directNodes = Array.isArray(rawBranches)
+                ? rawBranches.filter(Boolean)
+                : Array.isArray(rawBranches?.nodes)
+                  ? rawBranches.nodes.filter(Boolean)
+                  : [];
+
+            if (
+                result.errors &&
+                edgeNodes.length === 0 &&
+                directNodes.length === 0
+            ) {
                 throw new Error(
                     result.errors[0]?.message || "Error al cargar sucursales",
                 );
             }
 
-            branches =
-                result.data?.branches?.edges?.map((edge: any) => edge.node) ||
-                [];
+            branches = edgeNodes.length > 0 ? edgeNodes : directNodes;
         } catch (error) {
             console.error("Error loading branches:", error);
             errorMessage =
