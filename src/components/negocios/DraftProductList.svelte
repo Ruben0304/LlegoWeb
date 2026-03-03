@@ -11,6 +11,7 @@
     ProductCategory,
   } from "@/lib/product";
   import { onMount } from "svelte";
+  import DraftImageUploader from "./DraftImageUploader.svelte";
 
   interface Props {
     detectedProducts: DetectedProduct[];
@@ -101,22 +102,11 @@
     drafts = drafts.filter((d) => d._id !== draftId);
   }
 
-  function handleImageSelect(draftId: string, e: Event) {
-    const input = e.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) return;
-    if (file.size > 5 * 1024 * 1024) return;
-
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      updateDraft(draftId, {
-        _imageFile: file,
-        _imagePreview: ev.target?.result as string,
-      });
-    };
-    reader.readAsDataURL(file);
+  function handleImageSelect(draftId: string, file: File, preview: string) {
+    updateDraft(draftId, {
+      _imageFile: file,
+      _imagePreview: preview,
+    });
   }
 
   function removeImage(draftId: string) {
@@ -354,32 +344,11 @@
             <!-- Image upload for this draft -->
             <div class="draft-field">
               <label class="draft-label">Foto del producto</label>
-              {#if draft._imagePreview}
-                <div class="draft-image-preview">
-                  <img src={draft._imagePreview} alt={draft.name} />
-                  <button type="button" class="remove-img-sm" onclick={() => removeImage(draft._id)}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <line x1="18" y1="6" x2="6" y2="18"/>
-                      <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                  </button>
-                </div>
-              {:else}
-                <label class="add-photo-btn">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    class="file-input-hidden"
-                    onchange={(e) => handleImageSelect(draft._id, e)}
-                  />
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                    <circle cx="8.5" cy="8.5" r="1.5"/>
-                    <polyline points="21 15 16 10 5 21"/>
-                  </svg>
-                  Agregar foto
-                </label>
-              {/if}
+              <DraftImageUploader
+                imagePreview={draft._imagePreview}
+                onImageSelect={(file, preview) => handleImageSelect(draft._id, file, preview)}
+                onImageRemove={() => removeImage(draft._id)}
+              />
             </div>
 
             <!-- Editable fields -->
@@ -879,66 +848,6 @@
   select.draft-input {
     appearance: none;
     cursor: pointer;
-  }
-
-  .file-input-hidden {
-    display: none;
-  }
-
-  .add-photo-btn {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-    color: var(--color-text-variant);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px dashed rgba(255, 255, 255, 0.15);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all var(--transition-base);
-    width: fit-content;
-  }
-
-  .add-photo-btn:hover {
-    color: var(--color-secondary);
-    background: rgba(225, 199, 142, 0.1);
-    border-color: rgba(225, 199, 142, 0.3);
-  }
-
-  .draft-image-preview {
-    position: relative;
-    display: inline-block;
-    width: 80px;
-    height: 80px;
-    border-radius: var(--radius-md);
-    overflow: hidden;
-  }
-
-  .draft-image-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .remove-img-sm {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.6);
-    color: #fff;
-    border-radius: 50%;
-    transition: all var(--transition-base);
-  }
-
-  .remove-img-sm:hover {
-    background: rgba(255, 59, 48, 0.8);
   }
 
   .batch-create-btn {
