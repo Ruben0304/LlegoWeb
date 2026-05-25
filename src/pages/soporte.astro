@@ -1,0 +1,365 @@
+---
+export const prerender = true;
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+    title="Soporte | Llegó"
+    description="Centro de soporte de Llegó. Encuentra respuestas a tus preguntas o contáctanos para ayudarte con tu pedido o cuenta."
+>
+    <div class="page">
+        <header class="page-header">
+            <a href="/" class="logo">Llegó</a>
+        </header>
+
+        <main class="content">
+            <h1>Centro de Soporte</h1>
+            <p class="intro">
+                Estamos aquí para ayudarte. Encuentra respuestas a las preguntas más frecuentes o contáctanos directamente.
+            </p>
+
+            <!-- Contact box -->
+            <div class="contact-box">
+                <div class="contact-icon">✉️</div>
+                <div>
+                    <p class="contact-label">Escríbenos a</p>
+                    <a href="mailto:soporte@llegoweb-production.up.railway.app" class="contact-email">
+                        soporte@llegoweb-production.up.railway.app
+                    </a>
+                    <p class="contact-note">Respondemos en un plazo de 24–48 horas.</p>
+                </div>
+            </div>
+
+            <!-- FAQ -->
+            <h2>Preguntas frecuentes</h2>
+
+            <div class="faq-list">
+
+                <details class="faq-item">
+                    <summary>¿Cómo hago un pedido?</summary>
+                    <div class="faq-body">
+                        <p>Descarga la app Llegó, crea tu cuenta o inicia sesión, busca el negocio o producto que quieres y añádelo al carrito. Cuando estés listo, selecciona tu dirección de entrega, elige el método de pago y confirma el pedido. Recibirás una notificación en cada paso.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿Qué métodos de pago están disponibles?</summary>
+                    <div class="faq-body">
+                        <p>Puedes pagar con tarjeta de crédito o débito internacional (Visa, Mastercard, Amex) y efectivo al momento de la entrega. Los métodos disponibles pueden variar según el negocio.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿Cómo puedo hacer seguimiento de mi pedido?</summary>
+                    <div class="faq-body">
+                        <p>Una vez confirmado el pedido, puedes ver su estado en tiempo real desde la sección "Mis pedidos" en la app. Recibirás notificaciones automáticas cuando el negocio acepte el pedido, cuando esté en preparación y cuando el repartidor esté en camino.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>El negocio rechazó mi pedido. ¿Qué pasa con mi pago?</summary>
+                    <div class="faq-body">
+                        <p>Si pagaste con tarjeta y el negocio rechaza el pedido, el importe es reembolsado automáticamente a tu método de pago en un plazo de 3 a 5 días hábiles, dependiendo de tu banco. Si pagaste en efectivo, no se realiza ningún cobro.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿Cómo cancelo un pedido?</summary>
+                    <div class="faq-body">
+                        <p>Puedes cancelar un pedido mientras esté en estado "Esperando confirmación del negocio" desde la pantalla de detalle del pedido. Una vez que el negocio lo acepta, no es posible cancelarlo desde la app — en ese caso contáctanos directamente.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿Cómo cambio mi dirección de entrega?</summary>
+                    <div class="faq-body">
+                        <p>Puedes añadir y gestionar tus direcciones guardadas desde tu perfil en la app. Al hacer un nuevo pedido, selecciona la dirección que deseas usar. No es posible cambiar la dirección de un pedido ya confirmado.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿Cómo elimino mi cuenta?</summary>
+                    <div class="faq-body">
+                        <p>Para eliminar tu cuenta y todos tus datos, escríbenos a <a href="mailto:soporte@llegoweb-production.up.railway.app">soporte@llegoweb-production.up.railway.app</a> con el asunto "Eliminar cuenta" desde el correo registrado en Llegó. Procesaremos la solicitud en un plazo de 30 días.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿Cómo registro mi negocio en Llegó?</summary>
+                    <div class="faq-body">
+                        <p>Puedes registrar tu negocio desde <a href="/negocios">llegoweb-production.up.railway.app/negocios</a>. Una vez enviada la solicitud, nuestro equipo la revisará y te contactará para completar el proceso de activación.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>No recuerdo mi contraseña. ¿Qué hago?</summary>
+                    <div class="faq-body">
+                        <p>En la pantalla de inicio de sesión, toca "¿Olvidaste tu contraseña?" y sigue las instrucciones para restablecerla mediante tu correo electrónico. Si tienes problemas, escríbenos a soporte.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿La app está disponible fuera de Cuba?</summary>
+                    <div class="faq-body">
+                        <p>Actualmente Llegó opera en Cuba. Si tienes interés en expandir el servicio a otra región o eres un negocio fuera de Cuba, contáctanos para explorar opciones.</p>
+                    </div>
+                </details>
+
+            </div>
+
+            <!-- Bottom contact CTA -->
+            <div class="bottom-cta">
+                <h3>¿No encontraste lo que buscabas?</h3>
+                <p>Escríbenos y te respondemos lo antes posible.</p>
+                <a href="mailto:soporte@llegoweb-production.up.railway.app" class="btn-contact">
+                    Contactar soporte
+                </a>
+            </div>
+        </main>
+
+        <footer class="page-footer">
+            <p>© 2025 Llegó. Todos los derechos reservados.</p>
+            <nav>
+                <a href="/privacidad">Privacidad</a>
+                <a href="/soporte">Soporte</a>
+            </nav>
+        </footer>
+    </div>
+</Layout>
+
+<style>
+    .page {
+        min-height: 100vh;
+        background: var(--color-background);
+        color: var(--color-text);
+        font-family: var(--font-family);
+    }
+
+    .page-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--color-secondary);
+        text-decoration: none;
+        letter-spacing: -0.02em;
+    }
+
+    .content {
+        max-width: 740px;
+        margin: 0 auto;
+        padding: 3rem 2rem 5rem;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.75rem;
+    }
+
+    .intro {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: rgba(255,255,255,0.7);
+        margin-bottom: 2.5rem;
+    }
+
+    /* Contact box */
+    .contact-box {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.25rem;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: var(--radius-xl);
+        padding: 1.75rem;
+        margin-bottom: 3rem;
+    }
+
+    .contact-icon {
+        font-size: 2rem;
+        line-height: 1;
+        margin-top: 0.1rem;
+    }
+
+    .contact-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--color-text-variant);
+        margin-bottom: 0.25rem;
+    }
+
+    .contact-email {
+        display: block;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--color-accent);
+        text-decoration: none;
+        word-break: break-all;
+        margin-bottom: 0.4rem;
+    }
+
+    .contact-email:hover {
+        text-decoration: underline;
+    }
+
+    .contact-note {
+        font-size: 0.85rem;
+        color: var(--color-text-variant);
+        margin: 0;
+    }
+
+    /* FAQ */
+    h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 1.25rem;
+    }
+
+    .faq-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 3rem;
+    }
+
+    .faq-item {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        transition: border-color 0.2s;
+    }
+
+    .faq-item[open] {
+        border-color: rgba(178, 214, 154, 0.3);
+    }
+
+    .faq-item summary {
+        padding: 1.1rem 1.25rem;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--color-text);
+        user-select: none;
+    }
+
+    .faq-item summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .faq-item summary::after {
+        content: '+';
+        font-size: 1.25rem;
+        color: var(--color-text-variant);
+        transition: transform 0.2s;
+        flex-shrink: 0;
+        margin-left: 1rem;
+    }
+
+    .faq-item[open] summary::after {
+        content: '−';
+    }
+
+    .faq-body {
+        padding: 0 1.25rem 1.25rem;
+        border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .faq-body p {
+        margin: 1rem 0 0;
+        line-height: 1.75;
+        color: rgba(255,255,255,0.7);
+        font-size: 0.95rem;
+    }
+
+    .faq-body a {
+        color: var(--color-accent);
+        text-decoration: none;
+    }
+
+    .faq-body a:hover {
+        text-decoration: underline;
+    }
+
+    /* Bottom CTA */
+    .bottom-cta {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: var(--radius-2xl);
+    }
+
+    .bottom-cta h3 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .bottom-cta p {
+        color: rgba(255,255,255,0.6);
+        margin-bottom: 1.5rem;
+        font-size: 1rem;
+    }
+
+    .btn-contact {
+        display: inline-block;
+        padding: 0.85rem 2rem;
+        background: var(--color-button);
+        color: white;
+        border-radius: var(--radius-full);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: opacity 0.2s;
+    }
+
+    .btn-contact:hover {
+        opacity: 0.85;
+    }
+
+    /* Footer */
+    .page-footer {
+        padding: 2rem;
+        border-top: 1px solid rgba(255,255,255,0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        color: var(--color-text-variant);
+        font-size: 0.875rem;
+    }
+
+    .page-footer nav {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .page-footer nav a {
+        color: var(--color-text-variant);
+        text-decoration: none;
+    }
+
+    .page-footer nav a:hover {
+        color: var(--color-text);
+    }
+
+    @media (max-width: 640px) {
+        h1 { font-size: 1.75rem; }
+        .content { padding: 2rem 1.25rem 4rem; }
+        .contact-box { flex-direction: column; gap: 0.75rem; }
+        .page-footer { flex-direction: column; text-align: center; }
+    }
+</style>
