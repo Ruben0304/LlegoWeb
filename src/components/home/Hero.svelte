@@ -311,7 +311,7 @@
 
             <!-- CTA Buttons -->
             <div class="hero-actions" id="descargar">
-                <a href="https://apps.apple.com/us/app/llego/id6755007388" class="btn-primary" class:highlight={highlightDownload} target="_blank" rel="noopener noreferrer">
+                <a href="https://apps.apple.com/us/app/llego/id6755007388" class="btn-primary" class:highlight={highlightDownload}>
                     <svg
                         viewBox="0 0 24 24"
                         fill="currentColor"
