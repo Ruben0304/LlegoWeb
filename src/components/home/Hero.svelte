@@ -311,7 +311,7 @@
 
             <!-- CTA Buttons -->
             <div class="hero-actions" id="descargar">
-                <a href="#" class="btn-primary" class:highlight={highlightDownload}>
+                <a href="https://apps.apple.com/us/app/llego/id6755007388" class="btn-primary" class:highlight={highlightDownload} target="_blank" rel="noopener noreferrer">
                     <svg
                         viewBox="0 0 24 24"
                         fill="currentColor"
@@ -327,7 +327,7 @@
                         <span class="btn-store">App Store</span>
                     </span>
                 </a>
-                <a href="#" class="btn-primary" class:highlight={highlightDownload}>
+                <a href="/api/download/android" class="btn-primary" class:highlight={highlightDownload}>
                     <svg
                         viewBox="0 0 24 24"
                         fill="currentColor"
@@ -339,8 +339,8 @@
                         />
                     </svg>
                     <span class="btn-content">
-                        <span class="btn-label">Disponible en</span>
-                        <span class="btn-store">Google Play</span>
+                        <span class="btn-label">Descargar</span>
+                        <span class="btn-store">Android APK</span>
                     </span>
                 </a>
             </div>
