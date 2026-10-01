@@ -12,13 +12,14 @@ interface Props {
 const {
     title,
     description,
-    keywords = "app de compras inteligentes, IA para compras, delivery restaurantes, mercado a domicilio, compras con IA, Llegó app, Llegó+, ahorro en compras, cashback compras",
+    keywords = "delivery Cuba, app de delivery, IA para compras, delivery restaurantes, mercado a domicilio, compras con IA, Llegó app",
     image = "/og-image.jpg",
     canonical = Astro.url.href,
 } = Astro.props;
 
 const siteName = "Llegó";
-const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
+// Si el título ya menciona la marca (p. ej. la home) no se vuelve a añadir.
+const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 ---
 
 <!doctype html>
@@ -82,12 +83,7 @@ const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
                     price: "0",
                     priceCurrency: "USD",
                 },
-                aggregateRating: {
-                    "@type": "AggregateRating",
-                    ratingValue: "4.8",
-                    ratingCount: "1000",
-                },
-            })}
+            }).replace(/</g, "\\u003c")}
         />
     </head>
     <body>

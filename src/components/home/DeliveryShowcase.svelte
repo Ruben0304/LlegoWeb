@@ -5,19 +5,18 @@
     icon: string;
     title: string;
     description: string;
-    stat: string;
-    statLabel: string;
+    // Dato opcional: solo se muestra si es verificable (nada de cifras inventadas).
+    stat?: string;
+    statLabel?: string;
     color: string;
   }
 
   const features: Feature[] = [
     {
       icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
-      title: "Entregas ultra rápidas",
+      title: "Entregas rápidas",
       description:
-        "Tu pedido llega en minutos, no en horas. Optimizamos cada ruta con IA para que recibas todo fresco.",
-      stat: "~25",
-      statLabel: "min promedio",
+        "Tu pedido llega a tu puerta sin complicaciones. Los mensajeros recogen en el negocio y entregan lo más rápido posible.",
       color: "#E1C78E",
     },
     {
@@ -31,29 +30,18 @@
     },
     {
       icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`,
-      title: "Miles de opciones",
+      title: "Muchas opciones",
       description:
         "Restaurantes, supermercados, tiendas de ropa y productos del campo. Todo en una sola app.",
-      stat: "1000+",
-      statLabel: "comercios",
       color: "#5A8467",
     },
     {
       icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>`,
-      title: "Pagos seguros",
+      title: "Pagos claros",
       description:
-        "Paga como prefieras: tarjeta, transferencia o efectivo. Todas las transacciones están protegidas.",
-      stat: "100%",
-      statLabel: "seguro",
+        "Paga en efectivo al recibir o por transferencia. Ves el total de tu pedido antes de confirmarlo.",
       color: "#7C412B",
     },
-  ];
-
-  const stats = [
-    { value: "50K+", label: "Pedidos entregados" },
-    { value: "4.9", label: "Calificación promedio" },
-    { value: "15min", label: "Entrega más rápida" },
-    { value: "24/7", label: "Soporte disponible" },
   ];
 
   let sectionElement: HTMLElement;
@@ -746,25 +734,17 @@
                 <h3 class="feature-title">{feature.title}</h3>
                 <p class="feature-description">{feature.description}</p>
               </div>
-              <div class="feature-stat">
-                <span class="stat-value">{feature.stat}</span>
-                <span class="stat-label">{feature.statLabel}</span>
-              </div>
+              {#if feature.stat}
+                <div class="feature-stat">
+                  <span class="stat-value">{feature.stat}</span>
+                  <span class="stat-label">{feature.statLabel}</span>
+                </div>
+              {/if}
               <div class="feature-indicator"></div>
             </button>
           {/each}
         </div>
       </div>
-    </div>
-
-    <!-- Stats bar -->
-    <div class="stats-bar" class:visible={isVisible}>
-      {#each stats as stat, index}
-        <div class="stat-item" style="--delay: {index * 100 + 400}ms">
-          <span class="stat-value">{stat.value}</span>
-          <span class="stat-label">{stat.label}</span>
-        </div>
-      {/each}
     </div>
 
     <!-- CTA -->
@@ -1170,48 +1150,6 @@
     letter-spacing: 0.05em;
   }
 
-  /* Stats bar */
-  .stats-bar {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    padding: 40px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 24px;
-    margin-bottom: 60px;
-  }
-
-  .stat-item {
-    text-align: center;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .stats-bar.visible .stat-item {
-    opacity: 1;
-    transform: translateY(0);
-    transition-delay: var(--delay);
-  }
-
-  .stat-item .stat-value {
-    display: block;
-    font-size: 32px;
-    font-weight: 700;
-    background: linear-gradient(135deg, #e1c78e, #b2d69a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.02em;
-    margin-bottom: 4px;
-  }
-
-  .stat-item .stat-label {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.5);
-  }
-
   /* CTA */
   .cta-section {
     opacity: 0;
@@ -1306,15 +1244,6 @@
 
   /* Responsive */
   @media (min-width: 768px) {
-    .stats-bar {
-      grid-template-columns: repeat(4, 1fr);
-      padding: 48px 60px;
-    }
-
-    .stat-item .stat-value {
-      font-size: 40px;
-    }
-
     .cta-content {
       flex-direction: row;
       justify-content: space-between;
