@@ -33,7 +33,7 @@ import {
                 <li><strong>Direcciones de entrega</strong> — las que guardas en tu perfil o indicas al hacer un pedido.</li>
                 <li><strong>Ubicación</strong> — la ubicación de tu dispositivo, solo con tu permiso, para mostrarte negocios cercanos y calcular la entrega. En Llego Mensajeros, la ubicación del mensajero mientras realiza una entrega (ver sección 4).</li>
                 <li><strong>Pedidos y pagos</strong> — productos, negocios, montos, método de pago, estado del pedido y los datos de la transferencia que usamos para confirmar tu pago (monto, identificador de transferencia y teléfono del pagador), incluidas las capturas de comprobantes que subas.</li>
-                <li><strong>Búsquedas, actividad y asistente de IA</strong> — lo que buscas, los productos que ves, marcas como favoritos o añades al carrito, tus pedidos entregados y los mensajes que escribes al asistente de IA, para responderte y personalizar las recomendaciones.</li>
+                <li><strong>Búsquedas, actividad y asistente de IA</strong> — lo que buscas, los productos que ves, marcas como favoritos o añades al carrito, tus pedidos entregados y los mensajes que escribes al asistente de IA y sus respuestas (guardamos el historial de la conversación para darle continuidad), para responderte y personalizar las recomendaciones.</li>
                 <li><strong>Mensajes del pedido</strong> — comentarios y mensajes que envías en el chat o los comentarios de un pedido.</li>
                 <li><strong>Datos del dispositivo y de actividad</strong> — identificador del dispositivo, token de notificaciones push, sistema operativo, versión de la app, fecha de tu última conexión e informes de errores y fallos de la app.</li>
                 <li><strong>Verificación de identidad</strong> — si quieres pagar en efectivo y te lo pedimos, una foto de tu documento de identidad y una selfie sosteniéndolo (ver sección 3).</li>
@@ -91,23 +91,26 @@ import {
             <ul>
                 <li><strong>Railway</strong> — alojamiento del servidor (API) y de este sitio web, y almacenamiento de archivos compatible con S3 (fotos de perfil, de productos, comprobantes e imágenes de verificación).</li>
                 <li><strong>MongoDB</strong> — base de datos con tu cuenta, pedidos y resto de la información de la plataforma.</li>
-                <li><strong>Redis</strong> — caché y presencia en tiempo real de mensajeros.</li>
+                <li><strong>Redis</strong> — límite de peticiones (para frenar abusos) y presencia en tiempo real de los mensajeros (su última ubicación conocida mientras están conectados).</li>
                 <li><strong>Qdrant</strong> — búsqueda semántica: almacena representaciones vectoriales (embeddings) de productos y negocios y un vector de tus gustos, calculado a partir de tus clics, favoritos, carrito y pedidos entregados, para recomendarte mejor.</li>
             </ul>
 
             <h3>Inicio de sesión, mapas y notificaciones</h3>
             <ul>
                 <li><strong>Google Sign-In</strong> y <strong>Sign in with Apple</strong> — inicio de sesión opcional; nos comparten solo el identificador, nombre y correo necesarios.</li>
-                <li><strong>Google Maps</strong> — mapas y selección de direcciones y ubicaciones en las apps.</li>
+                <li><strong>Google Maps</strong> — mapas y selección de direcciones y ubicaciones en las apps de Android (clientes, negocios y mensajeros) y en la app Llego Mensajeros para iOS. Google recibe la zona del mapa que consultas y datos técnicos del dispositivo, según su propia política.</li>
+                <li><strong>Apple Maps (MapKit)</strong> — mapas y selección de ubicaciones en las apps de clientes y de negocios para iOS.</li>
+                <li><strong>Geocodificación del sistema</strong> — en las apps de clientes, para convertir tus coordenadas en una dirección legible se usa el servicio de tu sistema operativo (Android Geocoder en Android, Apple CLGeocoder en iOS), que puede enviar las coordenadas a Google o a Apple.</li>
+                <li><strong>OSRM</strong> (servidor público <code>router.project-osrm.org</code>) — Llego Mensajeros le envía las coordenadas de origen (la posición del mensajero) y de destino (el punto de recogida o de entrega) para calcular la ruta y dibujarla en el mapa. Es un servicio de terceros: recibe esas coordenadas y la dirección IP del dispositivo, pero no tu nombre ni otros datos del pedido.</li>
                 <li><strong>Firebase Cloud Messaging</strong> (Android) y <strong>Apple Push Notification service</strong> (iOS) — envío de notificaciones push; reciben el token de tu dispositivo y el texto de la notificación.</li>
             </ul>
 
             <h3>Inteligencia artificial</h3>
             <ul>
-                <li><strong>Google Gemini</strong> — asistente conversacional, búsqueda semántica, lectura de comprobantes de transferencia, detección de productos en las fotos que suben los negocios y verificación de identidad (sección 3).</li>
-                <li><strong>Anthropic (Claude)</strong> — recomendaciones de productos y complementos y análisis de errores técnicos de la plataforma.</li>
+                <li><strong>Anthropic (Claude)</strong> — asistente conversacional: recibe los mensajes que le escribes y los más recientes de la conversación, junto con los productos y negocios que se encuentran para responderte. También genera recomendaciones de productos y complementos (a partir de los productos del carrito y del catálogo del negocio) y analiza errores técnicos de la plataforma (con los datos sensibles ya filtrados).</li>
+                <li><strong>Google Gemini</strong> — búsqueda semántica (convierte en vectores el texto de tus búsquedas y las descripciones de productos y negocios), lectura de comprobantes de transferencia, detección de productos en las fotos que suben los negocios y verificación de identidad (sección 3).</li>
             </ul>
-            <p>Les enviamos el contenido necesario para cada tarea (por ejemplo, tu consulta al asistente o las imágenes de una verificación).</p>
+            <p>Les enviamos el contenido necesario para cada tarea (por ejemplo, tu mensaje al asistente, tu texto de búsqueda o las imágenes de una verificación).</p>
 
             <h3>Pagos</h3>
             <p>
@@ -138,7 +141,7 @@ import {
             </p>
         </section>
 
-        <section>
+        <section id="conservacion">
             <h2>8. Conservación y eliminación de datos</h2>
             <p>
                 Conservamos tus datos mientras tu cuenta esté activa. Puedes solicitar la eliminación de tu cuenta en cualquier momento desde la propia app o por correo; los pasos exactos para cada app están en <a href="/eliminar-cuenta">Eliminar mi cuenta</a>.
@@ -147,8 +150,24 @@ import {
                 <li>En las apps de <strong>Android</strong>, <strong>Negocios</strong> y <strong>Mensajeros</strong>, la solicitud programa la eliminación con un <strong>período de gracia de 30 días</strong>. Durante ese plazo tu cuenta sigue funcionando y puedes cancelar la eliminación iniciando sesión; pasado el plazo, un proceso automático borra tu cuenta de forma definitiva.</li>
                 <li>En la app de <strong>iOS</strong> para clientes, la eliminación se aplica de inmediato y no se puede deshacer.</li>
             </ul>
+
+            <h3>Qué elimina el borrado de la cuenta</h3>
             <p>
-                Al completarse el borrado eliminamos tu perfil (nombre, correo, teléfono, usuario, foto y datos de acceso). Podemos conservar de forma restringida los registros de pedidos y pagos que necesitemos por razones contables, antifraude o para resolver disputas, así como las imágenes de verificación de identidad hasta que las eliminemos a tu petición. Si quieres que eliminemos también esos registros, escríbenos y lo revisaremos.
+                Al completarse el borrado se elimina tu cuenta de usuario: nombre, correo, teléfono, nombre de usuario, foto de perfil, ubicación y direcciones guardadas en tu perfil, contraseña cifrada y el vínculo con Google o Apple.
+            </p>
+
+            <h3>Qué no se elimina automáticamente</h3>
+            <p>
+                El proceso de eliminación de la app borra únicamente tu cuenta de usuario. Los siguientes registros se guardan aparte, asociados a tu identificador interno, y <strong>no se borran de forma automática</strong>:
+            </p>
+            <ul>
+                <li>El historial de conversaciones con el asistente de IA, tus búsquedas, tus favoritos y tu carrito, los «me gusta» a sucursales, los tokens de notificaciones push de tus dispositivos y el vector de gustos que usamos para las recomendaciones.</li>
+                <li>Si eres mensajero, tu perfil de mensajero: nombre, teléfono, datos de tu vehículo, matrícula, foto y última ubicación conocida.</li>
+                <li>Los resultados, el registro de auditoría y las imágenes (documento y selfie) de la verificación de identidad para pagos en efectivo.</li>
+                <li>Los registros de pedidos y pagos, que podemos conservar de forma restringida por razones contables, antifraude o para resolver disputas.</li>
+            </ul>
+            <p>
+                Si quieres que eliminemos también estos registros, indícalo en tu solicitud escribiéndonos al correo o al WhatsApp de la sección Contacto, desde el correo con el que te registraste. Borramos el historial del asistente, la actividad, los tokens, el perfil de mensajero y las imágenes de verificación de identidad en un máximo de 30 días. El resultado y el registro de auditoría de la verificación y los registros de pedidos y pagos los revisamos caso por caso, porque a veces debemos conservarlos por obligaciones contables o antifraude, o para resolver disputas.
             </p>
         </section>
 
