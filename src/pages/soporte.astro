@@ -1,159 +1,133 @@
 ---
-export const prerender = true;
-import Layout from "../layouts/Layout.astro";
+export const prerender = false;
+
+import LegalLayout from "../layouts/LegalLayout.astro";
+import {
+    SUPPORT_EMAIL,
+    SUPPORT_RESPONSE_TIME,
+    SUPPORT_WHATSAPP_DISPLAY,
+    supportMailtoUrl,
+    supportWhatsappUrl,
+} from "../lib/site";
 ---
 
-<Layout
-    title="Soporte | Llegó"
-    description="Centro de soporte de Llegó. Encuentra respuestas a tus preguntas o contáctanos para ayudarte con tu pedido o cuenta."
+<LegalLayout
+    title="Soporte"
+    description="Centro de soporte de Llegó. Encuentra respuestas a tus preguntas o contáctanos por correo o WhatsApp para ayudarte con tu pedido o cuenta."
 >
-    <div class="page">
-        <header class="page-header">
-            <a href="/" class="logo">Llegó</a>
-        </header>
+    <h1>Centro de Soporte</h1>
+    <p class="intro">
+        Estamos aquí para ayudarte. Encuentra respuestas a las preguntas más frecuentes o contáctanos directamente.
+    </p>
 
-        <main class="content">
-            <h1>Centro de Soporte</h1>
-            <p class="intro">
-                Estamos aquí para ayudarte. Encuentra respuestas a las preguntas más frecuentes o contáctanos directamente.
-            </p>
-
-            <!-- Contact box -->
-            <div class="contact-box">
-                <div class="contact-icon">✉️</div>
-                <div>
-                    <p class="contact-label">Escríbenos a</p>
-                    <a href="mailto:soporte@llegoweb-production.up.railway.app" class="contact-email">
-                        soporte@llegoweb-production.up.railway.app
-                    </a>
-                    <p class="contact-note">Respondemos en un plazo de 24–48 horas.</p>
-                </div>
+    <!-- Contact box -->
+    <div class="contact-box" id="contacto">
+        <div class="contact-method">
+            <div class="contact-icon">✉️</div>
+            <div>
+                <p class="contact-label">Escríbenos a</p>
+                <a href={supportMailtoUrl()} class="contact-email">{SUPPORT_EMAIL}</a>
             </div>
-
-            <!-- FAQ -->
-            <h2>Preguntas frecuentes</h2>
-
-            <div class="faq-list">
-
-                <details class="faq-item">
-                    <summary>¿Cómo hago un pedido?</summary>
-                    <div class="faq-body">
-                        <p>Descarga la app Llegó, crea tu cuenta o inicia sesión, busca el negocio o producto que quieres y añádelo al carrito. Cuando estés listo, selecciona tu dirección de entrega, elige el método de pago y confirma el pedido. Recibirás una notificación en cada paso.</p>
-                    </div>
-                </details>
-
-                <details class="faq-item">
-                    <summary>¿Qué métodos de pago están disponibles?</summary>
-                    <div class="faq-body">
-                        <p>Puedes pagar con tarjeta de crédito o débito internacional (Visa, Mastercard, Amex) y efectivo al momento de la entrega. Los métodos disponibles pueden variar según el negocio.</p>
-                    </div>
-                </details>
-
-                <details class="faq-item">
-                    <summary>¿Cómo puedo hacer seguimiento de mi pedido?</summary>
-                    <div class="faq-body">
-                        <p>Una vez confirmado el pedido, puedes ver su estado en tiempo real desde la sección "Mis pedidos" en la app. Recibirás notificaciones automáticas cuando el negocio acepte el pedido, cuando esté en preparación y cuando el repartidor esté en camino.</p>
-                    </div>
-                </details>
-
-                <details class="faq-item">
-                    <summary>El negocio rechazó mi pedido. ¿Qué pasa con mi pago?</summary>
-                    <div class="faq-body">
-                        <p>Si pagaste con tarjeta y el negocio rechaza el pedido, el importe es reembolsado automáticamente a tu método de pago en un plazo de 3 a 5 días hábiles, dependiendo de tu banco. Si pagaste en efectivo, no se realiza ningún cobro.</p>
-                    </div>
-                </details>
-
-                <details class="faq-item">
-                    <summary>¿Cómo cancelo un pedido?</summary>
-                    <div class="faq-body">
-                        <p>Puedes cancelar un pedido mientras esté en estado "Esperando confirmación del negocio" desde la pantalla de detalle del pedido. Una vez que el negocio lo acepta, no es posible cancelarlo desde la app — en ese caso contáctanos directamente.</p>
-                    </div>
-                </details>
-
-                <details class="faq-item">
-                    <summary>¿Cómo cambio mi dirección de entrega?</summary>
-                    <div class="faq-body">
-                        <p>Puedes añadir y gestionar tus direcciones guardadas desde tu perfil en la app. Al hacer un nuevo pedido, selecciona la dirección que deseas usar. No es posible cambiar la dirección de un pedido ya confirmado.</p>
-                    </div>
-                </details>
-
-                <details class="faq-item">
-                    <summary>¿Cómo elimino mi cuenta?</summary>
-                    <div class="faq-body">
-                        <p>Para eliminar tu cuenta y todos tus datos, escríbenos a <a href="mailto:soporte@llegoweb-production.up.railway.app">soporte@llegoweb-production.up.railway.app</a> con el asunto "Eliminar cuenta" desde el correo registrado en Llegó. Procesaremos la solicitud en un plazo de 30 días.</p>
-                    </div>
-                </details>
-
-                <details class="faq-item">
-                    <summary>¿Cómo registro mi negocio en Llegó?</summary>
-                    <div class="faq-body">
-                        <p>Puedes registrar tu negocio desde <a href="/negocios">llegoweb-production.up.railway.app/negocios</a>. Una vez enviada la solicitud, nuestro equipo la revisará y te contactará para completar el proceso de activación.</p>
-                    </div>
-                </details>
-
-                <details class="faq-item">
-                    <summary>No recuerdo mi contraseña. ¿Qué hago?</summary>
-                    <div class="faq-body">
-                        <p>En la pantalla de inicio de sesión, toca "¿Olvidaste tu contraseña?" y sigue las instrucciones para restablecerla mediante tu correo electrónico. Si tienes problemas, escríbenos a soporte.</p>
-                    </div>
-                </details>
-
-                <details class="faq-item">
-                    <summary>¿La app está disponible fuera de Cuba?</summary>
-                    <div class="faq-body">
-                        <p>Actualmente Llegó opera en Cuba. Si tienes interés en expandir el servicio a otra región o eres un negocio fuera de Cuba, contáctanos para explorar opciones.</p>
-                    </div>
-                </details>
-
+        </div>
+        <div class="contact-method">
+            <div class="contact-icon">💬</div>
+            <div>
+                <p class="contact-label">O por WhatsApp</p>
+                <a href={supportWhatsappUrl()} class="contact-email" target="_blank" rel="noopener noreferrer">{SUPPORT_WHATSAPP_DISPLAY}</a>
             </div>
-
-            <!-- Bottom contact CTA -->
-            <div class="bottom-cta">
-                <h3>¿No encontraste lo que buscabas?</h3>
-                <p>Escríbenos y te respondemos lo antes posible.</p>
-                <a href="mailto:soporte@llegoweb-production.up.railway.app" class="btn-contact">
-                    Contactar soporte
-                </a>
-            </div>
-        </main>
-
-        <footer class="page-footer">
-            <p>© 2025 Llegó. Todos los derechos reservados.</p>
-            <nav>
-                <a href="/privacidad">Privacidad</a>
-                <a href="/soporte">Soporte</a>
-            </nav>
-        </footer>
+        </div>
+        <p class="contact-note">Respondemos en un plazo de {SUPPORT_RESPONSE_TIME}.</p>
     </div>
-</Layout>
+
+    <!-- FAQ -->
+    <h2>Preguntas frecuentes</h2>
+
+    <div class="faq-list">
+
+        <details class="faq-item">
+            <summary>¿Cómo hago un pedido?</summary>
+            <div class="faq-body">
+                <p>Descarga la app Llegó, crea tu cuenta o inicia sesión, busca el negocio o producto que quieres y añádelo al carrito. Cuando estés listo, selecciona tu dirección de entrega, elige el método de pago y confirma el pedido. Recibirás una notificación en cada paso.</p>
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Qué métodos de pago están disponibles?</summary>
+            <div class="faq-body">
+                <p>Por ahora puedes pagar de dos formas: <strong>efectivo</strong> al recibir tu pedido, o por <strong>transferencia</strong> (Transfermóvil) a la cuenta del negocio, confirmando el pago desde la app. Los métodos disponibles pueden variar según el negocio. En algunos casos, para habilitar el pago en efectivo te pediremos verificar tu identidad con una foto de tu documento y una selfie. De momento no se aceptan pagos con tarjeta internacional.</p>
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Cómo puedo hacer seguimiento de mi pedido?</summary>
+            <div class="faq-body">
+                <p>Una vez confirmado el pedido, puedes ver su estado en tiempo real desde la sección "Mis pedidos" en la app. Recibirás notificaciones automáticas cuando el negocio acepte el pedido, cuando esté en preparación y cuando el repartidor esté en camino.</p>
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>El negocio rechazó mi pedido. ¿Qué pasa con mi pago?</summary>
+            <div class="faq-body">
+                <p>Si el negocio rechaza el pedido, no se te cobra nada: en efectivo pagas al recibir y, en transferencia, el pago se pide solo cuando el negocio y un repartidor ya aceptaron el pedido. Si ya habías transferido y el pedido no se completa, escríbenos con el número de pedido y el comprobante para gestionar la devolución.</p>
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Cómo cancelo un pedido?</summary>
+            <div class="faq-body">
+                <p>Puedes cancelar un pedido mientras esté en estado "Esperando confirmación del negocio" desde la pantalla de detalle del pedido. Una vez que el negocio lo acepta, no es posible cancelarlo desde la app — en ese caso contáctanos directamente. Los pedidos que el negocio o el repartidor no confirman a tiempo se cancelan automáticamente.</p>
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Cómo cambio mi dirección de entrega?</summary>
+            <div class="faq-body">
+                <p>Puedes añadir y gestionar tus direcciones guardadas desde tu perfil en la app. Al hacer un nuevo pedido, selecciona la dirección que deseas usar. No es posible cambiar la dirección de un pedido ya confirmado.</p>
+            </div>
+        </details>
+
+        <details class="faq-item" id="eliminar-cuenta">
+            <summary>¿Cómo elimino mi cuenta?</summary>
+            <div class="faq-body">
+                <p>Puedes eliminarla desde la app: en Llegó (clientes) abre la pestaña <strong>Cuenta</strong> y toca <strong>Eliminar cuenta</strong>; en Llegó Negocios ve a <strong>Más › Cuenta › Eliminar mi cuenta</strong>; en Llegó Mensajeros ve a <strong>Perfil › Eliminar cuenta</strong>. En Android, Negocios y Mensajeros la eliminación se programa para dentro de 30 días y puedes cancelarla iniciando sesión; en iOS (clientes) es inmediata.</p>
+                <p>Si no puedes entrar a la app, escríbenos a <a href={supportMailtoUrl("Eliminar cuenta")}>{SUPPORT_EMAIL}</a> con el asunto "Eliminar cuenta" desde el correo registrado en Llegó. Todos los detalles están en <a href="/eliminar-cuenta">Eliminar mi cuenta</a>.</p>
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿Cómo registro mi negocio o me sumo como mensajero?</summary>
+            <div class="faq-body">
+                <p>Estamos preparando un registro en línea para negocios y mensajeros (lo verás en <a href="/negocios">Negocios y mensajeros</a>). Mientras tanto, escríbenos por WhatsApp al <a href={supportWhatsappUrl("Hola Llegó, quiero registrar mi negocio o ser mensajero.")} target="_blank" rel="noopener noreferrer">{SUPPORT_WHATSAPP_DISPLAY}</a> o a <a href={supportMailtoUrl("Quiero sumarme a Llegó")}>{SUPPORT_EMAIL}</a> y te ayudamos a empezar.</p>
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>No recuerdo mi contraseña. ¿Qué hago?</summary>
+            <div class="faq-body">
+                <p>Por ahora la app no incluye el restablecimiento automático de contraseña. Si te registraste con Google o con Apple, no necesitas contraseña: inicia sesión con ese mismo botón. Si usas correo y contraseña, escríbenos a <a href={supportMailtoUrl("Recuperar acceso a mi cuenta")}>{SUPPORT_EMAIL}</a> desde el correo de tu cuenta y te ayudamos a recuperar el acceso.</p>
+            </div>
+        </details>
+
+        <details class="faq-item">
+            <summary>¿La app está disponible fuera de Cuba?</summary>
+            <div class="faq-body">
+                <p>Actualmente Llegó opera en Cuba. Si tienes interés en expandir el servicio a otra región o eres un negocio fuera de Cuba, contáctanos para explorar opciones.</p>
+            </div>
+        </details>
+
+    </div>
+
+    <!-- Bottom contact CTA -->
+    <div class="bottom-cta">
+        <h3>¿No encontraste lo que buscabas?</h3>
+        <p>Escríbenos y te respondemos en un plazo de {SUPPORT_RESPONSE_TIME}.</p>
+        <a href={supportMailtoUrl()} class="btn-contact">
+            Contactar soporte
+        </a>
+    </div>
+</LegalLayout>
 
 <style>
-    .page {
-        min-height: 100vh;
-        background: var(--color-background);
-        color: var(--color-text);
-        font-family: var(--font-family);
-    }
-
-    .page-header {
-        padding: 1.5rem 2rem;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .logo {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--color-secondary);
-        text-decoration: none;
-        letter-spacing: -0.02em;
-    }
-
-    .content {
-        max-width: 740px;
-        margin: 0 auto;
-        padding: 3rem 2rem 5rem;
-    }
-
     h1 {
         font-size: 2.5rem;
         font-weight: 700;
@@ -171,13 +145,19 @@ import Layout from "../layouts/Layout.astro";
     /* Contact box */
     .contact-box {
         display: flex;
-        align-items: flex-start;
+        flex-direction: column;
         gap: 1.25rem;
         background: rgba(255,255,255,0.04);
         border: 1px solid rgba(255,255,255,0.1);
         border-radius: var(--radius-xl);
         padding: 1.75rem;
         margin-bottom: 3rem;
+    }
+
+    .contact-method {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.25rem;
     }
 
     .contact-icon {
@@ -201,7 +181,7 @@ import Layout from "../layouts/Layout.astro";
         color: var(--color-accent);
         text-decoration: none;
         word-break: break-all;
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.1rem;
     }
 
     .contact-email:hover {
@@ -329,37 +309,8 @@ import Layout from "../layouts/Layout.astro";
         opacity: 0.85;
     }
 
-    /* Footer */
-    .page-footer {
-        padding: 2rem;
-        border-top: 1px solid rgba(255,255,255,0.08);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-        color: var(--color-text-variant);
-        font-size: 0.875rem;
-    }
-
-    .page-footer nav {
-        display: flex;
-        gap: 1.5rem;
-    }
-
-    .page-footer nav a {
-        color: var(--color-text-variant);
-        text-decoration: none;
-    }
-
-    .page-footer nav a:hover {
-        color: var(--color-text);
-    }
-
     @media (max-width: 640px) {
         h1 { font-size: 1.75rem; }
-        .content { padding: 2rem 1.25rem 4rem; }
-        .contact-box { flex-direction: column; gap: 0.75rem; }
-        .page-footer { flex-direction: column; text-align: center; }
+        .contact-method { flex-direction: column; gap: 0.75rem; }
     }
 </style>
