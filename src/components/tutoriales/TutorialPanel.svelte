@@ -288,7 +288,13 @@
 
   async function handleTutorialDeleted(tutorialId: string) {
     try {
-      await deleteTutorial(tutorialId, jwt);
+      // deleteTutorial devuelve un Boolean: solo se quita de la lista si el
+      // backend confirma el borrado.
+      const deleted = await deleteTutorial(tutorialId, jwt);
+      if (!deleted) {
+        tutorialError = "No se pudo eliminar el tutorial";
+        return;
+      }
       tutorials = tutorials.filter((t) => t.id !== tutorialId);
     } catch (error) {
       console.error("Error deleting tutorial:", error);

@@ -53,14 +53,11 @@ export const UPDATE_TUTORIAL = gql`
 `;
 
 /**
- * Elimina un tutorial
+ * Elimina un tutorial. El backend devuelve un Boolean (sin subcampos).
  */
 export const DELETE_TUTORIAL = gql`
-  mutation DeleteTutorial($tutorialId: String!, $jwt: String!) {
-    deleteTutorial(tutorialId: $tutorialId, jwt: $jwt) {
-      success
-      message
-    }
+  mutation DeleteTutorial($id: String!, $jwt: String!) {
+    deleteTutorial(id: $id, jwt: $jwt)
   }
 `;
 
@@ -68,8 +65,8 @@ export const DELETE_TUTORIAL = gql`
  * Activa/desactiva un tutorial
  */
 export const TOGGLE_TUTORIAL_ACTIVE = gql`
-  mutation ToggleTutorialActive($tutorialId: String!, $jwt: String!) {
-    toggleTutorialActive(tutorialId: $tutorialId, jwt: $jwt) {
+  mutation ToggleTutorialActive($id: String!, $jwt: String!) {
+    toggleTutorialActive(id: $id, jwt: $jwt) {
       id
       title
       description

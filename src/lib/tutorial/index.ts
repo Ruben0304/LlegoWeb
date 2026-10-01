@@ -188,12 +188,13 @@ export async function updateTutorial(
  * Elimina un tutorial
  * @param tutorialId - ID del tutorial
  * @param jwt - Token JWT de autenticación
+ * @returns true si el backend eliminó el tutorial
  */
 export async function deleteTutorial(
   tutorialId: string,
   jwt: string
-): Promise<{ success: boolean; message: string }> {
-  const result = await mutation<DeleteTutorialResponse>(DELETE_TUTORIAL, { tutorialId, jwt });
+): Promise<boolean> {
+  const result = await mutation<DeleteTutorialResponse>(DELETE_TUTORIAL, { id: tutorialId, jwt });
   return result.deleteTutorial;
 }
 
@@ -207,7 +208,7 @@ export async function toggleTutorialActive(
   tutorialId: string,
   jwt: string
 ): Promise<Tutorial> {
-  const result = await mutation<ToggleTutorialActiveResponse>(TOGGLE_TUTORIAL_ACTIVE, { tutorialId, jwt });
+  const result = await mutation<ToggleTutorialActiveResponse>(TOGGLE_TUTORIAL_ACTIVE, { id: tutorialId, jwt });
   return result.toggleTutorialActive;
 }
 

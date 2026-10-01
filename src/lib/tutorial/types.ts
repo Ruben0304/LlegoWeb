@@ -113,10 +113,7 @@ export interface UpdateTutorialResponse {
 }
 
 export interface DeleteTutorialResponse {
-  deleteTutorial: {
-    success: boolean;
-    message: string;
-  };
+  deleteTutorial: boolean;
 }
 
 export interface ToggleTutorialActiveResponse {
