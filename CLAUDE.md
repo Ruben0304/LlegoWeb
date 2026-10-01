@@ -28,22 +28,33 @@ This is a marketing website for **Llegó**, a Spanish-language shopping app with
 src/
 ├── pages/                    # Route files (file-based routing)
 │   ├── index.astro           # Homepage
-│   ├── plus.astro            # Pricing/subscription page
-│   └── negocios.astro        # Business panel page
+│   ├── plus.astro            # Llegó+ ("Próximamente")
+│   ├── negocios.astro        # Negocios y mensajeros ("Próximamente", fase 2: registro)
+│   ├── privacidad.astro      # Política de privacidad (fuente única, enlazada desde las apps)
+│   ├── terminos.astro        # Términos y condiciones (fuente única, enlazada desde las apps)
+│   ├── soporte.astro         # Centro de soporte / FAQ
+│   ├── eliminar-cuenta.astro # Cómo eliminar la cuenta desde cada app o por correo
+│   ├── tutoriales.astro      # Panel admin de tutoriales (con login Google/Apple)
+│   ├── business-types.astro  # Panel admin de tipos de negocio
+│   ├── auth/callback.astro   # Callback OAuth (guarda el JWT en localStorage)
+│   └── api/                  # Endpoints (proxy GraphQL, login social, descarga APK)
 ├── layouts/
-│   └── Layout.astro          # Main layout wrapper with SEO metadata
+│   ├── Layout.astro          # Main layout wrapper with SEO metadata
+│   └── LegalLayout.astro     # Shell de las páginas legales/soporte (© dinámico)
 ├── components/               # Svelte components organized by screen
-│   ├── common/               # Reusable components (Navbar, Footer)
-│   ├── home/                 # Home page components (Hero, Categories, etc.)
-│   ├── plus/                 # Plus page components (Pricing, Benefits, etc.)
-│   └── negocios/             # Business panel components (BusinessPanel, ProductForm, etc.)
+│   ├── common/               # Reusable components (Navbar, Footer, ComingSoon)
+│   ├── home/                 # Home page components (Hero, FeatureShowcase, etc.)
+│   ├── tutoriales/           # Panel admin de tutoriales (TutorialPanel, TutorialForm, ...)
+│   └── business-types/       # Panel admin de tipos de negocio
 ├── lib/                      # Business logic organized by feature
-│   ├── shared/               # Shared config (GraphQL client, utils)
-│   ├── product/              # Product feature (types, queries, mutations)
-│   ├── business/             # Business feature
-│   └── auth/                 # Auth feature
+│   ├── shared/               # Shared config (GraphQL client)
+│   ├── site.ts               # Correo/WhatsApp de soporte, tiempo de respuesta, URL pública
+│   ├── auth/                 # Login social (Google/Apple)
+│   ├── business-type/        # Business types feature
+│   └── tutorial/             # Tutorials feature
 └── styles/
-    └── global.css            # CSS custom properties and global styles
+    ├── global.css            # CSS custom properties and global styles
+    └── legal.css             # Estilos del texto de las páginas legales
 ```
 
 **Import aliases configured:**
@@ -98,8 +109,7 @@ Components are organized by screen/feature for better maintainability:
 ---
 // From index files (recommended)
 import { Navbar, Footer } from '@/components/common';
-import { Hero, Categories } from '@/components/home';
-import { Pricing, Benefits } from '@/components/plus';
+import { Hero, FeatureShowcase } from '@/components/home';
 
 // Or individual imports
 import Hero from '@/components/home/Hero.svelte';
@@ -107,10 +117,12 @@ import Hero from '@/components/home/Hero.svelte';
 ```
 
 **Component folders:**
-- `common/` - Shared components (Navbar, Footer)
-- `home/` - Homepage components (Hero, Categories, DeliveryShowcase, FeatureShowcase, HowItWorks, ScrollytellingHowItWorks)
-- `plus/` - Plus page components (PlusHeroStory, PricingHero, Pricing, PricingFAQ, Benefits)
-- `negocios/` - Business panel components (BusinessPanel, ProductForm, ProductList)
+- `common/` - Shared components (Navbar, Footer, ComingSoon)
+- `home/` - Homepage components (Hero, DeliveryShowcase, FeatureShowcase, ScrollytellingHowItWorks)
+- `tutoriales/` - Admin tutorials panel (TutorialPanel, TutorialForm, TutorialList, uploaders)
+- `business-types/` - Admin business types panel
+
+**Legal / contact data:** the support email, WhatsApp, response time and public site URL live in `src/lib/site.ts`. The apps link to `/privacidad` and `/terminos` on this site, so change texts here (not in the backend).
 
 #### 6. GraphQL & Backend Integration
 Backend communication uses GraphQL with `graphql-request` client.
@@ -130,20 +142,15 @@ Each feature in `src/lib/` contains:
 **Example usage:**
 ```astro
 ---
-import { getProducts, type Product } from '@/lib/product';
+import { getTutorials } from '@/lib/tutorial';
 
-// Server-side data fetching
-const { products } = await getProducts({ limit: 20 });
+// Server-side data fetching (the admin panels call it from the browser with the user's JWT)
+const tutorials = await getTutorials(jwt);
 ---
-
-<div>
-  {products.map(product => <ProductCard {...product} />)}
-</div>
 ```
 
 **GraphQL client location:**
 - Main client: `src/lib/shared/graphql.ts`
-- Example usage: `src/lib/shared/graphql-example.ts`
 - See `src/lib/README.md` for detailed documentation
 
 #### 7. Scroll Animations

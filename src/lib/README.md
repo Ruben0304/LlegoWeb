@@ -6,10 +6,11 @@ Esta carpeta contiene la lógica de negocio, servicios, y funcionalidades organi
 
 ```
 lib/
-├── shared/          # Configuración compartida (GraphQL client, utils)
-├── product/         # Feature de productos (types, queries, mutations)
-├── business/        # Feature de negocios (types, queries, mutations)
-└── auth/            # Feature de autenticación (types, queries, mutations)
+├── shared/          # Configuración compartida (cliente GraphQL)
+├── site.ts          # Datos de contacto/soporte y URL pública de la web
+├── auth/            # Login social (Google/Apple): types, mutations
+├── business-type/   # Tipos de negocio (types, queries, mutations)
+└── tutorial/        # Tutoriales (types, queries, mutations)
 ```
 
 ## Uso
@@ -19,11 +20,11 @@ lib/
 ```astro
 ---
 // Importar todo el feature
-import { getProducts, createProduct, type Product } from '@/lib/product';
+import { getTutorials, createTutorial, type Tutorial } from '@/lib/tutorial';
 
 // O importar específicamente
-import { GET_PRODUCTS } from '@/lib/product/queries';
-import type { Product } from '@/lib/product/types';
+import { GET_TUTORIALS } from '@/lib/tutorial/queries';
+import type { Tutorial } from '@/lib/tutorial/types';
 ---
 ```
 
@@ -43,21 +44,20 @@ const data = await query(gql`{ ... }`);
 ### [shared/](shared/)
 Configuración y utilidades compartidas:
 - **[graphql.ts](shared/graphql.ts)** - Cliente GraphQL configurado
-- **[graphql-example.ts](shared/graphql-example.ts)** - Ejemplos de uso
 - **[README.md](shared/README.md)** - Documentación del cliente GraphQL
 
-### [product/](product/) *(ejemplo)*
-Feature de productos con estructura completa:
-- **[types.ts](product/types.ts)** - Tipos TypeScript
-- **[queries.ts](product/queries.ts)** - Queries GraphQL
-- **[mutations.ts](product/mutations.ts)** - Mutations GraphQL
-- **[index.ts](product/index.ts)** - Funciones helper y exports
+### [tutorial/](tutorial/)
+Feature de tutoriales con estructura completa:
+- **[types.ts](tutorial/types.ts)** - Tipos TypeScript
+- **[queries.ts](tutorial/queries.ts)** - Queries GraphQL
+- **[mutations.ts](tutorial/mutations.ts)** - Mutations GraphQL
+- **[index.ts](tutorial/index.ts)** - Funciones helper y exports
 
-### [business/](business/)
-Feature de negocios (agregar types, queries, mutations según tu backend)
+### [business-type/](business-type/)
+Feature de tipos de negocio (misma estructura).
 
 ### [auth/](auth/)
-Feature de autenticación (agregar types, queries, mutations según tu backend)
+Login social con Google y Apple (types, mutations).
 
 ## Agregar un nuevo feature
 
@@ -71,7 +71,7 @@ Feature de autenticación (agregar types, queries, mutations según tu backend)
    touch src/lib/mi-feature/{types.ts,queries.ts,mutations.ts,index.ts}
    ```
 
-3. Seguir la estructura de [product/](product/) como ejemplo
+3. Seguir la estructura de [tutorial/](tutorial/) como ejemplo
 
 ## Convenciones
 

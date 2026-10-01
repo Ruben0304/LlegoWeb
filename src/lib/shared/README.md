@@ -5,7 +5,6 @@ Esta carpeta contiene la configuración del cliente GraphQL para comunicarse con
 ## Archivos
 
 - **[graphql.ts](graphql.ts)** - Cliente GraphQL configurado con variable de entorno privada
-- **[graphql-example.ts](graphql-example.ts)** - Ejemplos de uso con queries y mutations
 
 ## Configuración
 
@@ -104,7 +103,7 @@ export const GET: APIRoute = async () => {
 
 ### Con funciones helper
 
-Ver ejemplos completos en [graphql-example.ts](graphql-example.ts).
+Ver los features de [tutorial/](../tutorial/) y [business-type/](../business-type/), que envuelven `query` y `mutation` en funciones tipadas.
 
 ## Testing Local
 
