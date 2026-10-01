@@ -1,20 +1,28 @@
 ---
-export const prerender = true;
+export const prerender = false;
 
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/common/Navbar.svelte';
-import PricingHero from '../components/plus/PricingHero.svelte';
+import ComingSoon from '../components/common/ComingSoon.astro';
 import Footer from '../components/common/Footer.svelte';
 
-const title = "Llego+ | Suscripcion Premium";
-const description = "Desbloquea todo el potencial de Llego con IA avanzada, cashback y beneficios exclusivos.";
-const keywords = "Llego+, suscripcion premium, IA para compras, cashback";
+const title = "Llegó+, próximamente";
+const description = "Llegó+ llegará pronto. Todavía no está disponible ni tiene precio definido.";
+const keywords = "Llegó+, próximamente, delivery Cuba";
 ---
 
 <Layout title={title} description={description} keywords={keywords}>
   <Navbar client:load />
   <main>
-    <PricingHero client:load />
+    <ComingSoon
+      eyebrow="Llegó+"
+      title="Llegó+ llegará pronto"
+      description="Estamos preparando Llegó+, una suscripción con ventajas extra para quienes compran con Llegó. Todavía no está disponible ni tiene precio definido. Mientras tanto, descarga la app y empieza a pedir."
+      primaryHref="/#descargar"
+      primaryLabel="Descargar la app"
+      secondaryHref="/"
+      secondaryLabel="Volver al inicio"
+    />
   </main>
   <Footer />
 </Layout>
