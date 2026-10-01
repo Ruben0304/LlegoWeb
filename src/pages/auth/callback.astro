@@ -134,16 +134,33 @@
         if (messageEl) messageEl.style.display = 'none';
         
         if (errorContainer) {
-          errorContainer.innerHTML = `
-            <div class="error">
-              <div class="error-title">${title}</div>
-              <div class="error-message">${message}</div>
-            </div>
-            <a href="/negocios" class="back-link">Volver al inicio</a>
-          `;
+          // El mensaje llega por la URL (?message=): jamás se inserta como HTML.
+          // Se construye el DOM con textContent para evitar XSS en un origen que
+          // guarda el JWT en localStorage.
+          errorContainer.replaceChildren();
+
+          const errorBox = document.createElement('div');
+          errorBox.className = 'error';
+
+          const errorTitle = document.createElement('div');
+          errorTitle.className = 'error-title';
+          errorTitle.textContent = title;
+
+          const errorMessage = document.createElement('div');
+          errorMessage.className = 'error-message';
+          errorMessage.textContent = message;
+
+          errorBox.append(errorTitle, errorMessage);
+
+          const backLink = document.createElement('a');
+          backLink.href = '/';
+          backLink.className = 'back-link';
+          backLink.textContent = 'Volver al inicio';
+
+          errorContainer.append(errorBox, backLink);
           errorContainer.style.display = 'block';
         }
-        
+
         if (spinner) (spinner as HTMLElement).style.display = 'none';
       }
 
@@ -185,16 +202,16 @@
               role: payload.role || 'user'
             }));
 
-            console.log('✅ Auth successful, redirecting to /negocios');
+            console.log('✅ Auth successful, redirecting to /tutoriales');
             
-            // Redirect to business panel
-            window.location.href = '/negocios';
+            // Redirect to the admin panel (the only authenticated area of the site)
+            window.location.href = '/tutoriales';
           } catch (decodeError) {
             console.error('Error decoding token:', decodeError);
             // Still try to store the token even if decode fails
             localStorage.setItem(AUTH_TOKEN_KEY, token);
             localStorage.setItem(AUTH_TOKEN_TYPE_KEY, 'bearer');
-            window.location.href = '/negocios';
+            window.location.href = '/tutoriales';
           }
         } catch (error) {
           console.error('Callback error:', error);
