@@ -3,24 +3,27 @@ export const prerender = false;
 
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/common/Navbar.svelte';
-import BusinessPanel from '../components/negocios/BusinessPanel.svelte';
+import ComingSoon from '../components/common/ComingSoon.astro';
 import Footer from '../components/common/Footer.svelte';
+import { SUPPORT_WHATSAPP_DISPLAY, supportMailtoUrl, supportWhatsappUrl } from '../lib/site';
 
-const title = "Panel de Negocios | Llegó";
-const description = "Gestiona tu negocio en Llegó. Registra tu empresa, agrega productos y llega a más clientes.";
+const title = "Negocios y mensajeros";
+const description = "Próximamente: registro de negocios y mensajeros en Llegó. Mientras tanto, escríbenos por WhatsApp y te ayudamos a empezar.";
+const whatsappUrl = supportWhatsappUrl("Hola Llegó, quiero registrar mi negocio o ser mensajero.");
 ---
 
 <Layout title={title} description={description}>
   <Navbar client:load />
-  <main class="business-page">
-    <BusinessPanel client:load />
+  <main>
+    <ComingSoon
+      eyebrow="Próximamente"
+      title="Registro de negocios y mensajeros"
+      description={`Estamos preparando el registro en línea para que negocios y mensajeros se sumen a Llegó. Mientras tanto, escríbenos por WhatsApp al ${SUPPORT_WHATSAPP_DISPLAY} y te ayudamos a empezar.`}
+      primaryHref={whatsappUrl}
+      primaryLabel="Escribir por WhatsApp"
+      secondaryHref={supportMailtoUrl("Quiero sumarme a Llegó")}
+      secondaryLabel="Enviar un correo"
+    />
   </main>
   <Footer />
 </Layout>
-
-<style>
-  .business-page {
-    min-height: 100vh;
-    padding-top: 100px;
-  }
-</style>

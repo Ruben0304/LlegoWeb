@@ -1,0 +1,118 @@
+---
+/**
+ * Página "Próximamente" reutilizable (/plus, /negocios).
+ * Sin precios, métricas ni acciones que no existan todavía.
+ */
+interface Props {
+  eyebrow: string;
+  title: string;
+  description: string;
+  primaryHref: string;
+  primaryLabel: string;
+  secondaryHref?: string;
+  secondaryLabel?: string;
+}
+
+const { eyebrow, title, description, primaryHref, primaryLabel, secondaryHref, secondaryLabel } = Astro.props;
+// Los enlaces http(s) (p. ej. WhatsApp) se abren en otra pestaña.
+const opensNewTab = primaryHref.startsWith('http');
+---
+
+<section class="coming-soon">
+  <div class="coming-soon-inner">
+    <span class="badge">{eyebrow}</span>
+    <h1 class="title">{title}</h1>
+    <p class="description">{description}</p>
+    <div class="actions">
+      <a
+        href={primaryHref}
+        class="btn btn-primary"
+        target={opensNewTab ? '_blank' : undefined}
+        rel={opensNewTab ? 'noopener noreferrer' : undefined}
+      >{primaryLabel}</a>
+      {secondaryHref && secondaryLabel && (
+        <a href={secondaryHref} class="btn btn-secondary">{secondaryLabel}</a>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .coming-soon {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 20px 80px;
+    background: #000;
+  }
+
+  .coming-soon-inner {
+    max-width: 560px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .badge {
+    display: inline-flex;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 13px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  .title {
+    font-size: clamp(28px, 6vw, 40px);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  .description {
+    font-size: 16px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 32px;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
+    color: var(--color-primary);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(225, 199, 142, 0.3);
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fff;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+</style>

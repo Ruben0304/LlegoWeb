@@ -64,7 +64,7 @@
             <a href="/plus" class="nav-link" onclick={closeMobileMenu}>Llegó+</a
             >
             <a href="/negocios" class="nav-link" onclick={closeMobileMenu}
-                >Negocios</a
+                >Negocios y mensajeros</a
             >
             <a href="/#descargar" class="nav-cta" onclick={handleDescargar}>
                 <span>Descargar</span>

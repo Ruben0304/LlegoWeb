@@ -519,7 +519,8 @@
             </div>
           </div>
           <div class="header-actions">
-            <a href="/negocios" class="back-btn">
+            <a href="/business-types" class="back-btn">
+              Tipos de negocio
               <svg
                 width="16"
                 height="16"
@@ -528,9 +529,8 @@
                 stroke="currentColor"
                 stroke-width="2"
               >
-                <polyline points="15 18 9 12 15 6" />
+                <polyline points="9 18 15 12 9 6" />
               </svg>
-              Panel de Negocios
             </a>
             <button class="logout-btn" onclick={handleLogout}>
               <svg

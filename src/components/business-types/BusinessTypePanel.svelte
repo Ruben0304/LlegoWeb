@@ -18,12 +18,12 @@
   let activeView = $state<"list" | "form">("list");
   let loadError = $state("");
 
-  // Auth storage keys (same as BusinessPanel)
+  // Auth storage keys (mismas que TutorialPanel, que es donde se inicia sesión)
   const AUTH_TOKEN_KEY = "llego.auth.accessToken";
   const AUTH_USER_KEY = "llego.auth.user";
 
   onMount(async () => {
-    // Check auth from localStorage (same keys as BusinessPanel)
+    // Check auth from localStorage (misma sesión que inicia TutorialPanel en /tutoriales)
     const storedJwt = localStorage.getItem(AUTH_TOKEN_KEY);
     const storedUser = localStorage.getItem(AUTH_USER_KEY);
     
@@ -106,8 +106,8 @@
         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
       </svg>
       <h2>Acceso Restringido</h2>
-      <p>Debes iniciar sesión como administrador para gestionar los tipos de negocio.</p>
-      <a href="/auth/login" class="btn btn-accent">Iniciar Sesión</a>
+      <p>Debes iniciar sesión como administrador para gestionar los tipos de negocio. El inicio de sesión se hace desde el panel de Tutoriales y la sesión se comparte con este panel.</p>
+      <a href="/tutoriales" class="btn btn-accent">Iniciar Sesión</a>
     </div>
   {:else}
     <div class="bt-panel-header">
