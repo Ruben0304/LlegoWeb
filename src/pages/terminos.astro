@@ -1,0 +1,130 @@
+---
+export const prerender = false;
+
+import LegalLayout from "../layouts/LegalLayout.astro";
+import "../styles/legal.css";
+import {
+    LEGAL_LAST_UPDATED,
+    SUPPORT_EMAIL,
+    SUPPORT_RESPONSE_TIME,
+    SUPPORT_WHATSAPP_DISPLAY,
+    supportWhatsappUrl,
+} from "../lib/site";
+---
+
+<LegalLayout
+    title="Términos y Condiciones de Uso"
+    description="Términos y condiciones de uso de las aplicaciones Llegó (clientes, negocios y mensajeros) y de los servicios relacionados."
+>
+    <article class="legal-prose">
+        <h1>Términos y Condiciones de Uso</h1>
+        <p class="last-updated">Última actualización: {LEGAL_LAST_UPDATED}</p>
+
+        <p class="intro">
+            Al descargar, acceder o utilizar las aplicaciones <strong>Llegó</strong> (clientes), <strong>Llegó Negocios</strong> y <strong>Llegó Mensajeros</strong>, este sitio web o cualquiera de nuestros servicios relacionados, aceptas estos Términos y Condiciones. Si no estás de acuerdo, por favor no utilices la plataforma. El tratamiento de tus datos personales se explica en nuestra <a href="/privacidad">Política de Privacidad</a>.
+        </p>
+
+        <section>
+            <h2>1. Descripción del servicio</h2>
+            <p>
+                Llegó es una plataforma que conecta a clientes finales, negocios (comerciantes) y mensajeros para facilitar la venta y la entrega a domicilio de productos. La plataforma actúa como intermediario tecnológico: los productos y servicios los ofrecen directamente los negocios participantes y las entregas las realizan los mensajeros.
+            </p>
+        </section>
+
+        <section>
+            <h2>2. Cuentas y elegibilidad</h2>
+            <ul>
+                <li>Debes tener al menos 18 años, o la mayoría de edad en tu jurisdicción, para crear una cuenta.</li>
+                <li>Te comprometes a proporcionar información veraz, actual y completa.</li>
+                <li>Eres responsable de mantener la confidencialidad de tu sesión y de toda la actividad que ocurra bajo tu cuenta.</li>
+                <li>Avísanos de inmediato si sospechas un acceso no autorizado.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>3. Uso aceptable</h2>
+            <p>Al usar la plataforma te comprometes a NO:</p>
+            <ul>
+                <li>Publicar contenido ilegal, falso, fraudulento, ofensivo, difamatorio o que infrinja derechos de terceros.</li>
+                <li>Suplantar la identidad de otra persona o entidad, ni presentar documentos de identidad que no sean tuyos.</li>
+                <li>Interferir con el funcionamiento de la plataforma, intentar acceder a áreas restringidas o realizar ingeniería inversa.</li>
+                <li>Usar la plataforma para actividades de lavado de dinero, financiamiento del terrorismo o cualquier actividad ilegal.</li>
+                <li>Crear varias cuentas para evadir restricciones o sanciones.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>4. Pagos y comisiones</h2>
+            <p>
+                Los pedidos pueden pagarse en <strong>efectivo</strong> al recibirlos o mediante <strong>transferencia</strong> bancaria (Transfermóvil) a la cuenta del negocio. Los métodos disponibles pueden variar según el negocio. Si en el futuro habilitamos otros métodos (por ejemplo, tarjeta o criptomonedas), al usarlos aceptarás también los términos del proveedor correspondiente.
+            </p>
+            <ul>
+                <li>En los pagos por transferencia, el pedido no pasa a preparación hasta que el pago se confirma.</li>
+                <li>Para habilitar el pago en efectivo podemos pedirte una verificación de identidad (documento y selfie) con el fin de prevenir el fraude.</li>
+                <li>Llegó puede aplicar comisiones por el uso de la plataforma, que se comunicarán claramente antes de cada operación.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>5. Pedidos, entregas y devoluciones</h2>
+            <p>
+                La responsabilidad del producto vendido recae en el <strong>negocio</strong> y la responsabilidad de la entrega recae en el <strong>mensajero</strong> asignado. Llegó facilita la coordinación, pero no es vendedor ni transportista directo. Los pedidos que el negocio o el mensajero no confirman a tiempo pueden cancelarse automáticamente. Las políticas de devolución, garantía y reclamos se gestionan caso por caso, siguiendo las reglas publicadas en la app y las normas de protección al consumidor aplicables. Para cualquier reclamo escríbenos a soporte.
+            </p>
+        </section>
+
+        <section>
+            <h2>6. Contenido del usuario</h2>
+            <p>
+                Cuando subes información (productos, fotos, comentarios, mensajes), nos otorgas una licencia limitada, mundial y no exclusiva para almacenarla y mostrarla únicamente con el fin de operar el servicio. Conservas la titularidad de tu contenido. Nos reservamos el derecho de retirar contenido que viole estos Términos sin previo aviso.
+            </p>
+        </section>
+
+        <section>
+            <h2>7. Suspensión y eliminación de la cuenta</h2>
+            <p>
+                Podemos suspender o cerrar las cuentas que infrinjan estos Términos, sin perjuicio de los derechos y obligaciones contraídos previamente.
+            </p>
+            <p>
+                Puedes eliminar tu cuenta en cualquier momento desde la app o por correo; los pasos de cada app están en <a href="/eliminar-cuenta">Eliminar mi cuenta</a>. En Android, Negocios y Mensajeros la eliminación se programa con un período de gracia de 30 días, durante el cual puedes cancelarla iniciando sesión; en la app de iOS para clientes se aplica de inmediato. Qué datos se borran y cuáles pueden conservarse lo explica la Política de Privacidad.
+            </p>
+        </section>
+
+        <section>
+            <h2>8. Propiedad intelectual</h2>
+            <p>
+                Todo el software, las marcas, los diseños, los textos y los elementos gráficos de la plataforma son propiedad de Llegó o de sus licenciantes. No se concede ningún derecho sobre la propiedad intelectual de la plataforma más allá del uso autorizado por estos Términos.
+            </p>
+        </section>
+
+        <section>
+            <h2>9. Limitación de responsabilidad</h2>
+            <p>
+                La plataforma se proporciona "tal cual" y "según disponibilidad", sin garantías de ningún tipo, salvo las exigidas por la ley aplicable. En la máxima medida permitida por la ley, Llegó no será responsable por daños indirectos, lucro cesante, pérdida de datos o cualquier perjuicio derivado del uso o de la imposibilidad de uso de la plataforma.
+            </p>
+        </section>
+
+        <section>
+            <h2>10. Modificaciones de los Términos</h2>
+            <p>
+                Podemos actualizar estos Términos en cualquier momento. Publicaremos siempre la versión vigente en esta página e indicaremos la fecha de la última actualización. El uso continuado de la plataforma tras los cambios supone tu aceptación de los Términos actualizados.
+            </p>
+        </section>
+
+        <section>
+            <h2>11. Ley aplicable</h2>
+            <p>
+                Estos Términos se rigen por las leyes aplicables en la jurisdicción donde Llegó opera legalmente. Las disputas se resolverán de forma amistosa siempre que sea posible y, en su defecto, ante los tribunales competentes.
+            </p>
+        </section>
+
+        <section>
+            <h2>12. Contacto</h2>
+            <p>Para cualquier consulta sobre estos Términos, escríbenos:</p>
+            <ul>
+                <li><strong>Correo:</strong> <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a></li>
+                <li><strong>WhatsApp:</strong> <a href={supportWhatsappUrl()} target="_blank" rel="noopener noreferrer">{SUPPORT_WHATSAPP_DISPLAY}</a></li>
+            </ul>
+            <p>Tiempo de respuesta habitual: {SUPPORT_RESPONSE_TIME}.</p>
+        </section>
+    </article>
+</LegalLayout>

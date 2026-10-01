@@ -1,266 +1,193 @@
 ---
-export const prerender = true;
-import Layout from "../layouts/Layout.astro";
+export const prerender = false;
+
+import LegalLayout from "../layouts/LegalLayout.astro";
+import "../styles/legal.css";
+import {
+    LEGAL_LAST_UPDATED,
+    SUPPORT_EMAIL,
+    SUPPORT_RESPONSE_TIME,
+    SUPPORT_WHATSAPP_DISPLAY,
+    supportWhatsappUrl,
+} from "../lib/site";
 ---
 
-<Layout
-    title="Política de Privacidad | Llegó"
-    description="Política de privacidad de Llegó. Conoce cómo recopilamos, usamos y protegemos tus datos personales."
+<LegalLayout
+    title="Política de Privacidad"
+    description="Política de privacidad de Llegó. Conoce qué datos recopilamos, con qué proveedores los compartimos, cuánto tiempo los conservamos y cómo eliminar tu cuenta."
 >
-    <div class="page">
-        <header class="page-header">
-            <a href="/" class="logo">Llegó</a>
-        </header>
+    <article class="legal-prose">
+        <h1>Política de Privacidad</h1>
+        <p class="last-updated">Última actualización: {LEGAL_LAST_UPDATED}</p>
 
-        <main class="content">
-            <h1>Política de Privacidad</h1>
-            <p class="last-updated">Última actualización: 25 de mayo de 2025</p>
+        <p class="intro">
+            Llegó ("nosotros", "nuestro") es una plataforma de delivery para Cuba. Esta política explica qué datos personales recopilamos, para qué los usamos, con quién los compartimos y cómo puedes controlarlos o eliminarlos. Se aplica a las aplicaciones <strong>Llegó</strong> (clientes, iOS y Android), <strong>Llegó Negocios</strong> y <strong>Llegó Mensajeros</strong>, y a este sitio web.
+        </p>
 
-            <p class="intro">
-                Llegó ("nosotros", "nuestro") opera la aplicación móvil Llegó disponible en App Store. Esta política explica qué datos recopilamos, cómo los usamos y cómo los protegemos cuando usas nuestra app.
+        <section>
+            <h2>1. Datos que recopilamos</h2>
+            <p>Según la app que uses y las funciones que actives, recopilamos:</p>
+            <ul>
+                <li><strong>Datos de cuenta</strong> — nombre, correo electrónico, número de teléfono, nombre de usuario y foto de perfil.</li>
+                <li><strong>Datos de inicio de sesión</strong> — si entras con Google o con Apple recibimos tu identificador en ese servicio, tu nombre y tu correo (Apple puede darnos un correo privado de retransmisión). Si entras con correo y contraseña, guardamos la contraseña únicamente cifrada (hash), nunca en texto plano.</li>
+                <li><strong>Direcciones de entrega</strong> — las que guardas en tu perfil o indicas al hacer un pedido.</li>
+                <li><strong>Ubicación</strong> — la ubicación de tu dispositivo, solo con tu permiso, para mostrarte negocios cercanos y calcular la entrega. En Llegó Mensajeros, la ubicación del mensajero mientras realiza una entrega (ver sección 4).</li>
+                <li><strong>Pedidos y pagos</strong> — productos, negocios, montos, método de pago, estado del pedido y los datos de la transferencia que usamos para confirmar tu pago (monto, identificador de transferencia y teléfono del pagador), incluidas las capturas de comprobantes que subas.</li>
+                <li><strong>Búsquedas, actividad y asistente de IA</strong> — lo que buscas, los productos que ves, marcas como favoritos o añades al carrito, tus pedidos entregados y los mensajes que escribes al asistente de IA, para responderte y personalizar las recomendaciones.</li>
+                <li><strong>Mensajes del pedido</strong> — comentarios y mensajes que envías en el chat o los comentarios de un pedido.</li>
+                <li><strong>Datos del dispositivo y de actividad</strong> — identificador del dispositivo, token de notificaciones push, sistema operativo, versión de la app, fecha de tu última conexión e informes de errores y fallos de la app.</li>
+                <li><strong>Verificación de identidad</strong> — si quieres pagar en efectivo y te lo pedimos, una foto de tu documento de identidad y una selfie sosteniéndolo (ver sección 3).</li>
+                <li><strong>Datos de negocios</strong> — si registras un negocio: nombre, descripción, sucursales, direcciones, horarios, productos y fotos, y los datos de la cuenta o tarjeta y el teléfono de confirmación donde recibes transferencias.</li>
+                <li><strong>Datos de mensajeros</strong> — si eres mensajero: nombre, teléfono, información de tu vehículo de reparto y tu ubicación durante las entregas.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>2. Cómo usamos tus datos</h2>
+            <ul>
+                <li>Crear y gestionar tu cuenta y autenticarte.</li>
+                <li>Procesar pedidos: el negocio recibe lo necesario para prepararlo y el mensajero lo necesario para entregarlo.</li>
+                <li>Confirmar pagos en efectivo y por transferencia.</li>
+                <li>Mostrarte negocios y productos cercanos y personalizar las recomendaciones y los resultados de búsqueda.</li>
+                <li>Enviarte notificaciones sobre el estado de tus pedidos.</li>
+                <li>Prevenir fraude, abuso y usos indebidos de la plataforma.</li>
+                <li>Detectar y corregir errores técnicos y mejorar el servicio.</li>
+                <li>Atender tus consultas de soporte y cumplir obligaciones legales y contables.</li>
+            </ul>
+            <p><strong>No vendemos tus datos personales ni los usamos para publicidad de terceros.</strong></p>
+        </section>
+
+        <section>
+            <h2>3. Verificación de identidad en pagos en efectivo</h2>
+            <p>
+                Para reducir el fraude, en algunos casos te pedimos verificar tu identidad antes de habilitar el pago en efectivo. Para ello subes una foto del frente de tu documento de identidad y una selfie sosteniéndolo.
+            </p>
+            <ul>
+                <li>Las imágenes se guardan en nuestro almacenamiento de archivos y se envían a <strong>Google Gemini</strong> para que un modelo de IA compare el documento con la selfie y emita un veredicto con un nivel de confianza.</li>
+                <li>Si el resultado es dudoso, un miembro de nuestro equipo puede revisar las imágenes manualmente.</li>
+                <li>Guardamos el resultado de la verificación y un registro de auditoría de las decisiones. Una verificación aprobada tiene una vigencia limitada, tras la cual puede pedírtela de nuevo.</li>
+                <li>Usamos estas imágenes solo para esta verificación y la prevención de fraude, y no las compartimos con negocios ni con otros usuarios.</li>
+            </ul>
+            <p>
+                Puedes pedir que eliminemos tus imágenes de verificación escribiéndonos a <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
+            </p>
+        </section>
+
+        <section>
+            <h2>4. Ubicación</h2>
+            <p>
+                Las apps solicitan acceso a tu ubicación para mostrarte negocios en tu zona y calcular tiempos y costos de entrega. Solo accedemos a ella cuando la app está en uso y con tu permiso, y puedes retirarlo en cualquier momento desde los ajustes del dispositivo. Sin ubicación, algunas funciones, como el mapa de negocios o el cálculo del envío, no estarán disponibles.
+            </p>
+            <p>
+                Cuando un mensajero realiza una entrega, su ubicación se comparte en tiempo real con el cliente de ese pedido para que pueda seguirlo y con nuestro sistema para asignar y supervisar entregas. Las posiciones registradas durante un pedido se conservan como máximo 24 horas y la presencia en el mapa en vivo se renueva cada pocos segundos; no mantenemos un historial permanente de recorridos.
+            </p>
+        </section>
+
+        <section>
+            <h2>5. Proveedores con los que compartimos datos</h2>
+            <p>Usamos proveedores que tratan datos en nuestro nombre y solo para prestar el servicio:</p>
+
+            <h3>Infraestructura</h3>
+            <ul>
+                <li><strong>Railway</strong> — alojamiento del servidor (API) y de este sitio web, y almacenamiento de archivos compatible con S3 (fotos de perfil, de productos, comprobantes e imágenes de verificación).</li>
+                <li><strong>MongoDB</strong> — base de datos con tu cuenta, pedidos y resto de la información de la plataforma.</li>
+                <li><strong>Redis</strong> — caché y presencia en tiempo real de mensajeros.</li>
+                <li><strong>Qdrant</strong> — búsqueda semántica: almacena representaciones vectoriales (embeddings) de productos y negocios y un vector de tus gustos, calculado a partir de tus clics, favoritos, carrito y pedidos entregados, para recomendarte mejor.</li>
+            </ul>
+
+            <h3>Inicio de sesión, mapas y notificaciones</h3>
+            <ul>
+                <li><strong>Google Sign-In</strong> y <strong>Sign in with Apple</strong> — inicio de sesión opcional; nos comparten solo el identificador, nombre y correo necesarios.</li>
+                <li><strong>Google Maps</strong> — mapas y selección de direcciones y ubicaciones en las apps.</li>
+                <li><strong>Firebase Cloud Messaging</strong> (Android) y <strong>Apple Push Notification service</strong> (iOS) — envío de notificaciones push; reciben el token de tu dispositivo y el texto de la notificación.</li>
+            </ul>
+
+            <h3>Inteligencia artificial</h3>
+            <ul>
+                <li><strong>Google Gemini</strong> — asistente conversacional, búsqueda semántica, lectura de comprobantes de transferencia, detección de productos en las fotos que suben los negocios y verificación de identidad (sección 3).</li>
+                <li><strong>Anthropic (Claude)</strong> — recomendaciones de productos y complementos y análisis de errores técnicos de la plataforma.</li>
+            </ul>
+            <p>Les enviamos el contenido necesario para cada tarea (por ejemplo, tu consulta al asistente o las imágenes de una verificación).</p>
+
+            <h3>Pagos</h3>
+            <p>
+                Hoy los pedidos se pagan en <strong>efectivo</strong> o por <strong>transferencia</strong> bancaria (Transfermóvil): no pasan por un procesador de pagos externo y no recopilamos datos de tarjetas. La plataforma tiene integraciones con <strong>Stripe</strong> (tarjeta), <strong>QvaPay</strong> y <strong>TronDealer</strong> (USDT) que actualmente no están habilitadas; si las activamos, estos proveedores recibirán los datos de pago necesarios y actualizaremos esta política.
             </p>
 
-            <section>
-                <h2>1. Datos que recopilamos</h2>
-                <p>Recopilamos los siguientes datos cuando te registras o usas Llegó:</p>
-                <ul>
-                    <li><strong>Nombre completo</strong> — para identificar tu cuenta y personalizar la experiencia.</li>
-                    <li><strong>Dirección de correo electrónico</strong> — para autenticación, notificaciones de pedidos y comunicación contigo.</li>
-                    <li><strong>Número de teléfono</strong> — para verificar tu cuenta y facilitar la entrega.</li>
-                    <li><strong>Dirección física</strong> — las direcciones de entrega que guardas en tu perfil para recibir pedidos.</li>
-                    <li><strong>Ubicación exacta</strong> — para mostrarte los negocios cercanos y calcular rutas de entrega. Solo se accede a ella cuando la app está en uso y con tu permiso explícito.</li>
-                    <li><strong>Historial de pedidos</strong> — los productos y negocios en los que has realizado compras dentro de la app.</li>
-                    <li><strong>Historial de búsqueda</strong> — las búsquedas que realizas dentro de la app para mejorar las recomendaciones.</li>
-                    <li><strong>ID de usuario y ID de dispositivo</strong> — identificadores técnicos para gestionar tu sesión y enviar notificaciones push.</li>
-                </ul>
-            </section>
+            <h3>Negocios y mensajeros</h3>
+            <p>
+                Al hacer un pedido, el negocio ve tu nombre, teléfono, dirección de entrega y los productos del pedido, y el mensajero asignado ve tu nombre, teléfono, dirección y la ubicación de entrega. También podemos divulgar datos cuando una autoridad competente nos lo exija legalmente.
+            </p>
 
-            <section>
-                <h2>2. Cómo usamos tus datos</h2>
-                <p>Todos los datos que recopilamos se usan exclusivamente para el funcionamiento de la app:</p>
-                <ul>
-                    <li>Crear y gestionar tu cuenta de usuario.</li>
-                    <li>Procesar y entregar tus pedidos.</li>
-                    <li>Mostrarte negocios y productos disponibles cerca de tu ubicación.</li>
-                    <li>Enviarte notificaciones sobre el estado de tus pedidos.</li>
-                    <li>Mejorar la experiencia de búsqueda y recomendaciones personalizadas dentro de la app.</li>
-                    <li>Prevenir fraude y garantizar la seguridad de la plataforma.</li>
-                </ul>
-                <p><strong>No vendemos, alquilamos ni compartimos tus datos personales con terceros con fines publicitarios.</strong></p>
-            </section>
+            <p>
+                Algunos de estos proveedores procesan datos fuera de Cuba (por ejemplo, en Estados Unidos) y se rigen por sus propias políticas de privacidad.
+            </p>
+        </section>
 
-            <section>
-                <h2>3. Pagos</h2>
-                <p>
-                    Los pagos con tarjeta de crédito o débito se procesan a través de <strong>Stripe</strong>, un proveedor de pagos certificado PCI DSS. Llegó nunca tiene acceso a los datos completos de tu tarjeta. Stripe gestiona y cifra toda la información de pago de acuerdo con los estándares internacionales de seguridad. Puedes consultar la política de privacidad de Stripe en <a href="https://stripe.com/privacy" target="_blank" rel="noopener">stripe.com/privacy</a>.
-                </p>
-            </section>
+        <section>
+            <h2>6. Notificaciones push</h2>
+            <p>
+                Usamos notificaciones push para avisarte del estado de tus pedidos (aceptado, en preparación, en camino, entregado) y, en las apps de negocios y mensajeros, de nuevos pedidos y asignaciones. Puedes desactivarlas en cualquier momento desde los ajustes de tu dispositivo.
+            </p>
+        </section>
 
-            <section>
-                <h2>4. Servicios de terceros</h2>
-                <p>Llegó integra los siguientes servicios externos que pueden procesar datos según sus propias políticas:</p>
-                <ul>
-                    <li><strong>Stripe</strong> — procesamiento de pagos.</li>
-                    <li><strong>Google Sign-In</strong> — inicio de sesión opcional con cuenta de Google.</li>
-                    <li><strong>Apple Sign-In</strong> — inicio de sesión opcional con Apple ID.</li>
-                </ul>
-                <p>Cuando usas Google o Apple para iniciar sesión, estos servicios comparten con nosotros únicamente el nombre y el correo electrónico necesarios para crear tu cuenta.</p>
-            </section>
+        <section>
+            <h2>7. Seguridad</h2>
+            <p>
+                Toda la comunicación entre las apps, este sitio y nuestros servidores usa HTTPS/TLS. Las contraseñas se almacenan cifradas, el acceso a los datos se restringe por roles y los tokens de sesión se guardan en el almacenamiento del dispositivo (en iOS, en el Keychain). Ningún sistema es infalible: te recomendamos proteger tu dispositivo y tu sesión y avisarnos si sospechas de un acceso no autorizado.
+            </p>
+        </section>
 
-            <section>
-                <h2>5. Ubicación</h2>
-                <p>
-                    Llegó solicita acceso a tu ubicación para mostrarte los negocios disponibles en tu zona y calcular los tiempos y costos de entrega. Puedes desactivar el acceso a la ubicación en cualquier momento desde los ajustes de tu dispositivo. Sin ubicación, algunas funciones como el mapa de negocios y el cálculo de envío no estarán disponibles.
-                </p>
-            </section>
+        <section>
+            <h2>8. Conservación y eliminación de datos</h2>
+            <p>
+                Conservamos tus datos mientras tu cuenta esté activa. Puedes solicitar la eliminación de tu cuenta en cualquier momento desde la propia app o por correo; los pasos exactos para cada app están en <a href="/eliminar-cuenta">Eliminar mi cuenta</a>.
+            </p>
+            <ul>
+                <li>En las apps de <strong>Android</strong>, <strong>Negocios</strong> y <strong>Mensajeros</strong>, la solicitud programa la eliminación con un <strong>período de gracia de 30 días</strong>. Durante ese plazo tu cuenta sigue funcionando y puedes cancelar la eliminación iniciando sesión; pasado el plazo, un proceso automático borra tu cuenta de forma definitiva.</li>
+                <li>En la app de <strong>iOS</strong> para clientes, la eliminación se aplica de inmediato y no se puede deshacer.</li>
+            </ul>
+            <p>
+                Al completarse el borrado eliminamos tu perfil (nombre, correo, teléfono, usuario, foto y datos de acceso). Podemos conservar de forma restringida los registros de pedidos y pagos que necesitemos por razones contables, antifraude o para resolver disputas, así como las imágenes de verificación de identidad hasta que las eliminemos a tu petición. Si quieres que eliminemos también esos registros, escríbenos y lo revisaremos.
+            </p>
+        </section>
 
-            <section>
-                <h2>6. Notificaciones push</h2>
-                <p>
-                    Usamos notificaciones push para informarte sobre el estado de tus pedidos (aceptado, en preparación, en camino, entregado). Puedes desactivarlas en cualquier momento desde los ajustes de tu dispositivo.
-                </p>
-            </section>
+        <section>
+            <h2>9. Tus derechos</h2>
+            <p>Tienes derecho a:</p>
+            <ul>
+                <li>Acceder a los datos personales que tenemos sobre ti y pedir una copia.</li>
+                <li>Corregir datos incorrectos (la mayoría puedes editarlos desde tu perfil en la app).</li>
+                <li>Eliminar tu cuenta y tus datos.</li>
+                <li>Oponerte a ciertos usos de tus datos y retirar permisos (ubicación, notificaciones) desde los ajustes de tu dispositivo.</li>
+            </ul>
+            <p>
+                Para ejercer cualquiera de estos derechos escríbenos al correo o al WhatsApp de la sección Contacto. Respondemos en un plazo de {SUPPORT_RESPONSE_TIME}.
+            </p>
+        </section>
 
-            <section>
-                <h2>7. Seguridad de los datos</h2>
-                <p>
-                    Todos los datos se transmiten mediante HTTPS/TLS. Los tokens de autenticación se almacenan en el Keychain cifrado del dispositivo. Nuestro backend está alojado en Railway con acceso restringido a la base de datos.
-                </p>
-            </section>
+        <section>
+            <h2>10. Menores de edad</h2>
+            <p>
+                Llegó está dirigida a personas mayores de 18 años y no recopilamos intencionalmente datos de menores. Si detectamos que un menor ha creado una cuenta, la eliminaremos.
+            </p>
+        </section>
 
-            <section>
-                <h2>8. Retención de datos</h2>
-                <p>
-                    Conservamos tus datos mientras tu cuenta esté activa. Si eliminas tu cuenta, tus datos personales serán borrados en un plazo máximo de 30 días, excepto los datos que estemos obligados a conservar por razones legales o fiscales.
-                </p>
-            </section>
+        <section>
+            <h2>11. Cambios en esta política</h2>
+            <p>
+                Podemos actualizar esta política cuando cambien la plataforma, los proveedores o la normativa. Publicaremos siempre la versión vigente en esta misma página con su fecha de actualización y, si los cambios son importantes, te avisaremos en la app o por correo.
+            </p>
+        </section>
 
-            <section>
-                <h2>9. Tus derechos</h2>
-                <p>Tienes derecho a:</p>
-                <ul>
-                    <li>Acceder a los datos personales que tenemos sobre ti.</li>
-                    <li>Solicitar la corrección de datos incorrectos.</li>
-                    <li>Solicitar la eliminación de tu cuenta y tus datos.</li>
-                    <li>Oponerte al tratamiento de tus datos.</li>
-                </ul>
-                <p>Para ejercer cualquiera de estos derechos, contáctanos en <strong>soporte@llegoweb-production.up.railway.app</strong>.</p>
-            </section>
-
-            <section>
-                <h2>10. Menores de edad</h2>
-                <p>
-                    Llegó no está dirigida a menores de 13 años y no recopilamos intencionalmente datos de menores. Si detectamos que un menor ha creado una cuenta, la eliminaremos de inmediato.
-                </p>
-            </section>
-
-            <section>
-                <h2>11. Cambios en esta política</h2>
-                <p>
-                    Podemos actualizar esta política ocasionalmente. Cuando lo hagamos, actualizaremos la fecha al inicio del documento y, si los cambios son significativos, te notificaremos por correo electrónico o mediante un aviso en la app.
-                </p>
-            </section>
-
-            <section>
-                <h2>12. Contacto</h2>
-                <p>Si tienes preguntas sobre esta política de privacidad, escríbenos a:</p>
-                <p><strong>Email:</strong> soporte@llegoweb-production.up.railway.app</p>
-            </section>
-        </main>
-
-        <footer class="page-footer">
-            <p>© 2025 Llegó. Todos los derechos reservados.</p>
-            <nav>
-                <a href="/privacidad">Privacidad</a>
-                <a href="/soporte">Soporte</a>
-            </nav>
-        </footer>
-    </div>
-</Layout>
-
-<style>
-    .page {
-        min-height: 100vh;
-        background: var(--color-background);
-        color: var(--color-text);
-        font-family: var(--font-family);
-    }
-
-    .page-header {
-        padding: 1.5rem 2rem;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .logo {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--color-secondary);
-        text-decoration: none;
-        letter-spacing: -0.02em;
-    }
-
-    .content {
-        max-width: 740px;
-        margin: 0 auto;
-        padding: 3rem 2rem 5rem;
-    }
-
-    h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        letter-spacing: -0.03em;
-        margin-bottom: 0.5rem;
-        color: var(--color-text);
-    }
-
-    .last-updated {
-        color: var(--color-text-variant);
-        font-size: 0.9rem;
-        margin-bottom: 2rem;
-    }
-
-    .intro {
-        font-size: 1.1rem;
-        line-height: 1.7;
-        color: rgba(255,255,255,0.8);
-        margin-bottom: 2.5rem;
-        padding-bottom: 2.5rem;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-
-    section {
-        margin-bottom: 2.5rem;
-        padding-bottom: 2.5rem;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-
-    section:last-child {
-        border-bottom: none;
-    }
-
-    h2 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        color: var(--color-secondary);
-        letter-spacing: -0.01em;
-    }
-
-    p {
-        line-height: 1.75;
-        color: rgba(255,255,255,0.75);
-        margin-bottom: 1rem;
-    }
-
-    ul {
-        padding-left: 1.25rem;
-        margin-bottom: 1rem;
-    }
-
-    li {
-        line-height: 1.75;
-        color: rgba(255,255,255,0.75);
-        margin-bottom: 0.5rem;
-    }
-
-    strong {
-        color: var(--color-text);
-        font-weight: 600;
-    }
-
-    a {
-        color: var(--color-accent);
-        text-decoration: none;
-    }
-
-    a:hover {
-        text-decoration: underline;
-    }
-
-    .page-footer {
-        padding: 2rem;
-        border-top: 1px solid rgba(255,255,255,0.08);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-        color: var(--color-text-variant);
-        font-size: 0.875rem;
-    }
-
-    .page-footer nav {
-        display: flex;
-        gap: 1.5rem;
-    }
-
-    .page-footer nav a {
-        color: var(--color-text-variant);
-    }
-
-    @media (max-width: 640px) {
-        h1 { font-size: 1.75rem; }
-        .content { padding: 2rem 1.25rem 4rem; }
-        .page-footer { flex-direction: column; text-align: center; }
-    }
-</style>
+        <section>
+            <h2>12. Contacto</h2>
+            <p>Si tienes preguntas sobre esta política o sobre el tratamiento de tus datos, escríbenos:</p>
+            <ul>
+                <li><strong>Correo:</strong> <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a></li>
+                <li><strong>WhatsApp:</strong> <a href={supportWhatsappUrl()} target="_blank" rel="noopener noreferrer">{SUPPORT_WHATSAPP_DISPLAY}</a></li>
+            </ul>
+            <p>Tiempo de respuesta habitual: {SUPPORT_RESPONSE_TIME}.</p>
+        </section>
+    </article>
+</LegalLayout>

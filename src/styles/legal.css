@@ -1,0 +1,111 @@
+/* Llegó - Estilos del texto de las páginas legales (/privacidad, /terminos, /eliminar-cuenta).
+   Se activan con la clase .legal-prose en el contenedor del documento. */
+
+.legal-prose h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
+  color: var(--color-text);
+}
+
+.legal-prose .last-updated {
+  color: var(--color-text-variant);
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+}
+
+.legal-prose .intro {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.legal-prose section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.legal-prose section:last-child {
+  border-bottom: none;
+}
+
+.legal-prose h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--color-secondary);
+  letter-spacing: -0.01em;
+}
+
+.legal-prose h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.75rem;
+  color: var(--color-text);
+}
+
+.legal-prose p {
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 1rem;
+}
+
+.legal-prose ul,
+.legal-prose ol {
+  padding-left: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.legal-prose ul {
+  list-style: disc;
+}
+
+.legal-prose ol {
+  list-style: decimal;
+}
+
+.legal-prose li {
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 0.5rem;
+}
+
+.legal-prose strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.legal-prose a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.legal-prose a:hover {
+  text-decoration: underline;
+}
+
+/* Recuadro para avisos destacados (p. ej. plazos de eliminación) */
+.legal-prose .callout {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.legal-prose .callout p:last-child,
+.legal-prose .callout ul:last-child,
+.legal-prose .callout ol:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .legal-prose h1 {
+    font-size: 1.75rem;
+  }
+}

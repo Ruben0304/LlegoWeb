@@ -1,0 +1,86 @@
+---
+export const prerender = false;
+
+import LegalLayout from "../layouts/LegalLayout.astro";
+import "../styles/legal.css";
+import {
+    SUPPORT_EMAIL,
+    SUPPORT_RESPONSE_TIME,
+    SUPPORT_WHATSAPP_DISPLAY,
+    supportMailtoUrl,
+    supportWhatsappUrl,
+} from "../lib/site";
+---
+
+<LegalLayout
+    title="Eliminar mi cuenta"
+    description="Cómo eliminar tu cuenta de Llegó y tus datos: pasos desde la app de clientes (iOS y Android), Llegó Negocios y Llegó Mensajeros, o por correo."
+>
+    <article class="legal-prose">
+        <h1>Eliminar mi cuenta</h1>
+        <p class="intro">
+            Puedes eliminar tu cuenta de Llegó y tus datos personales en cualquier momento. La forma más rápida es hacerlo desde la propia app; si no puedes entrar a ella, también puedes pedirlo por correo o por WhatsApp.
+        </p>
+
+        <section id="desde-la-app">
+            <h2>Desde la app</h2>
+
+            <h3 id="ios">Llegó para clientes (iPhone / iOS)</h3>
+            <ol>
+                <li>Inicia sesión y abre la pestaña <strong>Cuenta</strong>.</li>
+                <li>Desplázate hasta el final y toca <strong>Eliminar cuenta</strong>.</li>
+                <li>Confirma en el aviso. La cuenta se elimina <strong>de inmediato</strong> y no se puede deshacer.</li>
+            </ol>
+
+            <h3 id="android">Llegó para clientes (Android)</h3>
+            <ol>
+                <li>Inicia sesión y abre la pestaña <strong>Cuenta</strong>.</li>
+                <li>Desplázate hasta el final, debajo de <strong>Cerrar sesión</strong>, y toca <strong>Eliminar cuenta</strong>.</li>
+                <li>Confirma en el aviso. La eliminación queda <strong>programada para dentro de 30 días</strong> y se cierra tu sesión. Para cancelarla, vuelve a iniciar sesión antes de esa fecha, abre la pestaña <strong>Cuenta</strong> y toca <strong>Cancelar eliminación</strong> en el aviso.</li>
+            </ol>
+
+            <h3 id="negocios">Llegó Negocios</h3>
+            <ol>
+                <li>Inicia sesión y abre la pestaña <strong>Más</strong>.</li>
+                <li>En la sección <strong>Cuenta</strong>, toca <strong>Eliminar mi cuenta</strong> y confirma.</li>
+                <li>La eliminación queda <strong>programada para dentro de 30 días</strong>. Para cancelarla, vuelve a esa misma sección y toca <strong>Cancelar eliminación</strong>.</li>
+            </ol>
+
+            <h3 id="mensajeros">Llegó Mensajeros</h3>
+            <ol>
+                <li>Inicia sesión y abre la pestaña <strong>Perfil</strong>.</li>
+                <li>Desplázate hasta el final, debajo de <strong>Cerrar sesión</strong>, y toca <strong>Eliminar cuenta</strong>; confirma en el aviso.</li>
+                <li>La eliminación queda <strong>programada para dentro de 30 días</strong>. Para cancelarla, vuelve a esa pantalla y toca <strong>Cancelar eliminación</strong>.</li>
+            </ol>
+        </section>
+
+        <section id="por-correo">
+            <h2>Por correo o WhatsApp</h2>
+            <p>Si no puedes acceder a la app o ya la desinstalaste, escríbenos:</p>
+            <ul>
+                <li><strong>Correo:</strong> <a href={supportMailtoUrl("Eliminar cuenta")}>{SUPPORT_EMAIL}</a>, con el asunto «Eliminar cuenta».</li>
+                <li><strong>WhatsApp:</strong> <a href={supportWhatsappUrl("Hola Llegó, quiero eliminar mi cuenta.")} target="_blank" rel="noopener noreferrer">{SUPPORT_WHATSAPP_DISPLAY}</a>.</li>
+            </ul>
+            <p>
+                Escribe desde el correo (o indica el teléfono) con el que te registraste, para poder identificar tu cuenta. Te respondemos en un plazo de {SUPPORT_RESPONSE_TIME} y procesamos la solicitud en un máximo de 30 días.
+            </p>
+        </section>
+
+        <section id="que-se-elimina">
+            <h2>Qué se elimina y qué se conserva</h2>
+            <div class="callout">
+                <p><strong>Se elimina</strong> tu perfil: nombre, correo, teléfono, nombre de usuario, foto, direcciones guardadas, ubicación y datos de acceso (incluido el vínculo con Google o Apple).</p>
+            </div>
+            <p>
+                Podemos conservar de forma restringida los registros de pedidos y pagos que necesitemos por razones contables, antifraude o para resolver disputas, así como las imágenes de verificación de identidad (documento y selfie) hasta que las eliminemos a tu petición. Si quieres que eliminemos también esos registros, indícalo en tu solicitud y lo revisaremos. Puedes ver todos los detalles en la <a href="/privacidad">Política de Privacidad</a>.
+            </p>
+        </section>
+
+        <section id="negocio-propio">
+            <h2>Si tienes un negocio o eres mensajero</h2>
+            <p>
+                Si tu cuenta es la propietaria de un negocio, escríbenos para indicar qué hacer con el negocio y sus sucursales (cerrarlos o traspasarlos a otra persona) antes de eliminar la cuenta.
+            </p>
+        </section>
+    </article>
+</LegalLayout>

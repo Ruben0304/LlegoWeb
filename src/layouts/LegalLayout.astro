@@ -1,0 +1,111 @@
+---
+/**
+ * Estructura común de las páginas informativas y legales
+ * (/privacidad, /terminos, /soporte, /eliminar-cuenta): cabecera con el
+ * logo, contenido centrado y pie con enlaces legales.
+ *
+ * El año del © se calcula en cada petición (las páginas que usan este layout
+ * no se prerenderizan), así que no hay que tocarlo cada enero.
+ */
+import Layout from "./Layout.astro";
+
+interface Props {
+    title: string;
+    description: string;
+}
+
+const { title, description } = Astro.props;
+const currentYear = new Date().getFullYear();
+---
+
+<Layout title={title} description={description}>
+    <div class="page">
+        <header class="page-header">
+            <a href="/" class="logo">Llegó</a>
+        </header>
+
+        <main class="content">
+            <slot />
+        </main>
+
+        <footer class="page-footer">
+            <p>© {currentYear} Llegó. Todos los derechos reservados.</p>
+            <nav aria-label="Enlaces legales">
+                <a href="/privacidad">Privacidad</a>
+                <a href="/terminos">Términos</a>
+                <a href="/soporte">Soporte</a>
+                <a href="/eliminar-cuenta">Eliminar cuenta</a>
+            </nav>
+        </footer>
+    </div>
+</Layout>
+
+<style>
+    .page {
+        min-height: 100vh;
+        background: var(--color-background);
+        color: var(--color-text);
+        font-family: var(--font-family);
+    }
+
+    .page-header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--color-secondary);
+        text-decoration: none;
+        letter-spacing: -0.02em;
+    }
+
+    .content {
+        max-width: 740px;
+        margin: 0 auto;
+        padding: 3rem 2rem 5rem;
+    }
+
+    .page-footer {
+        padding: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        color: var(--color-text-variant);
+        font-size: 0.875rem;
+    }
+
+    .page-footer nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem 1.5rem;
+    }
+
+    .page-footer nav a {
+        color: var(--color-text-variant);
+        text-decoration: none;
+    }
+
+    .page-footer nav a:hover {
+        color: var(--color-text);
+    }
+
+    @media (max-width: 640px) {
+        .content {
+            padding: 2rem 1.25rem 4rem;
+        }
+
+        .page-footer {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .page-footer nav {
+            justify-content: center;
+        }
+    }
+</style>
