@@ -7,6 +7,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- La URL trae el JWT (?token=): ni se indexa ni viaja en el Referer. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="no-referrer" />
     <title>Autenticando...</title>
     <style>
       * {
@@ -120,11 +123,13 @@
     </div>
 
     <script>
-      const AUTH_TOKEN_KEY = 'llego.auth.accessToken';
-      const AUTH_TOKEN_TYPE_KEY = 'llego.auth.tokenType';
-      const AUTH_USER_KEY = 'llego.auth.user';
+      import { consumeReturnTo, decodeJwtPayload, storeSession } from '@/lib/auth/session';
 
-      function showError(title: string, message: string) {
+      // Si nadie pidió volver a otra página (p. ej. /negocios), el login web es
+      // el del panel de tutoriales.
+      const DEFAULT_RETURN_TO = '/tutoriales';
+
+      function showError(title: string, message: string, backHref: string) {
         const titleEl = document.getElementById('status-title');
         const messageEl = document.getElementById('status-message');
         const errorContainer = document.getElementById('error-container');
@@ -153,9 +158,9 @@
           errorBox.append(errorTitle, errorMessage);
 
           const backLink = document.createElement('a');
-          backLink.href = '/';
+          backLink.href = backHref;
           backLink.className = 'back-link';
-          backLink.textContent = 'Volver al inicio';
+          backLink.textContent = backHref === '/' ? 'Volver al inicio' : 'Volver e intentarlo de nuevo';
 
           errorContainer.append(errorBox, backLink);
           errorContainer.style.display = 'block';
@@ -171,11 +176,19 @@
           const error = params.get('error');
           const errorMessage = params.get('message');
 
+          // El JWT llega en la URL (?token=...). Se quita de la barra y del
+          // historial antes de nada: así no queda en "atrás", en el historial del
+          // navegador ni en el Referer de la página siguiente.
+          if (window.location.search) {
+            history.replaceState(history.state, '', window.location.pathname);
+          }
+
           if (error) {
             console.error('Auth error:', error, errorMessage);
             showError(
               'Error de autenticación',
-              errorMessage || 'No se pudo completar la autenticación. Por favor intenta nuevamente.'
+              errorMessage || 'No se pudo completar la autenticación. Por favor intenta nuevamente.',
+              consumeReturnTo('/')
             );
             return;
           }
@@ -183,41 +196,35 @@
           if (!token) {
             showError(
               'Token no encontrado',
-              'No se recibió un token de autenticación válido.'
+              'No se recibió un token de autenticación válido.',
+              consumeReturnTo('/')
             );
             return;
           }
 
-          // Decode JWT to get user info (simple base64 decode, no verification needed here)
-          try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            
-            // Store auth data
-            localStorage.setItem(AUTH_TOKEN_KEY, token);
-            localStorage.setItem(AUTH_TOKEN_TYPE_KEY, 'bearer');
-            localStorage.setItem(AUTH_USER_KEY, JSON.stringify({
-              id: payload.sub || payload.userId,
-              name: payload.name || payload.email?.split('@')[0] || 'Usuario',
-              email: payload.email,
-              role: payload.role || 'user'
-            }));
+          // Datos de pantalla del JWT (sin verificar: lo verifica el backend en
+          // cada operación). El backend firma { sub: email, user_id, role }.
+          const payload = decodeJwtPayload(token);
+          storeSession(
+            token,
+            payload
+              ? {
+                  id: payload.user_id || payload.sub,
+                  name: payload.name || payload.email?.split('@')[0] || payload.sub?.split('@')[0] || 'Usuario',
+                  email: payload.email || payload.sub,
+                  role: payload.role || 'customer',
+                }
+              : null
+          );
 
-            console.log('✅ Auth successful, redirecting to /tutoriales');
-            
-            // Redirect to the admin panel (the only authenticated area of the site)
-            window.location.href = '/tutoriales';
-          } catch (decodeError) {
-            console.error('Error decoding token:', decodeError);
-            // Still try to store the token even if decode fails
-            localStorage.setItem(AUTH_TOKEN_KEY, token);
-            localStorage.setItem(AUTH_TOKEN_TYPE_KEY, 'bearer');
-            window.location.href = '/tutoriales';
-          }
+          // replace y no href: la página del callback no queda en el historial.
+          window.location.replace(consumeReturnTo(DEFAULT_RETURN_TO));
         } catch (error) {
           console.error('Callback error:', error);
           showError(
             'Error inesperado',
-            'Ocurrió un error al procesar la autenticación.'
+            'Ocurrió un error al procesar la autenticación.',
+            '/'
           );
         }
       }
