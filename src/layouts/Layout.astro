@@ -7,6 +7,8 @@ interface Props {
     keywords?: string;
     image?: string;
     canonical?: string;
+    /** Páginas con sesión o datos de cada usuario: fuera de los buscadores. */
+    noindex?: boolean;
 }
 
 const {
@@ -15,7 +17,10 @@ const {
     keywords = "delivery Cuba, app de delivery, IA para compras, delivery restaurantes, mercado a domicilio, compras con IA, Llegó app",
     image = "/og-image.jpg",
     canonical = Astro.url.href,
+    noindex = false,
 } = Astro.props;
+
+const robots = noindex ? "noindex, nofollow" : "index, follow";
 
 const siteName = "Llegó";
 // Si el título ya menciona la marca (p. ej. la home) no se vuelve a añadir.
@@ -36,8 +41,8 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
         <meta name="description" content={description} />
         <meta name="keywords" content={keywords} />
         <meta name="author" content="Llegó" />
-        <meta name="robots" content="index, follow" />
-        <meta name="googlebot" content="index, follow" />
+        <meta name="robots" content={robots} />
+        <meta name="googlebot" content={robots} />
 
         <!-- Canonical URL -->
         <link rel="canonical" href={canonical} />

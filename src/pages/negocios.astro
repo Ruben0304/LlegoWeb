@@ -3,27 +3,18 @@ export const prerender = false;
 
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/common/Navbar.svelte';
-import ComingSoon from '../components/common/ComingSoon.astro';
+import PartnerSignup from '../components/negocios/PartnerSignup.svelte';
 import Footer from '../components/common/Footer.svelte';
-import { SUPPORT_WHATSAPP_DISPLAY, supportMailtoUrl, supportWhatsappUrl } from '../lib/site';
 
 const title = "Negocios y mensajeros";
-const description = "Próximamente: registro de negocios y mensajeros en Llegó. Mientras tanto, escríbenos por WhatsApp y te ayudamos a empezar.";
-const whatsappUrl = supportWhatsappUrl("Hola Llegó, quiero registrar mi negocio o ser mensajero.");
+const description = "Vende en Llegó o reparte pedidos en tu zona: envía tu solicitud y te llamamos para conocerte.";
 ---
 
-<Layout title={title} description={description}>
+<!-- noindex: la página muestra la sesión y la solicitud de cada usuario. -->
+<Layout title={title} description={description} noindex>
   <Navbar client:load />
   <main>
-    <ComingSoon
-      eyebrow="Próximamente"
-      title="Registro de negocios y mensajeros"
-      description={`Estamos preparando el registro en línea para que negocios y mensajeros se sumen a Llegó. Mientras tanto, escríbenos por WhatsApp al ${SUPPORT_WHATSAPP_DISPLAY} y te ayudamos a empezar.`}
-      primaryHref={whatsappUrl}
-      primaryLabel="Escribir por WhatsApp"
-      secondaryHref={supportMailtoUrl("Quiero sumarme a Llegó")}
-      secondaryLabel="Enviar un correo"
-    />
+    <PartnerSignup client:load />
   </main>
   <Footer />
 </Layout>

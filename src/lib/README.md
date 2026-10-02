@@ -8,7 +8,8 @@ Esta carpeta contiene la lógica de negocio, servicios, y funcionalidades organi
 lib/
 ├── shared/          # Configuración compartida (cliente GraphQL)
 ├── site.ts          # Datos de contacto/soporte y URL pública de la web
-├── auth/            # Login social (Google/Apple): types, mutations
+├── auth/            # Login social (Google/Apple): types, mutations; session.ts (sesión en el navegador)
+├── partner/         # Registro de socios (types, queries, mutations, teléfono)
 ├── business-type/   # Tipos de negocio (types, queries, mutations)
 └── tutorial/        # Tutoriales (types, queries, mutations)
 ```
@@ -57,7 +58,15 @@ Feature de tutoriales con estructura completa:
 Feature de tipos de negocio (misma estructura).
 
 ### [auth/](auth/)
-Login social con Google y Apple (types, mutations).
+Login social con Google y Apple (types, mutations). **[session.ts](auth/session.ts)** es la
+sesión en el navegador: claves de localStorage compartidas con `/auth/callback`, login con
+Google Identity Services y con Apple (`/apple/start?redirect_scheme=<origen>/auth/callback`,
+que el backend solo acepta si está en `WEB_AUTH_CALLBACK_URLS`) y la ruta de vuelta tras el
+callback (`setReturnTo`/`consumeReturnTo`, solo rutas del propio sitio).
+
+### [partner/](partner/)
+Registro de socios de `/negocios`: `getMyPartnerAccess`, `submitPartnerRequest` y
+`normalizePhone` (misma regla que `utils/phone.py` del backend: 8 dígitos → `+53XXXXXXXX`).
 
 ## Agregar un nuevo feature
 

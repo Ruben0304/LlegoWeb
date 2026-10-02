@@ -8,6 +8,7 @@ Los componentes están organizados por pantalla y funcionalidad.
 components/
 ├── common/          # Componentes reutilizables (Navbar, Footer, ComingSoon)
 ├── home/            # Componentes de la página principal
+├── negocios/        # Registro de socios (/negocios)
 ├── tutoriales/      # Panel admin de tutoriales
 └── business-types/  # Panel admin de tipos de negocio
 ```
@@ -38,7 +39,7 @@ import { Hero, FeatureShowcase } from '@/components/home';
 Componentes reutilizables en múltiples páginas:
 - **Navbar** - Barra de navegación principal
 - **Footer** - Pie de página (enlaces legales y de soporte, © dinámico)
-- **ComingSoon** - Página "Próximamente" (usada en /plus y /negocios)
+- **ComingSoon** - Página "Próximamente" (usada en /plus)
 
 ### [home/](home/)
 Componentes de la página principal (index.astro):

@@ -29,14 +29,14 @@ src/
 ├── pages/                    # Route files (file-based routing)
 │   ├── index.astro           # Homepage
 │   ├── plus.astro            # Llegó+ ("Próximamente")
-│   ├── negocios.astro        # Negocios y mensajeros ("Próximamente", fase 2: registro)
+│   ├── negocios.astro        # Registro de socios: solicitud para vender o ser mensajero (noindex)
 │   ├── privacidad.astro      # Política de privacidad (fuente única, enlazada desde las apps)
 │   ├── terminos.astro        # Términos y condiciones (fuente única, enlazada desde las apps)
 │   ├── soporte.astro         # Centro de soporte / FAQ
 │   ├── eliminar-cuenta.astro # Cómo eliminar la cuenta desde cada app o por correo
 │   ├── tutoriales.astro      # Panel admin de tutoriales (con login Google/Apple)
 │   ├── business-types.astro  # Panel admin de tipos de negocio
-│   ├── auth/callback.astro   # Callback OAuth (guarda el JWT en localStorage)
+│   ├── auth/callback.astro   # Callback OAuth: guarda el JWT, lo quita de la URL y vuelve a returnTo
 │   └── api/                  # Endpoints (proxy GraphQL, login social, descarga APK)
 ├── layouts/
 │   ├── Layout.astro          # Main layout wrapper with SEO metadata
@@ -45,11 +45,13 @@ src/
 │   ├── common/               # Reusable components (Navbar, Footer, ComingSoon)
 │   ├── home/                 # Home page components (Hero, FeatureShowcase, etc.)
 │   ├── tutoriales/           # Panel admin de tutoriales (TutorialPanel, TutorialForm, ...)
+│   ├── negocios/             # Registro de socios (PartnerSignup, PartnerForm)
 │   └── business-types/       # Panel admin de tipos de negocio
 ├── lib/                      # Business logic organized by feature
 │   ├── shared/               # Shared config (GraphQL client)
 │   ├── site.ts               # Correo/WhatsApp de soporte, tiempo de respuesta, URL pública
-│   ├── auth/                 # Login social (Google/Apple)
+│   ├── auth/                 # Login social (Google/Apple); session.ts = sesión en el navegador
+│   ├── partner/              # Registro de socios (myPartnerAccess, submitPartnerRequest, teléfono)
 │   ├── business-type/        # Business types feature
 │   └── tutorial/             # Tutorials feature
 └── styles/
@@ -120,9 +122,10 @@ import Hero from '@/components/home/Hero.svelte';
 - `common/` - Shared components (Navbar, Footer, ComingSoon)
 - `home/` - Homepage components (Hero, DeliveryShowcase, FeatureShowcase, ScrollytellingHowItWorks)
 - `tutoriales/` - Admin tutorials panel (TutorialPanel, TutorialForm, TutorialList, uploaders)
+- `negocios/` - Registro de socios en /negocios (PartnerSignup: elegir tipo, login, formulario y estado; PartnerForm)
 - `business-types/` - Admin business types panel
 
-**Legal / contact data:** the support email, WhatsApp, response time and public site URL live in `src/lib/site.ts`. The apps link to `/privacidad` and `/terminos` on this site, so change texts here (not in the backend).
+**Legal / contact data:** the support email, WhatsApp, response time, public site URL and the partner apps (`PARTNER_APPS`, names and download links shown to approved partners) live in `src/lib/site.ts`. The apps link to `/privacidad` and `/terminos` on this site, so change texts here (not in the backend).
 
 #### 6. GraphQL & Backend Integration
 Backend communication uses GraphQL with `graphql-request` client.
