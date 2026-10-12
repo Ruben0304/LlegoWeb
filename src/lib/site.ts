@@ -16,7 +16,8 @@ export const SITE_URL = 'https://llegoweb-production.up.railway.app';
 
 /**
  * Ficha de Llegó (clientes) en el App Store. El ID 6755007388 es el de la ficha
- * real, cuya web de desarrollador y política de privacidad apuntan a SITE_URL.
+ * real: su bundle es com.ruben.LlegoiOS (el de LlegoiOS) y su web de
+ * desarrollador apunta a SITE_URL.
  * No se lee de `appConfig.ios.storeUrl` del backend: en producción ese campo
  * tiene un valor de ejemplo (id1234567890) que no lleva a la app.
  */

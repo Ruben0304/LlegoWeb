@@ -28,9 +28,12 @@ function proxySecret(): string {
 
 /**
  * IP del navegador. Detrás del edge de Railway la conexión viene del proxy:
- * X-Real-IP la pone el edge con la IP del cliente (y la sobrescribe si la manda
- * el cliente). `clientAddress` (Astro) es el respaldo: primer X-Forwarded-For o
- * la IP del socket.
+ * X-Real-IP la pone el edge con la IP del cliente (documentado en Railway,
+ * Public Networking > Specs & Limits). Que el edge sobrescriba la que mande el
+ * propio cliente lo afirma el soporte de Railway, no la documentación: hay que
+ * comprobarlo en producción (LlegoBackend, context.md §6 "IP del cliente").
+ * `clientAddress` (Astro) es el respaldo: primer X-Forwarded-For o la IP del
+ * socket.
  */
 export function getClientIp(request: Request, clientAddress?: string): string | null {
   const candidates = [request.headers.get('x-real-ip'), clientAddress];

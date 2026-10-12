@@ -2,8 +2,8 @@
  * Lista blanca del proxy /api/graphql: solo deja pasar las operaciones que
  * define la propia web en src/lib, y exactamente con el mismo documento.
  *
- * No basta con mirar `operationName`: lo elige quien llama, y con
- * `query GetTutorials { ...cualquier otra cosa }` se colaría cualquier consulta.
+ * No basta con mirar operationName: lo elige quien llama, y bastaría con
+ * llamar GetTutorials a una consulta cualquiera para colarla.
  * Por eso se compara el documento entero, normalizado con print() de graphql
  * (da igual el espaciado o los comentarios).
  *
@@ -85,8 +85,8 @@ export const ALLOWED_OPERATIONS: ReadonlyMap<string, string> = new Map(
 );
 
 /**
- * Nombre de la operación si `query` es exactamente una de la lista blanca (y
- * `operationName`, si viene, coincide); null en cualquier otro caso.
+ * Nombre de la operación si el documento recibido es exactamente uno de la
+ * lista blanca (y operationName, si viene, coincide); null en cualquier otro caso.
  */
 export function matchAllowedOperation(query: unknown, operationName: unknown): string | null {
   if (typeof query !== 'string') return null;
