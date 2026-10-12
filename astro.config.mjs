@@ -4,8 +4,12 @@ import { defineConfig } from 'astro/config';
 import svelte from '@astrojs/svelte';
 import node from '@astrojs/node';
 
+import { SITE_URL } from './src/lib/site.ts';
+
 // https://astro.build/config
 export default defineConfig({
+  // Dominio público: Astro.site para canonical, og:url, sitemap y robots.txt.
+  site: SITE_URL,
   output: 'server',
   // Las rutas /privacy y /terms (nombres en inglés, enlazadas desde versiones
   // antiguas de las apps y del backend) apuntan a las páginas en español.

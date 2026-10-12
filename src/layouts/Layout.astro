@@ -1,11 +1,19 @@
 ---
 import "../styles/global.css";
+import { SITE_URL } from "../lib/site";
+
+/** Imagen para redes por defecto: 1200x630, generada a partir de public/img/icon.png. */
+const DEFAULT_OG_IMAGE = "/og-image.jpg";
+const DEFAULT_OG_IMAGE_ALT = "Llegó: delivery en Cuba con IA";
 
 interface Props {
+    /** Título sin la marca: el layout añade " | Llegó" (salvo que ya la lleve, como la home). */
     title: string;
     description: string;
     keywords?: string;
+    /** Imagen para redes (ruta del sitio o URL absoluta). Por defecto la de public/og-image.jpg. */
     image?: string;
+    /** Ruta o URL canónica. Por defecto la ruta actual, sin query. */
     canonical?: string;
     /** Páginas con sesión o datos de cada usuario: fuera de los buscadores. */
     noindex?: boolean;
@@ -15,12 +23,24 @@ const {
     title,
     description,
     keywords = "delivery Cuba, app de delivery, IA para compras, delivery restaurantes, mercado a domicilio, compras con IA, Llegó app",
-    image = "/og-image.jpg",
-    canonical = Astro.url.href,
+    image = DEFAULT_OG_IMAGE,
+    canonical,
     noindex = false,
 } = Astro.props;
 
 const robots = noindex ? "noindex, nofollow" : "index, follow";
+
+// URLs absolutas sobre el dominio público (`site` de astro.config.mjs =
+// SITE_URL), no sobre el host de la petición: detrás del proxy de Railway
+// puede ser interno o http, y redes sociales y buscadores exigen URLs absolutas.
+const siteUrl = Astro.site ?? new URL(SITE_URL);
+// Sin barra final y con una sola barra inicial ("//otro.com" no debe
+// convertirse en otro dominio al resolverla contra el sitio).
+const currentPath =
+    Astro.url.pathname.replace(/^\/+/, "/").replace(/(.)\/+$/, "$1") || "/";
+const canonicalUrl = new URL(canonical ?? currentPath, siteUrl).href;
+const imageUrl = new URL(image, siteUrl).href;
+const isDefaultImage = image === DEFAULT_OG_IMAGE;
 
 const siteName = "Llegó";
 // Si el título ya menciona la marca (p. ej. la home) no se vuelve a añadir.
@@ -44,27 +64,36 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
         <meta name="robots" content={robots} />
         <meta name="googlebot" content={robots} />
 
-        <!-- Canonical URL -->
-        <link rel="canonical" href={canonical} />
+        <!-- Canonical URL (las páginas noindex no la declaran: serían señales contradictorias) -->
+        {!noindex && <link rel="canonical" href={canonicalUrl} />}
 
         <!-- Favicon -->
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={canonical} />
+        <meta property="og:url" content={canonicalUrl} />
         <meta property="og:title" content={fullTitle} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content={image} />
+        <meta property="og:image" content={imageUrl} />
+        {isDefaultImage && (
+            <>
+                <meta property="og:image:type" content="image/jpeg" />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt" content={DEFAULT_OG_IMAGE_ALT} />
+            </>
+        )}
         <meta property="og:site_name" content={siteName} />
         <meta property="og:locale" content="es_ES" />
 
         <!-- Twitter -->
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:url" content={canonical} />
+        <meta name="twitter:url" content={canonicalUrl} />
         <meta name="twitter:title" content={fullTitle} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content={image} />
+        <meta name="twitter:image" content={imageUrl} />
+        {isDefaultImage && <meta name="twitter:image:alt" content={DEFAULT_OG_IMAGE_ALT} />}
 
         <!-- Theme Color -->
         <meta name="theme-color" content="#023133" />

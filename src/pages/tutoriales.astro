@@ -6,11 +6,12 @@ import Navbar from '../components/common/Navbar.svelte';
 import TutorialPanel from '../components/tutoriales/TutorialPanel.svelte';
 import Footer from '../components/common/Footer.svelte';
 
-const title = "Tutoriales | Llegó";
+const title = "Tutoriales";
 const description = "Gestiona los tutoriales para clientes y comerciantes de Llegó.";
 ---
 
-<Layout title={title} description={description}>
+<!-- noindex: panel de administración (también bloqueado en robots.txt). -->
+<Layout title={title} description={description} noindex>
   <Navbar client:load />
   <main class="tutorial-page">
     <TutorialPanel client:load />

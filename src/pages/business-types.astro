@@ -7,11 +7,12 @@ import BusinessTypePanel from '../components/business-types/BusinessTypePanel.sv
 import Footer from '../components/common/Footer.svelte';
 import '../styles/business-types.css';
 
-const title = "Gestión de Business Types | Llegó";
+const title = "Gestión de Business Types";
 const description = "Panel de administración para gestionar los tipos de negocio en Llegó.";
 ---
 
-<Layout title={title} description={description}>
+<!-- noindex: panel de administración (también bloqueado en robots.txt). -->
+<Layout title={title} description={description} noindex>
   <Navbar client:load />
   <main class="business-types-page">
     <BusinessTypePanel client:load />
