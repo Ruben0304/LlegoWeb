@@ -6,7 +6,6 @@ Esta carpeta contiene la configuración del cliente GraphQL para comunicarse con
 
 - **[graphql.ts](graphql.ts)** - Cliente GraphQL. En el servidor usa `BACKEND_URL`; en el navegador, `PUBLIC_BACKEND_URL`
 - **[backend-proxy.ts](backend-proxy.ts)** - SOLO SERVIDOR: IP del visitante, cabeceras con `WEB_PROXY_SECRET` y `fetch` con tiempo máximo para los endpoints de `src/pages/api`
-- **[allowed-operations.ts](allowed-operations.ts)** - Lista blanca de operaciones del proxy `/api/graphql`
 
 ## Configuración
 

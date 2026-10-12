@@ -138,11 +138,11 @@ Backend communication uses GraphQL with `graphql-request` client.
 
 **Environment variables** (see `.env.example`; `.env` is not committed):
 - `BACKEND_URL` - Backend **base** URL without `/graphql` (private, server-only). Railway private network: `http://<service>.railway.internal:<PORT>` (http and port), or the public backend URL.
-- `WEB_PROXY_SECRET` - Server-only. Same value as the backend's `WEB_PROXY_SECRET`: server-side calls to the backend (`/api/graphql`, `/api/auth/*`, `/api/download/android`) forward the visitor IP with it so the backend rate limit counts per visitor (`src/lib/shared/backend-proxy.ts`). Never import that module from client code.
+- `WEB_PROXY_SECRET` - Server-only. Same value as the backend's `WEB_PROXY_SECRET`: server-side calls to the backend (`/api/auth/*`, `/api/download/android`) forward the visitor IP with it so the backend rate limit counts per visitor (`src/lib/shared/backend-proxy.ts`). Never import that module from client code.
 - `PUBLIC_BACKEND_URL` - Public backend URL used by the browser.
 - `PUBLIC_GOOGLE_CLIENT_ID` - Google OAuth client of type **Web application** (not the iOS one).
 
-**GraphQL proxy:** `/api/graphql` only forwards the operations listed in `src/lib/shared/allowed-operations.ts` (exact document), with a 100 KB body limit and a 10 s backend timeout. Add new operations there if they must go through the proxy. Today the browser calls `PUBLIC_BACKEND_URL` directly.
+**No GraphQL proxy:** the browser calls `PUBLIC_BACKEND_URL` directly. The old `/api/graphql` proxy was removed because nothing used it.
 
 **Feature-based organization:**
 Each feature in `src/lib/` contains:

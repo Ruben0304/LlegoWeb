@@ -1,6 +1,6 @@
 /**
  * Llamadas del servidor de la web al backend en nombre de un navegador
- * (proxy /api/graphql, login social, descarga del APK). SOLO SERVIDOR: lee
+ * (login social, descarga del APK). SOLO SERVIDOR: lee
  * WEB_PROXY_SECRET, que nunca debe llegar al navegador. No lo importes desde
  * componentes Svelte ni desde código que se ejecute en el cliente.
  *

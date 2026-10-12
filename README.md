@@ -63,14 +63,11 @@ arrancar (no al compilar), el servidor las lee igualmente de `process.env`.
 - **Textos legales:** `src/pages/privacidad.astro`, `src/pages/terminos.astro` y
   `src/pages/eliminar-cuenta.astro` (y la fecha en `LEGAL_LAST_UPDATED` de `site.ts`).
 - **Páginas del sitemap y rutas bloqueadas:** `src/lib/seo.ts`.
-- **Operaciones GraphQL:** `src/lib/<funcionalidad>/queries.ts` y `mutations.ts`. Si una
-  operación nueva debe pasar por el proxy `/api/graphql`, añádela a la lista blanca de
-  `src/lib/shared/allowed-operations.ts`.
+- **Operaciones GraphQL:** `src/lib/<funcionalidad>/queries.ts` y `mutations.ts`. El
+  navegador las envía directamente a `PUBLIC_BACKEND_URL` (no hay proxy GraphQL en la web).
 
 ## Seguridad del servidor
 
-- `/api/graphql` solo deja pasar las operaciones de la propia web (documento exacto),
-  con cuerpo de hasta 100 KB y 10 s de espera al backend, y no devuelve errores internos.
 - Las llamadas del servidor al backend reenvían la IP del visitante con el secreto
   compartido (`src/lib/shared/backend-proxy.ts`, solo servidor), para que el rate limit
   del backend cuente por visitante y no por servidor de la web.
