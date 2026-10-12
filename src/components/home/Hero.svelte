@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { ANDROID_DOWNLOAD_PATH, APP_STORE_URL } from "@/lib/site";
 
     let scrollY = $state(0);
     let windowHeight = $state(0);
@@ -311,7 +312,7 @@
 
             <!-- CTA Buttons -->
             <div class="hero-actions" id="descargar">
-                <a href="https://apps.apple.com/us/app/llego/id6755007388" class="btn-primary" class:highlight={highlightDownload}>
+                <a href={APP_STORE_URL} class="btn-primary" class:highlight={highlightDownload}>
                     <svg
                         viewBox="0 0 24 24"
                         fill="currentColor"
@@ -327,7 +328,7 @@
                         <span class="btn-store">App Store</span>
                     </span>
                 </a>
-                <a href="/api/download/android" class="btn-primary" class:highlight={highlightDownload}>
+                <a href={ANDROID_DOWNLOAD_PATH} class="btn-primary" class:highlight={highlightDownload}>
                     <svg
                         viewBox="0 0 24 24"
                         fill="currentColor"

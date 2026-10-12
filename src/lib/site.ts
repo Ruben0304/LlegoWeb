@@ -7,8 +7,23 @@
  * SITE_URL + /privacidad y /terminos.
  */
 
-/** URL pública de la web (la web es la fuente única de los textos legales). */
+/**
+ * URL pública de la web (la web es la fuente única de los textos legales).
+ * También es `site` en astro.config.mjs: canonical, og:url, sitemap y robots.txt
+ * salen de aquí.
+ */
 export const SITE_URL = 'https://llegoweb-production.up.railway.app';
+
+/**
+ * Ficha de Llegó (clientes) en el App Store. El ID 6755007388 es el de la ficha
+ * real, cuya web de desarrollador y política de privacidad apuntan a SITE_URL.
+ * No se lee de `appConfig.ios.storeUrl` del backend: en producción ese campo
+ * tiene un valor de ejemplo (id1234567890) que no lleva a la app.
+ */
+export const APP_STORE_URL = 'https://apps.apple.com/us/app/llego/id6755007388';
+
+/** Descarga del APK de Android (redirige al enlace firmado que da el backend). */
+export const ANDROID_DOWNLOAD_PATH = '/api/download/android';
 
 /** Correo de soporte. */
 export const SUPPORT_EMAIL = 'rubianclaude@gmail.com';
