@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { backendUrl } from "@/lib/shared/graphql";
+  import { backendUrl, describeGraphqlError } from "@/lib/shared/graphql";
   import {
     createTutorial,
     updateTutorial,
@@ -152,7 +152,7 @@
         successMessage = "";
       }, 3000);
     } catch (error) {
-      console.error("Error al guardar tutorial:", error);
+      console.error("Error al guardar tutorial:", describeGraphqlError(error));
       errorMessage =
         error instanceof Error ? error.message : "Error al guardar el tutorial";
     } finally {

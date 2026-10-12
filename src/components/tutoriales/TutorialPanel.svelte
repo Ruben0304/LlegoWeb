@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { describeGraphqlError } from "@/lib/shared/graphql";
   import type { Tutorial } from "@/lib/tutorial";
   import {
     getTutorials,
@@ -52,13 +53,6 @@
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
   }
 
-  function maskToken(token: string) {
-    if (token.length <= 12) {
-      return `${token.slice(0, 3)}...`;
-    }
-    return `${token.slice(0, 6)}...${token.slice(-6)}`;
-  }
-
   function clearAuth() {
     if (typeof window === "undefined") return;
     localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -72,38 +66,24 @@
     isAuthenticated = true;
   }
 
+  // Sin logs del correo ni del estado de la sesión: la consola del navegador
+  // la puede ver cualquiera con acceso al equipo.
   function restoreSession() {
-    if (typeof window === "undefined") {
-      console.log("restoreSession: No se ejecuta en SSR");
-      return;
-    }
+    if (typeof window === "undefined") return;
 
-    console.log("restoreSession: Buscando datos en localStorage...");
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     const userRaw = localStorage.getItem(AUTH_USER_KEY);
-
-    console.log("restoreSession: Token encontrado?", !!token);
-    console.log("restoreSession: User encontrado?", !!userRaw);
-
-    if (!token || !userRaw) {
-      console.log("restoreSession: No hay sesión guardada");
-      return;
-    }
+    if (!token || !userRaw) return;
 
     try {
       const user = JSON.parse(userRaw) as AuthUser;
-      console.log("restoreSession: Usuario parseado:", user.email);
-
       setAuthenticatedUser({
         accessToken: token,
         tokenType: localStorage.getItem(AUTH_TOKEN_TYPE_KEY) || "bearer",
         user,
       });
-
-      console.log("✅ Sesión restaurada exitosamente para:", user.email);
-      console.log("✅ isAuthenticated ahora es:", isAuthenticated);
-    } catch (error) {
-      console.error("❌ Error al restaurar sesión:", error);
+    } catch {
+      console.error("No se pudo restaurar la sesión guardada; se cierra.");
       clearAuth();
     }
   }
@@ -148,11 +128,7 @@
         | null;
 
       if (!response.ok || !data || "error" in data) {
-        console.error("Auth error:", {
-          endpoint,
-          status: response.status,
-          payload: data,
-        });
+        console.error(`Error de autenticación (HTTP ${response.status})`);
         errorMessage =
           (data && "error" in data && data.error) || "No se pudo autenticar.";
         return;
@@ -160,16 +136,11 @@
 
       storeAuth(data);
       setAuthenticatedUser(data);
-      console.info("Auth success:", {
-        endpoint,
-        userId: data.user.id,
-        email: data.user.email,
-      });
 
       // Load tutorials after authentication
       await loadTutorials();
     } catch (error) {
-      console.error("Error en autenticacion social:", error);
+      console.error("Error en autenticacion social:", describeGraphqlError(error));
       errorMessage = "Ocurrió un error al autenticar.";
     } finally {
       isLoading = false;
@@ -184,7 +155,6 @@
       return;
     }
 
-    console.info("Google credential recibido:", maskToken(response.credential));
     await exchangeSocialToken("/api/auth/google", {
       idToken: response.credential,
     });
@@ -211,40 +181,29 @@
     errorMessage = "";
 
     try {
-      console.log("🍎 Iniciando Apple Sign In...");
-      console.log("Backend URL:", BACKEND_URL);
-
       const response = await fetch(`${BACKEND_URL}/apple/start`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
 
-      console.log("Response status:", response.status);
-
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Backend error:", errorText);
+        console.error(`Apple Sign In: el backend respondió HTTP ${response.status}`);
         throw new Error("No se pudo iniciar el flujo de Apple Sign In");
       }
 
       const data = await response.json();
-      console.log("Backend response:", data);
 
       if (!data.auth_url) {
         throw new Error("No se recibió la URL de autenticación");
       }
 
-      console.log("Auth URL recibida:", data.auth_url);
-
       if (data.state) {
         sessionStorage.setItem("apple_auth_state", data.state);
-        console.log("State guardado:", data.state);
       }
 
-      console.log("🚀 Redirigiendo a Apple...");
       window.location.assign(data.auth_url);
     } catch (error) {
-      console.error("❌ Error en Apple Sign In:", error);
+      console.error("Error en Apple Sign In:", error instanceof Error ? error.message : error);
       errorMessage = error instanceof Error ? error.message : "Error al iniciar sesión con Apple";
       isLoading = false;
     }
@@ -271,7 +230,7 @@
     try {
       tutorials = await getTutorials(jwt);
     } catch (error) {
-      console.error("Error loading tutorials:", error);
+      console.error("Error loading tutorials:", describeGraphqlError(error));
       tutorialError =
         error instanceof Error ? error.message : "Error al cargar tutoriales";
       tutorials = [];
@@ -297,7 +256,7 @@
       }
       tutorials = tutorials.filter((t) => t.id !== tutorialId);
     } catch (error) {
-      console.error("Error deleting tutorial:", error);
+      console.error("Error deleting tutorial:", describeGraphqlError(error));
       tutorialError =
         error instanceof Error ? error.message : "Error al eliminar tutorial";
     }
@@ -310,7 +269,7 @@
         t.id === tutorialId ? updatedTutorial : t,
       );
     } catch (error) {
-      console.error("Error toggling tutorial:", error);
+      console.error("Error toggling tutorial:", describeGraphqlError(error));
       tutorialError =
         error instanceof Error
           ? error.message
@@ -340,14 +299,10 @@
   }
 
   onMount(async () => {
-    console.log("TutorialPanel onMount iniciado");
     restoreSession();
 
     if (isAuthenticated && jwt) {
-      console.log("Cargando tutoriales...");
       await loadTutorials();
-    } else {
-      console.log("No hay sesión activa, mostrando login");
     }
 
     if (GOOGLE_CLIENT_ID) {
