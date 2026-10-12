@@ -1,0 +1,40 @@
+# Comprueba que la web instala y compila (`npm ci && npm run build`, Astro SSR).
+# El contrato GraphQL con el backend se valida en graphql-contract.yml.
+name: Build web
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-web-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  build:
+    name: npm ci y npm run build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar
+        env:
+          # Valores de prueba (los reales viven en Railway): el build no contacta con el backend.
+          BACKEND_URL: https://backend.example.invalid
+          PUBLIC_BACKEND_URL: https://llegobackend-production.up.railway.app
+          PUBLIC_GOOGLE_CLIENT_ID: ci-build-sin-login-real
+        run: npm run build
