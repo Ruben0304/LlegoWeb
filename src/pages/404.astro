@@ -1,0 +1,28 @@
+---
+/**
+ * Página 404: cualquier ruta que no existe. Fuera de los buscadores.
+ */
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/common/Navbar.svelte';
+import ComingSoon from '../components/common/ComingSoon.astro';
+import Footer from '../components/common/Footer.svelte';
+
+const title = "Página no encontrada";
+const description = "La página que buscas no existe o cambió de dirección.";
+---
+
+<Layout title={title} description={description} noindex>
+  <Navbar client:load />
+  <main>
+    <ComingSoon
+      eyebrow="Error 404"
+      title="No encontramos esta página"
+      description="Puede que el enlace esté mal escrito o que la página ya no exista. Vuelve al inicio o escríbenos si necesitas ayuda."
+      primaryHref="/"
+      primaryLabel="Volver al inicio"
+      secondaryHref="/soporte"
+      secondaryLabel="Ir a soporte"
+    />
+  </main>
+  <Footer />
+</Layout>

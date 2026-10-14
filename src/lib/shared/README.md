@@ -4,13 +4,14 @@ Esta carpeta contiene la configuración del cliente GraphQL para comunicarse con
 
 ## Archivos
 
-- **[graphql.ts](graphql.ts)** - Cliente GraphQL configurado con variable de entorno privada
+- **[graphql.ts](graphql.ts)** - Cliente GraphQL. En el servidor usa `BACKEND_URL`; en el navegador, `PUBLIC_BACKEND_URL`
+- **[backend-proxy.ts](backend-proxy.ts)** - SOLO SERVIDOR: IP del visitante, cabeceras con `WEB_PROXY_SECRET` y `fetch` con tiempo máximo para los endpoints de `src/pages/api`
 
 ## Configuración
 
 ### 1. Variables de Entorno
 
-La URL del backend se configura mediante la variable `BACKEND_URL` en el archivo [.env](.env) (raíz del proyecto).
+La URL del backend se configura mediante la variable `BACKEND_URL` en el archivo `.env` (raíz del proyecto). Es la **URL base, sin `/graphql`**: el cliente añade `/graphql` y los endpoints REST (`/download/android`, `/upload/...`) cuelgan de la misma base. Si alguien la pone con `/graphql` o barra final, `getBackendBaseUrl()` la normaliza.
 
 **IMPORTANTE:** Esta variable NO tiene el prefijo `PUBLIC_`, por lo que:
 - ✅ Solo está disponible en el servidor (server-side)
@@ -23,8 +24,10 @@ La URL del backend se configura mediante la variable `BACKEND_URL` en el archivo
 Para máxima seguridad y rendimiento, usa el dominio privado de Railway:
 
 ```env
-BACKEND_URL=https://nombre-de-tu-servicio.railway.internal/graphql
+BACKEND_URL=http://nombre-de-tu-servicio.railway.internal:PUERTO
 ```
+
+La red privada de Railway va por `http` (no `https`) y necesita el puerto en el que escucha el backend.
 
 #### Ventajas del dominio privado (.railway.internal):
 - **Seguridad**: No expuesto a Internet pública
@@ -44,7 +47,8 @@ Configura la variable `BACKEND_URL` en Railway:
 1. Ve a tu proyecto en Railway
 2. Selecciona el servicio de frontend (este proyecto)
 3. Pestaña "Variables"
-4. Agrega: `BACKEND_URL=https://tu-backend.railway.internal/graphql`
+4. Agrega: `BACKEND_URL=http://tu-backend.railway.internal:PUERTO` (o la URL pública del backend)
+5. Agrega `WEB_PROXY_SECRET` con el mismo valor que en el backend (ver `.env.example`)
 
 ## Uso
 
@@ -109,10 +113,10 @@ Ver los features de [tutorial/](../tutorial/) y [business-type/](../business-typ
 
 Para probar localmente con tu backend:
 
-1. Copia [.env.example](.env.example) a [.env](.env)
+1. Copia `.env.example` (raíz del proyecto) a `.env`
 2. Actualiza `BACKEND_URL` con tu URL local o de desarrollo:
    ```env
-   BACKEND_URL=http://localhost:4000/graphql
+   BACKEND_URL=http://localhost:8000
    ```
 3. Reinicia el servidor de desarrollo: `npm run dev`
 

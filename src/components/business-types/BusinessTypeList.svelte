@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { describeGraphqlError } from "@/lib/shared/graphql";
   import type { BusinessTypeConfig } from "@/lib/business-type";
   import { deleteBusinessTypeConfig, deactivateBusinessTypeConfig } from "@/lib/business-type";
 
@@ -26,7 +27,7 @@
       await deleteBusinessTypeConfig(id, jwt);
       onDeleted(id);
     } catch (error) {
-      console.error("Error al eliminar:", error);
+      console.error("Error al eliminar:", describeGraphqlError(error));
     } finally {
       deletingId = null;
       confirmDeleteId = null;
@@ -40,7 +41,7 @@
         onUpdated({ ...bt, isActive: updated.isActive });
       }
     } catch (error) {
-      console.error("Error al cambiar estado:", error);
+      console.error("Error al cambiar estado:", describeGraphqlError(error));
     }
   }
 

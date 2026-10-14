@@ -91,5 +91,5 @@ Registro de socios de `/negocios`: `getMyPartnerAccess`, `submitPartnerRequest` 
 
 ## Variables de Entorno
 
-El cliente GraphQL usa `BACKEND_URL` (privada, solo servidor).
-Ver [shared/README.md](shared/README.md) para más detalles.
+El cliente GraphQL usa `BACKEND_URL` (privada, solo servidor; URL base sin `/graphql`)
+y `PUBLIC_BACKEND_URL` en el navegador. Ver [shared/README.md](shared/README.md) para más detalles.

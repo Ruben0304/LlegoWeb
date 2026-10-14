@@ -34,10 +34,13 @@ src/
 │   ├── terminos.astro        # Términos y condiciones (fuente única, enlazada desde las apps)
 │   ├── soporte.astro         # Centro de soporte / FAQ
 │   ├── eliminar-cuenta.astro # Cómo eliminar la cuenta desde cada app o por correo
-│   ├── tutoriales.astro      # Panel admin de tutoriales (con login Google/Apple)
-│   ├── business-types.astro  # Panel admin de tipos de negocio
+│   ├── tutoriales.astro      # Panel admin de tutoriales (con login Google/Apple, noindex)
+│   ├── business-types.astro  # Panel admin de tipos de negocio (noindex)
+│   ├── 404.astro             # Página no encontrada (noindex)
+│   ├── robots.txt.ts         # robots.txt (prerenderizado, desde lib/seo.ts)
+│   ├── sitemap.xml.ts        # Sitemap con las páginas públicas (prerenderizado, desde lib/seo.ts)
 │   ├── auth/callback.astro   # Callback OAuth: guarda el JWT, lo quita de la URL y vuelve a returnTo
-│   └── api/                  # Endpoints (proxy GraphQL, login social, descarga APK)
+│   └── api/                  # Endpoints (proxy GraphQL con lista blanca, login social, descarga APK)
 ├── layouts/
 │   ├── Layout.astro          # Main layout wrapper with SEO metadata
 │   └── LegalLayout.astro     # Shell de las páginas legales/soporte (© dinámico)
@@ -48,8 +51,9 @@ src/
 │   ├── negocios/             # Registro de socios (PartnerSignup, PartnerForm)
 │   └── business-types/       # Panel admin de tipos de negocio
 ├── lib/                      # Business logic organized by feature
-│   ├── shared/               # Shared config (GraphQL client)
-│   ├── site.ts               # Correo/WhatsApp de soporte, tiempo de respuesta, URL pública
+│   ├── shared/               # Cliente GraphQL; backend-proxy.ts (solo servidor) y lista blanca del proxy
+│   ├── site.ts               # Correo/WhatsApp de soporte, tiempo de respuesta, URL pública, tiendas
+│   ├── seo.ts                # Páginas del sitemap y rutas bloqueadas en robots.txt
 │   ├── auth/                 # Login social (Google/Apple); session.ts = sesión en el navegador
 │   ├── partner/              # Registro de socios (myPartnerAccess, submitPartnerRequest, teléfono)
 │   ├── business-type/        # Business types feature
@@ -125,15 +129,20 @@ import Hero from '@/components/home/Hero.svelte';
 - `negocios/` - Registro de socios en /negocios (PartnerSignup: elegir tipo, login, formulario y estado; PartnerForm)
 - `business-types/` - Admin business types panel
 
-**Legal / contact data:** the support email, WhatsApp, response time, public site URL and the partner apps (`PARTNER_APPS`, names and download links shown to approved partners) live in `src/lib/site.ts`. The apps link to `/privacidad` and `/terminos` on this site, so change texts here (not in the backend).
+**Legal / contact data:** the support email, WhatsApp, response time, public site URL, store links (`APP_STORE_URL`, `ANDROID_DOWNLOAD_PATH`) and the partner apps (`PARTNER_APPS`, names and download links shown to approved partners) live in `src/lib/site.ts`. The apps link to `/privacidad` and `/terminos` on this site, so change texts here (not in the backend). The App Store link is not read from the backend's `appConfig.ios.storeUrl` (in production it holds a placeholder ID).
+
+**SEO:** `SITE_URL` is also `site` in `astro.config.mjs`; `Layout.astro` builds canonical, `og:url` and `og:image` as absolute URLs on it (default image `public/og-image.jpg`, 1200x630). Pages with a user session or admin panels pass `noindex`. The sitemap and robots.txt lists live in `src/lib/seo.ts`.
 
 #### 6. GraphQL & Backend Integration
 Backend communication uses GraphQL with `graphql-request` client.
 
-**Environment variables:**
-- `BACKEND_URL` - Backend GraphQL endpoint (private, server-only)
-- Located in `.env` file (not committed to git)
-- For Railway deployments, use private domain: `https://service-name.railway.internal/graphql`
+**Environment variables** (see `.env.example`; `.env` is not committed):
+- `BACKEND_URL` - Backend **base** URL without `/graphql` (private, server-only). Railway private network: `http://<service>.railway.internal:<PORT>` (http and port), or the public backend URL.
+- `WEB_PROXY_SECRET` - Server-only. Same value as the backend's `WEB_PROXY_SECRET`: server-side calls to the backend (`/api/auth/*`, `/api/download/android`) forward the visitor IP with it so the backend rate limit counts per visitor (`src/lib/shared/backend-proxy.ts`). Never import that module from client code.
+- `PUBLIC_BACKEND_URL` - Public backend URL used by the browser.
+- `PUBLIC_GOOGLE_CLIENT_ID` - Google OAuth client of type **Web application** (not the iOS one).
+
+**No GraphQL proxy:** the browser calls `PUBLIC_BACKEND_URL` directly. The old `/api/graphql` proxy was removed because nothing used it.
 
 **Feature-based organization:**
 Each feature in `src/lib/` contains:

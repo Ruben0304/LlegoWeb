@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { describeGraphqlError } from "@/lib/shared/graphql";
   import {
     uploadBusinessTypeModel3d,
     createBusinessTypeConfig,
@@ -281,7 +282,7 @@
         successMessage = "";
       }, 3000);
     } catch (error) {
-      console.error("Error al guardar BusinessType:", error);
+      console.error("Error al guardar BusinessType:", describeGraphqlError(error));
       errorMessage = error instanceof Error ? error.message : "Error al guardar";
     } finally {
       isSubmitting = false;

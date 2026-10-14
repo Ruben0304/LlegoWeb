@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { describeGraphqlError } from "@/lib/shared/graphql";
   import { getBusinessTypeConfigs } from "@/lib/business-type";
   import type { BusinessTypeConfig } from "@/lib/business-type";
   import BusinessTypeForm from "./BusinessTypeForm.svelte";
@@ -43,7 +44,7 @@
       const response = await getBusinessTypeConfigs(undefined, jwt);
       businessTypes = response.businessTypeConfigs || [];
     } catch (error) {
-      console.error("Error loading business types:", error);
+      console.error("Error loading business types:", describeGraphqlError(error));
       loadError = "Error al cargar los tipos de negocio";
     }
   }
