@@ -244,24 +244,22 @@ import {
         display: none;
     }
 
+    /* Más / menos dibujados con máscara SVG (trazo 1.75) */
     .faq-item summary::after {
-        content: "+";
+        content: "";
         flex-shrink: 0;
         width: 32px;
         height: 32px;
-        display: grid;
-        place-items: center;
-        font-family: var(--font-display);
-        font-size: 1.6rem;
-        font-weight: 800;
-        background: var(--ink-orange);
-        color: var(--ink);
+        background-color: var(--ink-orange);
+        -webkit-mask: var(--sign) center / 20px no-repeat, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask: var(--sign) center / 20px no-repeat exclude, linear-gradient(#000 0 0);
+        --sign: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
     }
 
     .faq-item[open] summary::after {
-        content: "−";
-        background: var(--ink-teal);
-        color: var(--paper);
+        background-color: var(--ink-teal);
+        --sign: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M5 12h14'/%3E%3C/svg%3E");
     }
 
     .faq-item summary:hover {

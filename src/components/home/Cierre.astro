@@ -10,6 +10,7 @@ import StoreTickets from "../common/StoreTickets.astro";
   <div class="container cierre-inner">
     <PrintTitle id="cierre-title" class="cierre-title" lines={["¿Qué pides", "hoy?"]} under="var(--ink-orange)" />
     <div class="cierre-side">
+      <img class="cierre-box" src="/img/logo-caja-720.webp" srcset="/img/logo-caja-320.webp 320w, /img/logo-caja-720.webp 720w" sizes="(min-width: 900px) 340px, 220px" width="720" height="472" alt="" loading="lazy" decoding="async" />
       <p class="cierre-text">Descarga Llegó gratis y haz tu primer pedido.</p>
       <StoreTickets tone="ink" />
     </div>
@@ -31,6 +32,14 @@ import StoreTickets from "../common/StoreTickets.astro";
 
   :global(.cierre-title) {
     font-size: clamp(64px, 14vw, 176px);
+  }
+
+  .cierre-box {
+    width: clamp(200px, 26vw, 340px);
+    height: auto;
+    margin-bottom: 20px;
+    transform: rotate(-7deg) translateX(-4%);
+    filter: drop-shadow(8px 10px 0 rgba(2, 49, 51, 0.2));
   }
 
   .cierre-text {

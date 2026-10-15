@@ -209,7 +209,8 @@ p {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: -0.01em;
-  line-height: 0.92;
+  /* holgura para las tildes de la línea de abajo (LLEGÓ, LÓS) */
+  line-height: 0.98;
 }
 
 /*

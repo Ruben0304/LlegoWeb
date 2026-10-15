@@ -8,24 +8,21 @@ const apps = [
   {
     id: "clientes",
     name: "Llegó",
-    who: "Para quien compra",
-    text: "Encuentra todo tipo de negocios, pide y paga a tu manera. Desde Cuba o desde el exterior.",
+    text: "Para quien compra: encuentra todo tipo de negocios, pide y paga a tu manera, desde Cuba o desde el exterior.",
     href: "#descargar",
     cta: "Descargar la app",
   },
   {
     id: "negocios",
     name: "LlegoBusiness",
-    who: "Para quien vende",
-    text: "Pedidos, catálogo, ajustes del negocio y finanzas. Crea combos y banners de promoción.",
+    text: "Para quien vende: pedidos, catálogo, ajustes del negocio y finanzas. Crea combos y banners de promoción.",
     href: "/negocios",
     cta: "Vender en Llegó",
   },
   {
     id: "mensajeros",
     name: "Llego Mensajeros",
-    who: "Para quien entrega",
-    text: "Recoge en el negocio y entrega rápido y seguro, con cada pedido a la mano.",
+    text: "Para quien entrega: recoge en el negocio y entrega rápido y seguro, con cada pedido a la mano.",
     href: "/negocios",
     cta: "Ser mensajero",
   },
@@ -34,12 +31,11 @@ const apps = [
 
 <section class="eco" aria-labelledby="eco-title">
   <div class="container">
-    <PrintTitle id="eco-title" class="eco-title" lines={["Tres apps,", "un solo Llegó"]} accent={1} />
+    <PrintTitle id="eco-title" class="eco-title" lines={["Tres apps.", "Un solo Llegó."]} accent={1} />
 
     <ul class="eco-wall">
       {apps.map((app) => (
         <li class:list={["eco-poster", `eco-poster--${app.id}`]}>
-          <p class="eco-who">{app.who}</p>
           <h3 class="eco-name">{app.name}</h3>
           <p class="eco-text">{app.text}</p>
           <a href={app.href} class="eco-cta">
@@ -88,12 +84,6 @@ const apps = [
   .eco-poster--mensajeros {
     background: var(--ink-green);
     color: var(--ink);
-  }
-
-  .eco-who {
-    font-size: 15px;
-    font-weight: 700;
-    margin-bottom: 10px;
   }
 
   .eco-name {

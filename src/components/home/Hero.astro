@@ -55,7 +55,7 @@ import StoreTickets from "../common/StoreTickets.astro";
         width="720"
         height="472"
         alt=""
-        decoding="async"
+        fetchpriority="high"
       />
     </div>
   </div>
@@ -93,9 +93,9 @@ import StoreTickets from "../common/StoreTickets.astro";
   }
 
   :global(.hero-title) {
-    font-size: clamp(60px, 9.4vw, 128px);
+    font-size: clamp(62px, 9.4vw, 128px);
     font-weight: 900;
-    line-height: 0.86;
+    line-height: 0.98;
     margin-bottom: 28px;
     --reg-x: 0.05em;
     --reg-y: 0.04em;
@@ -185,6 +185,7 @@ import StoreTickets from "../common/StoreTickets.astro";
     top: 48%;
     width: clamp(200px, 52vw, 360px);
     height: auto;
+    z-index: 2;
     transform: rotate(-6deg);
     filter: drop-shadow(10px 14px 0 rgba(2, 49, 51, 0.22));
   }
@@ -197,7 +198,6 @@ import StoreTickets from "../common/StoreTickets.astro";
     @keyframes box-arrive {
       from {
         transform: translateX(-38%) rotate(-12deg);
-        opacity: 0;
       }
     }
   }

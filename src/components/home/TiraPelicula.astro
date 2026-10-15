@@ -32,7 +32,7 @@ const frames = [
     title: "Recíbelo",
     text: "A domicilio, programado para más tarde o recogido en la tienda.",
     src: "captura-3-hero",
-    alt: "Perfil de una tienda en Llegó, con su tiempo de entrega",
+    alt: "Perfil de una tienda de ejemplo en Llegó",
   },
 ];
 ---
@@ -40,14 +40,14 @@ const frames = [
 <section class="tira" id="como-funciona" aria-labelledby="tira-title">
   <div class="container tira-head">
     <PrintTitle id="tira-title" class="tira-title" lines={["Así llega", "tu pedido"]} under="var(--ink-orange)" />
-    <p class="tira-lede">Cuatro fotogramas, de la búsqueda a tu puerta.</p>
+    <p class="tira-lede">Cuatro fotogramas, de la búsqueda a tu puerta. Las pantallas son de la app real con datos de ejemplo.</p>
   </div>
 
   <div class="strip-scroller" tabindex="0" role="region" aria-label="Pasos para hacer un pedido (desliza para ver más)">
     <ol class="strip">
       {frames.map((f) => (
         <li class="frame">
-          <p class="edge-code" aria-hidden="true">LLEGÓ <span>▸</span> {f.code}</p>
+          <p class="edge-code" aria-hidden="true">LLEGÓ <span class="edge-mark"></span> {f.code}</p>
           <div class="frame-window">
             <img
               src={`/img/${f.src}-320.webp`}
@@ -150,8 +150,18 @@ const frames = [
     margin-bottom: 8px;
   }
 
-  .edge-code span {
-    color: var(--ink-sun);
+  .edge-code {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .edge-mark {
+    width: 0;
+    height: 0;
+    border-left: 7px solid var(--ink-sun);
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
   }
 
   .frame-window {
