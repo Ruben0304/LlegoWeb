@@ -20,6 +20,12 @@
         "/img/captura-2-hero.webp",
         "/img/captura-3-hero.webp",
     ];
+    const imageAlts = [
+        "Pantalla de restaurantes en la app Llegó",
+        "Pantalla de ropa en la app Llegó",
+        "Monedero de Llegó con saldo en USD y CUP",
+        "Perfil de una tienda en la app Llegó",
+    ];
     let loadedImageSources = $state<(string | null)[]>(images.map(() => null));
     let imageLoadStates = $state<ImageLoadState[]>(images.map(() => "idle"));
     const imageLoadPromises = new Map<number, Promise<void>>();
@@ -229,15 +235,13 @@
     );
     let translateY = $derived(lowMotionMode ? 0 : scrollY * 0.5);
     let scale = $derived(lowMotionMode ? 1 : 1 + scrollY * 0.0003);
-    let blurAmount = $derived(lowMotionMode ? 0 : Math.min(scrollY * 0.02, 10));
-    let heroFilter = $derived(lowMotionMode ? "none" : `blur(${blurAmount}px)`);
 </script>
 
 <section class="hero" id="inicio">
     <!-- Animated background -->
     <div
         class="hero-bg"
-        style="transform: scale({scale}); filter: {heroFilter};"
+        style="transform: scale({scale});"
     >
         <div
             class="gradient-mesh"
@@ -267,7 +271,6 @@
                 style="background: radial-gradient(circle, {currentTheme.tertiary} 0%, transparent 70%);"
             ></div>
         </div>
-        <div class="grid-overlay"></div>
         <div class="noise-overlay"></div>
     </div>
 
@@ -284,30 +287,15 @@
                 </span>
 
                 <span class="title-line title-line-3">
-                    <span class="word gradient-text">Llegó.</span><div class="hero-badge">
-                        <span class="badge-glow"></span>
-                        <span class="badge-icon">
-                            <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                            >
-                                <path
-                                    d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                                />
-                            </svg>
-                        </span>
-                        <span class="badge-text">Delivery inteligente con IA · Cuba</span>
-                    </div>
+                    <span class="word highlight-word">Llegó.</span>
                 </span>
             </h1>
 
             <!-- Subtitle -->
             <p class="hero-subtitle">
-                La primera app de delivery en Cuba.<br />
-                Restaurantes, ropa, mercado, perfumerías y más —<br />
-                todo en un solo lugar, guiado por IA.&#32;<a href="/plus" class="subtitle-link">Conoce Llegó+&nbsp;→</a>
+                La primera app de delivery en Cuba. Restaurantes, ropa,
+                mercado, perfumerías y más, todo en un solo lugar y guiado
+                por IA. <a href="/plus" class="subtitle-link">Conoce Llegó+&nbsp;→</a>
             </p>
 
             <!-- CTA Buttons -->
@@ -346,6 +334,19 @@
                 </a>
             </div>
 
+            <!-- En móvil y tablet: una captura fija de la app (el carrusel solo cabe en escritorio) -->
+            <div class="hero-device-mobile">
+                <img
+                    src="/img/captura-restaurante-hero-320.webp"
+                    srcset="/img/captura-restaurante-hero-320.webp 320w, /img/captura-restaurante-hero.webp 640w"
+                    sizes="240px"
+                    alt={imageAlts[0]}
+                    width="640"
+                    height="1390"
+                    loading="lazy"
+                    decoding="async"
+                />
+            </div>
         </div>
     </div>
 
@@ -382,7 +383,7 @@
                 {#each images as image, index}
                     <img
                         src={loadedImageSources[index] ?? undefined}
-                        alt="Llegó App {index + 1}"
+                        alt={imageAlts[index]}
                         class="phone-screenshot"
                         loading={index === 0 ? "eager" : "lazy"}
                         decoding="async"
@@ -449,7 +450,7 @@
         position: absolute;
         inset: -50px;
         z-index: 0;
-        will-change: transform, filter;
+        will-change: transform;
     }
 
     .gradient-mesh {
@@ -520,24 +521,6 @@
         }
     }
 
-    .grid-overlay {
-        position: absolute;
-        inset: 0;
-        background-image:
-            linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-            linear-gradient(
-                90deg,
-                rgba(255, 255, 255, 0.02) 1px,
-                transparent 1px
-            );
-        background-size: 60px 60px;
-        mask-image: radial-gradient(
-            ellipse at center,
-            black 0%,
-            transparent 70%
-        );
-    }
-
     .noise-overlay {
         position: absolute;
         inset: 0;
@@ -575,68 +558,11 @@
     .content-wrapper.loaded .hero-title {
         transition-delay: 0.1s;
     }
-    .content-wrapper.loaded .hero-badge {
-        transition-delay: 0.25s;
-    }
     .content-wrapper.loaded .hero-subtitle {
         transition-delay: 0.4s;
     }
     .content-wrapper.loaded .hero-actions {
         transition-delay: 0.55s;
-    }
-
-    /* Badge */
-    .hero-badge {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 14px 6px 10px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 100px;
-        backdrop-filter: blur(10px);
-        flex-shrink: 0;
-        align-self: center;
-    }
-
-    .badge-glow {
-        position: absolute;
-        inset: -1px;
-        border-radius: 100px;
-        background: linear-gradient(
-            90deg,
-            rgba(225, 199, 142, 0.3),
-            rgba(90, 132, 103, 0.3)
-        );
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-
-    .hero-badge:hover .badge-glow {
-        opacity: 1;
-    }
-
-    .badge-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 28px;
-        height: 28px;
-        background: linear-gradient(
-            135deg,
-            var(--color-primary),
-            var(--color-button)
-        );
-        border-radius: 50%;
-        color: white;
-    }
-
-    .badge-text {
-        font-size: 14px;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.9);
-        letter-spacing: -0.01em;
     }
 
     /* Title */
@@ -667,26 +593,18 @@
         overflow: visible;
     }
 
-    .gradient-text {
-        background: linear-gradient(
-            135deg,
-            #e1c78e 0%,
-            #b2d69a 50%,
-            #5a8467 100%
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        padding-bottom: 0.15em;
+    .highlight-word {
+        color: var(--color-highlight);
     }
 
     /* Subtitle */
     .hero-subtitle {
         font-size: clamp(1rem, 2.5vw, 1.25rem);
         line-height: 1.7;
-        color: rgba(255, 255, 255, 0.6);
+        color: var(--color-text-variant);
         margin-bottom: 40px;
         max-width: 480px;
+        text-wrap: pretty;
     }
 
     /* Actions */
@@ -735,8 +653,8 @@
     }
 
     .btn-label {
-        font-size: 11px;
-        opacity: 0.7;
+        font-size: 12px;
+        opacity: 0.75;
         letter-spacing: 0.02em;
     }
 
@@ -758,6 +676,24 @@
 
     .subtitle-link:hover {
         opacity: 0.8;
+    }
+
+    /* Captura fija en móvil y tablet */
+    .hero-device-mobile {
+        display: flex;
+        justify-content: center;
+        margin-top: 8px;
+    }
+
+    .hero-device-mobile img {
+        width: min(240px, 62vw);
+        height: auto;
+        aspect-ratio: 640 / 1390;
+        border-radius: 36px;
+        border: 3px solid #1a1a1a;
+        box-shadow:
+            0 40px 80px -30px rgba(0, 0, 0, 0.8),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.12);
     }
 
     /* Device */
@@ -955,6 +891,10 @@
             display: block;
         }
 
+        .hero-device-mobile {
+            display: none;
+        }
+
         .content-wrapper {
             max-width: 600px;
         }
@@ -1005,7 +945,6 @@
             animation-duration: 30s;
         }
 
-        .hero-badge,
         .btn-primary,
         .carousel-arrow {
             backdrop-filter: none;

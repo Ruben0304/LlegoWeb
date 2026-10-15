@@ -351,20 +351,7 @@
     {#if !isAuthenticated}
       <div class="auth-container">
         <div class="auth-header">
-          <div class="auth-icon">
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-            >
-              <polygon points="23 7 16 12 23 17 23 7" />
-              <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-            </svg>
-          </div>
-          <h1 class="auth-title">Gestión de Tutoriales</h1>
+          <h1 class="auth-title">Gestión de tutoriales</h1>
           <p class="auth-subtitle">
             Administra los tutoriales de Llegó
           </p>
@@ -458,9 +445,9 @@
 
           <p class="auth-terms">
             Al continuar, aceptas nuestros <a href="/terminos"
-              >Términos de Servicio</a
+              >Términos de uso</a
             >
-            y <a href="/privacidad">Política de Privacidad</a>
+            y la <a href="/privacidad">Política de privacidad</a>
           </p>
         </div>
       </div>
@@ -607,24 +594,6 @@
     margin-bottom: var(--spacing-3xl);
   }
 
-  .auth-icon {
-    width: 88px;
-    height: 88px;
-    margin: 0 auto var(--spacing-xl);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(255, 255, 255, 0.02) 100%
-    );
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 24px;
-    color: var(--color-accent);
-    backdrop-filter: blur(20px);
-  }
-
   .auth-title {
     font-size: 2rem;
     font-weight: 600;
@@ -634,7 +603,7 @@
   }
 
   .auth-subtitle {
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-text-variant);
     font-size: var(--font-size-base);
     font-weight: 400;
   }
@@ -795,15 +764,16 @@
   /* Auth Terms */
   .auth-terms {
     text-align: center;
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.5;
-    color: rgba(255, 255, 255, 0.35);
+    color: var(--color-text-subtle);
     max-width: 280px;
   }
 
   .auth-terms a {
-    color: rgba(255, 255, 255, 0.5);
-    text-decoration: none;
+    color: var(--color-text-variant);
+    text-decoration: underline;
+    text-underline-offset: 2px;
     transition: color 0.2s ease;
   }
 

@@ -419,7 +419,7 @@
 
   .upload-hint {
     font-size: var(--font-size-xs);
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--color-text-subtle);
     margin-top: var(--spacing-xs);
   }
 

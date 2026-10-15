@@ -8,7 +8,7 @@
       { name: 'Categorías', href: '/#categorias' },
       { name: 'Cómo funciona', href: '/#como-funciona' },
       { name: 'Llegó+', href: '/plus' },
-      { name: 'Descargar App', href: '/#descargar' },
+      { name: 'Descargar la app', href: '/#descargar' },
       { name: 'Negocios y mensajeros', href: '/negocios' }
     ],
     support: [
@@ -24,7 +24,6 @@
 <footer class="footer">
   <div class="footer-bg">
     <div class="bg-gradient"></div>
-    <div class="bg-grid"></div>
   </div>
 
   <div class="container">
@@ -55,7 +54,7 @@
 
       <div class="footer-links">
         <div class="links-column">
-          <h4 class="column-title">Producto</h4>
+          <h2 class="column-title">Producto</h2>
           <ul class="links-list">
             {#each footerLinks.product as link}
               <li><a href={link.href} class="footer-link">{link.name}</a></li>
@@ -64,7 +63,7 @@
         </div>
 
         <div class="links-column">
-          <h4 class="column-title">Soporte</h4>
+          <h2 class="column-title">Soporte</h2>
           <ul class="links-list">
             {#each footerLinks.support as link}
               <li><a href={link.href} class="footer-link">{link.name}</a></li>
@@ -106,16 +105,6 @@
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
   }
 
-  .bg-grid {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse at center top, black 0%, transparent 50%);
-  }
-
   .container {
     position: relative;
     z-index: 2;
@@ -145,15 +134,12 @@
     font-size: 28px;
     font-weight: 700;
     letter-spacing: -0.02em;
-    background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.7) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--color-text);
   }
 
   .footer-tagline {
     font-size: 15px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-text-variant);
     line-height: 1.6;
     margin-bottom: 28px;
   }
@@ -195,19 +181,21 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--color-text-subtle);
     margin-bottom: 20px;
   }
 
   .links-list {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 4px;
   }
 
   .footer-link {
+    display: inline-block;
+    padding: 6px 0;
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-text-variant);
     transition: color 0.3s ease;
   }
 
@@ -225,7 +213,7 @@
 
   .copyright {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--color-text-subtle);
     text-align: center;
   }
 

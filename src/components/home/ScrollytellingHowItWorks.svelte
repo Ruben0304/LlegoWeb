@@ -3,7 +3,6 @@
 
     interface Step {
         id: string;
-        number: string;
         title: string;
         subtitle: string;
         description: string;
@@ -15,7 +14,6 @@
     const steps: Step[] = [
         {
             id: "explore",
-            number: "01",
             title: "Explora",
             subtitle: "con un toque",
             description:
@@ -26,7 +24,6 @@
         },
         {
             id: "ai-search",
-            number: "02",
             title: "Habla",
             subtitle: "con nuestra IA",
             description:
@@ -37,13 +34,12 @@
         },
         {
             id: "confirm",
-            number: "03",
             title: "Recibe",
             subtitle: "en minutos",
             description:
                 "Confirma tu pedido y rastréalo en tiempo real. Tu orden llega a tu puerta en minutos.",
             highlight: "Entrega express",
-            color: "#5A8467",
+            color: "#6FA07E",
             image: "/img/captura-3-hero.webp",
         },
     ];
@@ -325,6 +321,15 @@
     $effect(() => {
         markVisibleStepRangeForLoad(activeStep);
     });
+
+    // Los puntos llevan al tramo de scroll de cada paso (centro del tramo).
+    function goToStep(index: number) {
+        if (!sectionRef) return;
+        const top = sectionRef.getBoundingClientRect().top + window.scrollY;
+        const scrollable = Math.max(1, sectionRef.offsetHeight - window.innerHeight);
+        const target = top + ((index + 0.5) / steps.length) * scrollable;
+        window.scrollTo({ top: target, behavior: isReducedMotion ? "auto" : "smooth" });
+    }
 </script>
 
 <section class="scrollytelling" bind:this={sectionRef} id="como-funciona">
@@ -334,7 +339,6 @@
             class="bg-gradient"
             style="--active-color: {steps[activeStep]?.color || steps[0].color}"
         ></div>
-        <div class="bg-grid"></div>
     </div>
 
     <!-- Sticky container - this stays fixed while scrolling through the section -->
@@ -363,7 +367,7 @@
                                     src={loadedStepImageSources[index] ??
                                         undefined}
                                     sizes="(min-width: 1280px) 304px, (min-width: 1024px) 280px, 240px"
-                                    alt="Paso {step.number}"
+                                    alt="Paso {index + 1}: {step.title} {step.subtitle}"
                                     class="phone-screenshot"
                                     loading={index === 0 ? "eager" : "lazy"}
                                     decoding="async"
@@ -392,7 +396,9 @@
                             class="step-dot"
                             class:active={activeStep === index}
                             style="--dot-color: {step.color}"
-                            aria-label="Paso {index + 1}"
+                            aria-label="Ir al paso {index + 1}: {step.title}"
+                            aria-current={activeStep === index ? "step" : undefined}
+                            onclick={() => goToStep(index)}
                         >
                             <span class="dot-inner"></span>
                         </button>
@@ -403,7 +409,6 @@
             <!-- Right side: Timeline steps -->
             <div class="content-container">
                 <div class="section-header">
-                    <span class="eyebrow">Cómo funciona</span>
                     <h2 class="headline">
                         Pedir nunca fue<br />
                         <span class="highlight">tan natural.</span>
@@ -429,8 +434,7 @@
                         >
                             <!-- Step indicator -->
                             <div class="step-indicator">
-                                <span class="step-number">{step.number}</span>
-                                <div class="indicator-glow"></div>
+                                <span class="step-number">{index + 1}</span>
                             </div>
 
                             <!-- Step content -->
@@ -483,24 +487,6 @@
             transparent 60%
         );
         transition: background 0.6s ease;
-    }
-
-    .bg-grid {
-        position: absolute;
-        inset: 0;
-        background-image:
-            linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-            linear-gradient(
-                90deg,
-                rgba(255, 255, 255, 0.02) 1px,
-                transparent 1px
-            );
-        background-size: 60px 60px;
-        mask-image: radial-gradient(
-            ellipse at 50% 50%,
-            black 20%,
-            transparent 70%
-        );
     }
 
     /* Sticky wrapper - stays in view while scrolling */
@@ -655,6 +641,12 @@
         position: relative;
     }
 
+    .step-dot::before {
+        content: "";
+        position: absolute;
+        inset: -10px;
+    }
+
     .step-dot.active {
         background: var(--dot-color);
         transform: scale(1.2);
@@ -696,16 +688,6 @@
         margin-bottom: 32px;
     }
 
-    .eyebrow {
-        display: inline-block;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.2em;
-        color: var(--color-secondary);
-        margin-bottom: 12px;
-    }
-
     .headline {
         font-size: clamp(1.75rem, 5vw, 2.5rem);
         font-weight: 700;
@@ -715,10 +697,7 @@
     }
 
     .highlight {
-        background: linear-gradient(135deg, #e1c78e 0%, #b2d69a 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--color-highlight);
     }
 
     /* Timeline */
@@ -757,7 +736,7 @@
         position: relative;
         display: flex;
         gap: 16px;
-        opacity: 0.4;
+        opacity: 0.65;
         transform: translateX(0);
         transition:
             opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
@@ -765,7 +744,7 @@
     }
 
     .timeline-step.completed {
-        opacity: 0.6;
+        opacity: 0.8;
     }
 
     .timeline-step.active {
@@ -802,14 +781,12 @@
         background: var(--step-color);
         border-color: var(--step-color);
         transform: scale(1.15);
-        box-shadow: 0 0 20px
-            color-mix(in srgb, var(--step-color) 50%, transparent);
     }
 
     .step-number {
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 700;
-        color: rgba(255, 255, 255, 0.5);
+        color: rgba(255, 255, 255, 0.75);
         letter-spacing: 0.05em;
         transition: color 0.4s ease;
     }
@@ -820,33 +797,6 @@
 
     .timeline-step.active .step-number {
         color: #000;
-    }
-
-    .indicator-glow {
-        position: absolute;
-        inset: -8px;
-        border-radius: 50%;
-        background: var(--step-color);
-        opacity: 0;
-        filter: blur(12px);
-        transition: opacity 0.4s ease;
-    }
-
-    .timeline-step.active .indicator-glow {
-        opacity: 0.4;
-        animation: glowPulse 2s ease-in-out infinite;
-    }
-
-    @keyframes glowPulse {
-        0%,
-        100% {
-            opacity: 0.4;
-            transform: scale(1);
-        }
-        50% {
-            opacity: 0.2;
-            transform: scale(1.2);
-        }
     }
 
     /* Step content */
@@ -861,7 +811,7 @@
     .step-title {
         font-size: clamp(1.1rem, 3vw, 1.4rem);
         font-weight: 700;
-        color: rgba(255, 255, 255, 0.6);
+        color: rgba(255, 255, 255, 0.8);
         letter-spacing: -0.02em;
         line-height: 1.2;
         transition: color 0.4s ease;
@@ -874,18 +824,18 @@
     .step-subtitle {
         display: block;
         font-weight: 400;
-        color: rgba(255, 255, 255, 0.3);
+        color: rgba(255, 255, 255, 0.55);
         transition: color 0.4s ease;
     }
 
     .timeline-step.active .step-subtitle {
-        color: rgba(255, 255, 255, 0.5);
+        color: var(--color-text-variant);
     }
 
     .step-description {
         font-size: 14px;
         line-height: 1.6;
-        color: rgba(255, 255, 255, 0.3);
+        color: var(--color-text-variant);
         max-width: 320px;
         max-height: 0;
         overflow: hidden;
@@ -897,9 +847,9 @@
     }
 
     .timeline-step.active .step-description {
-        max-height: 100px;
+        max-height: 160px;
         opacity: 1;
-        color: rgba(255, 255, 255, 0.6);
+        color: var(--color-text-variant);
     }
 
     .step-badge {
@@ -909,9 +859,9 @@
         background: transparent;
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 100px;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 600;
-        color: rgba(255, 255, 255, 0.3);
+        color: rgba(255, 255, 255, 0.6);
         text-transform: uppercase;
         letter-spacing: 0.05em;
         opacity: 0;
@@ -1047,13 +997,52 @@
             transition: none;
         }
 
+        /* Sin scroll que avance los pasos: se muestran los tres completos */
         .timeline-step,
-        .timeline-step.active {
+        .timeline-step.active,
+        .timeline-step.completed {
+            opacity: 1;
             transform: none;
         }
 
-        .indicator-glow {
-            filter: none;
+        .timeline .timeline-step .step-indicator {
+            background: color-mix(in srgb, var(--step-color) 20%, transparent);
+            border-color: var(--step-color);
+            transform: none;
+        }
+
+        .timeline .timeline-step .step-number {
+            color: var(--step-color);
+        }
+
+        .timeline .timeline-step .step-title {
+            color: #fff;
+        }
+
+        .timeline .timeline-step .step-subtitle {
+            color: var(--color-text-variant);
+        }
+
+        .timeline .timeline-step .step-description {
+            max-height: none;
+            opacity: 1;
+            color: var(--color-text-variant);
+        }
+
+        .timeline .timeline-step .step-badge {
+            opacity: 1;
+            transform: none;
+            background: color-mix(in srgb, var(--step-color) 15%, transparent);
+            border-color: color-mix(in srgb, var(--step-color) 30%, transparent);
+            color: var(--step-color);
+        }
+
+        .timeline-progress {
+            height: 100% !important;
+        }
+
+        .step-dots {
+            display: none;
         }
     }
 
@@ -1070,8 +1059,7 @@
             transition: none !important;
         }
 
-        .step-dot.active::after,
-        .timeline-step.active .indicator-glow {
+        .step-dot.active::after {
             animation: none !important;
         }
     }

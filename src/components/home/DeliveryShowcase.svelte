@@ -47,7 +47,6 @@
   let sectionElement: HTMLElement;
   let isVisible = $state(false);
   let isInView = $state(false);
-  let activeFeature = $state(0);
   let routeCanvas: SVGSVGElement | null = null;
 
   onMount(() => {
@@ -77,17 +76,10 @@
       observer.observe(sectionElement);
     }
 
-    // Auto-rotate features
-    const interval = setInterval(() => {
-      if (!isInView) return;
-      activeFeature = (activeFeature + 1) % features.length;
-    }, 4000);
-
     syncRouteAnimationState();
 
     return () => {
       observer.disconnect();
-      clearInterval(interval);
     };
   });
 </script>
@@ -96,68 +88,14 @@
   <!-- Background -->
   <div class="section-bg">
     <div class="bg-gradient"></div>
-    <div class="bg-pattern"></div>
-    <div class="floating-icons">
-      <div class="float-icon icon-1">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-        >
-          <rect x="1" y="3" width="15" height="13" rx="2" />
-          <path d="M16 8h4l3 4v5h-7V8z" />
-          <circle cx="5.5" cy="18.5" r="2.5" />
-          <circle cx="18.5" cy="18.5" r="2.5" />
-        </svg>
-      </div>
-      <div class="float-icon icon-2">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-        >
-          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-          <line x1="3" y1="6" x2="21" y2="6" />
-          <path d="M16 10a4 4 0 01-8 0" />
-        </svg>
-      </div>
-      <div class="float-icon icon-3">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-        >
-          <path
-            d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"
-          />
-          <path d="M12 6v6l4 2" />
-        </svg>
-      </div>
-    </div>
   </div>
 
   <div class="container">
     <!-- Header -->
     <div class="section-header" class:visible={isVisible}>
-      <div class="header-badge">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          width="16"
-          height="16"
-        >
-          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-        </svg>
-        <span>Delivery inteligente</span>
-      </div>
       <h2 class="headline">
         Todo lo que amas,<br />
-        <span class="gradient-text">en tu puerta.</span>
+        <span class="highlight">en tu puerta.</span>
       </h2>
       <p class="subheadline">
         Combinamos tecnología de punta con logística eficiente para que recibas
@@ -718,16 +656,13 @@
 
       <!-- Right: Features -->
       <div class="features-side">
-        <div class="features-grid">
+        <ul class="features-grid">
           {#each features as feature, index}
-            <button
+            <li
               class="feature-card"
-              class:active={activeFeature === index}
               style="--feature-color: {feature.color}; --delay: {index * 100}ms"
-              onclick={() => (activeFeature = index)}
-              type="button"
             >
-              <div class="feature-icon">
+              <div class="feature-icon" aria-hidden="true">
                 {@html feature.icon}
               </div>
               <div class="feature-content">
@@ -740,10 +675,9 @@
                   <span class="stat-label">{feature.statLabel}</span>
                 </div>
               {/if}
-              <div class="feature-indicator"></div>
-            </button>
+            </li>
           {/each}
-        </div>
+        </ul>
       </div>
     </div>
 
@@ -768,7 +702,7 @@
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </a>
-          <a href="#como-funciona" class="cta-secondary"> Ver demo </a>
+          <a href="#como-funciona" class="cta-secondary">Ver cómo funciona</a>
         </div>
       </div>
     </div>
@@ -805,63 +739,6 @@
       );
   }
 
-  .bg-pattern {
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(
-        circle at 25% 25%,
-        rgba(255, 255, 255, 0.02) 1px,
-        transparent 1px
-      ),
-      radial-gradient(
-        circle at 75% 75%,
-        rgba(255, 255, 255, 0.02) 1px,
-        transparent 1px
-      );
-    background-size: 60px 60px;
-  }
-
-  .floating-icons {
-    position: absolute;
-    inset: 0;
-  }
-
-  .float-icon {
-    position: absolute;
-    width: 48px;
-    height: 48px;
-    color: rgba(255, 255, 255, 0.06);
-    animation: floatIcon 20s ease-in-out infinite;
-  }
-
-  .icon-1 {
-    top: 15%;
-    left: 10%;
-    animation-delay: 0s;
-  }
-  .icon-2 {
-    top: 60%;
-    right: 8%;
-    animation-delay: -7s;
-  }
-  .icon-3 {
-    bottom: 20%;
-    left: 15%;
-    animation-delay: -14s;
-  }
-
-  @keyframes floatIcon {
-    0%,
-    100% {
-      transform: translateY(0) rotate(0deg);
-      opacity: 0.06;
-    }
-    50% {
-      transform: translateY(-20px) rotate(10deg);
-      opacity: 0.1;
-    }
-  }
-
   .container {
     position: relative;
     z-index: 2;
@@ -885,20 +762,6 @@
     transform: translateY(0);
   }
 
-  .header-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background: rgba(225, 199, 142, 0.1);
-    border: 1px solid rgba(225, 199, 142, 0.2);
-    border-radius: 100px;
-    color: var(--color-secondary);
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 24px;
-  }
-
   .headline {
     font-size: clamp(2.5rem, 6vw, 4rem);
     font-weight: 700;
@@ -908,17 +771,15 @@
     margin-bottom: 20px;
   }
 
-  .gradient-text {
-    background: linear-gradient(135deg, #e1c78e 0%, #b2d69a 50%, #5a8467 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .highlight {
+    color: var(--color-highlight);
   }
 
   .subheadline {
     font-size: 18px;
     line-height: 1.7;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-text-variant);
+    text-wrap: pretty;
   }
 
   /* Content grid */
@@ -987,7 +848,6 @@
     animation: previewPulse 5s ease-in-out infinite;
   }
 
-  .delivery-showcase:not(.in-view) .float-icon,
   .delivery-showcase:not(.in-view) .delivery-route,
   .delivery-showcase:not(.in-view) .route-preview {
     animation-play-state: paused;
@@ -1042,8 +902,9 @@
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition:
+      opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     text-align: left;
     opacity: 0;
     transform: translateX(20px);
@@ -1053,33 +914,6 @@
     opacity: 1;
     transform: translateX(0);
     transition-delay: var(--delay);
-  }
-
-  .feature-card:hover,
-  .feature-card.active {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: color-mix(in srgb, var(--feature-color) 30%, transparent);
-    transform: translateX(8px);
-  }
-
-  .feature-card.active {
-    background: color-mix(in srgb, var(--feature-color) 8%, transparent);
-  }
-
-  .feature-indicator {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 0;
-    background: var(--feature-color);
-    border-radius: 0 4px 4px 0;
-    transition: height 0.3s ease;
-  }
-
-  .feature-card.active .feature-indicator {
-    height: 60%;
   }
 
   .feature-icon {
@@ -1099,11 +933,6 @@
     height: 24px;
   }
 
-  .feature-card.active .feature-icon {
-    background: color-mix(in srgb, var(--feature-color) 20%, transparent);
-    transform: scale(1.05);
-  }
-
   .feature-content {
     min-width: 0;
   }
@@ -1117,17 +946,10 @@
   }
 
   .feature-description {
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.5;
-    color: rgba(255, 255, 255, 0.4);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .feature-card.active .feature-description {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-text-variant);
+    text-wrap: pretty;
   }
 
   .feature-stat {
@@ -1145,7 +967,7 @@
 
   .feature-stat .stat-label {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--color-text-subtle);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -1188,7 +1010,7 @@
 
   .cta-text p {
     font-size: 15px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-text-variant);
   }
 
   .cta-buttons {
@@ -1243,6 +1065,24 @@
   }
 
   /* Responsive */
+  @media (max-width: 480px) {
+    .feature-card {
+      grid-template-columns: 48px 1fr;
+      padding: 18px 16px;
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+    }
+
+    /* El dato extra no cabe al lado del texto: lo dice ya la descripción */
+    .feature-stat {
+      display: none;
+    }
+  }
+
   @media (min-width: 768px) {
     .cta-content {
       flex-direction: row;

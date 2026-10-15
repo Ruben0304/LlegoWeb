@@ -52,7 +52,7 @@
 
 <div class="bt-list-container">
   <div class="bt-list-header">
-    <h2 class="bt-list-title">Business Types</h2>
+    <h2 class="bt-list-title">Tipos de negocio</h2>
     <span class="bt-list-count">{businessTypes.length} tipos</span>
   </div>
 

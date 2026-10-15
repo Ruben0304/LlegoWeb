@@ -1,12 +1,21 @@
 /* Llegó - Estilos del texto de las páginas legales (/privacidad, /terminos, /eliminar-cuenta).
    Se activan con la clase .legal-prose en el contenedor del documento. */
 
+/* Columna de lectura: ~70 caracteres por línea */
+.legal-prose {
+  max-width: 66ch;
+  margin: 0 auto;
+  font-size: 1.0625rem;
+}
+
 .legal-prose h1 {
   font-size: 2.5rem;
   font-weight: 700;
   letter-spacing: -0.03em;
   margin-bottom: 0.5rem;
   color: var(--color-text);
+  text-wrap: balance;
+  line-height: 1.15;
 }
 
 .legal-prose .last-updated {
@@ -35,7 +44,7 @@
 }
 
 .legal-prose h2 {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 600;
   margin-bottom: 1rem;
   color: var(--color-secondary);
@@ -82,11 +91,13 @@
 
 .legal-prose a {
   color: var(--color-accent);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+  text-underline-offset: 3px;
 }
 
 .legal-prose a:hover {
-  text-decoration: underline;
+  text-decoration-color: currentColor;
 }
 
 /* Recuadro para avisos destacados (p. ej. plazos de eliminación) */

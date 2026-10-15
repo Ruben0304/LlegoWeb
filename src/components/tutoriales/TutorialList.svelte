@@ -92,7 +92,7 @@
         </svg>
       </div>
       <div>
-        <h2 class="list-title">Tus Tutoriales</h2>
+        <h2 class="list-title">Tus tutoriales</h2>
         <p class="list-subtitle">
           {tutorials.length}
           {tutorials.length === 1 ? "tutorial" : "tutoriales"} en total
@@ -455,7 +455,7 @@
   }
 
   .search-input::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.5);
   }
 
   .search-input:focus {

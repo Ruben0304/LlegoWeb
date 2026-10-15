@@ -247,7 +247,8 @@
 
   input:focus,
   textarea:focus {
-    outline: none;
+    outline: 2px solid color-mix(in srgb, var(--color-secondary) 45%, transparent);
+    outline-offset: 1px;
     border-color: var(--color-secondary);
     background: rgba(255, 255, 255, 0.07);
   }
@@ -258,7 +259,7 @@
 
   .field-help,
   .field-error {
-    font-size: var(--font-size-xs);
+    font-size: 0.8125rem;
     line-height: 1.5;
   }
 
@@ -283,22 +284,21 @@
   .btn {
     padding: 14px 28px;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-full);
     font: inherit;
     font-weight: 600;
     font-size: 15px;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    transition: background-color 0.2s, opacity 0.2s;
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
-    color: var(--color-primary);
+    background: #fff;
+    color: #000;
   }
 
   .btn-primary:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(225, 199, 142, 0.3);
+    background: var(--color-secondary);
   }
 
   .btn:disabled {

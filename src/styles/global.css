@@ -13,6 +13,10 @@
   --color-surface-variant: #111111;
   --color-text: #ffffff;
   --color-text-variant: rgba(255, 255, 255, 0.6);
+  /* Texto secundario más tenue: el mínimo que aún da 4.5:1 sobre fondos casi negros */
+  --color-text-subtle: rgba(255, 255, 255, 0.55);
+  /* Palabra destacada en los titulares (sustituye al texto con degradado) */
+  --color-highlight: var(--color-secondary);
   --color-accent: #B2D69A;
   --color-button: #5A8467;
 
@@ -80,7 +84,6 @@
 }
 
 html {
-  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -93,6 +96,11 @@ body {
   color: var(--color-text);
   background-color: var(--color-background);
   overflow-x: hidden;
+}
+
+/* Los anclajes no quedan tapados por la barra de navegación fija */
+[id] {
+  scroll-margin-top: 88px;
 }
 
 img, video {
@@ -137,12 +145,15 @@ ul, ol {
   border: 0;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 /* Typography Utilities */
-.text-gradient {
-  background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 50%, var(--color-button) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.text-highlight {
+  color: var(--color-highlight);
 }
 
 /* Button Styles */

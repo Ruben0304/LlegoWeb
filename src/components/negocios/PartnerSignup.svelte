@@ -295,7 +295,6 @@
 <section class="partner">
   <div class="partner-inner">
     <header class="partner-header">
-      <span class="badge">Negocios y mensajeros</span>
       <h1 class="title">Súmate a Llegó</h1>
       <p class="subtitle">
         Vende en Llegó o reparte pedidos en tu zona. Envía tu solicitud y te llamaremos para conocerte.
@@ -485,17 +484,6 @@
     text-align: center;
   }
 
-  .badge {
-    display: inline-flex;
-    padding: 6px 14px;
-    background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
-    color: var(--color-primary);
-    font-weight: 600;
-    font-size: 13px;
-    border-radius: 20px;
-    margin-bottom: 20px;
-  }
-
   .title {
     font-size: clamp(28px, 6vw, 40px);
     font-weight: 700;
@@ -537,7 +525,7 @@
     text-align: left;
     border-radius: var(--radius-lg);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+    background: rgba(255, 255, 255, 0.04);
     color: var(--color-text);
     font: inherit;
     cursor: pointer;
@@ -548,7 +536,6 @@
   .choice:focus-visible {
     transform: translateY(-2px);
     border-color: var(--color-secondary);
-    outline: none;
   }
 
   .choice-icon {
@@ -577,7 +564,7 @@
     padding: 28px 24px;
     border-radius: var(--radius-xl);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+    background: rgba(255, 255, 255, 0.035);
   }
 
   .card-top {
@@ -739,8 +726,9 @@
 
   .btn {
     display: inline-block;
-    padding: 12px 22px;
-    border-radius: 10px;
+    min-height: 44px;
+    padding: 12px 24px;
+    border-radius: var(--radius-full);
     border: none;
     font: inherit;
     font-weight: 600;
@@ -750,8 +738,13 @@
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
-    color: var(--color-primary);
+    background: #fff;
+    color: #000;
+    transition: background-color var(--transition-fast);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-secondary);
   }
 
   .btn-secondary {
@@ -772,7 +765,7 @@
   }
 
   .link-button {
-    padding: 0;
+    padding: 10px 0;
     border: none;
     background: none;
     color: var(--color-secondary);

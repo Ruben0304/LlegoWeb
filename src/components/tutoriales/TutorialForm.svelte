@@ -185,7 +185,7 @@
     </div>
     <div>
       <h2 class="form-title">
-        {isEditMode ? "Editar Tutorial" : "Agregar Tutorial"}
+        {isEditMode ? "Editar tutorial" : "Agregar tutorial"}
       </h2>
       <p class="form-subtitle">
         {isEditMode
@@ -388,7 +388,7 @@
             <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
           {/if}
         </svg>
-        {isEditMode ? "Guardar Cambios" : "Agregar Tutorial"}
+        {isEditMode ? "Guardar cambios" : "Agregar tutorial"}
       {/if}
     </button>
   </form>
@@ -518,7 +518,7 @@
 
   .form-group input::placeholder,
   .form-group textarea::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.5);
   }
 
   .form-group input:focus,

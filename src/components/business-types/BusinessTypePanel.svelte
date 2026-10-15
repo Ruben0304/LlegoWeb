@@ -106,9 +106,9 @@
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
       </svg>
-      <h2>Acceso Restringido</h2>
+      <h2>Acceso restringido</h2>
       <p>Debes iniciar sesión como administrador para gestionar los tipos de negocio. El inicio de sesión se hace desde el panel de Tutoriales y la sesión se comparte con este panel.</p>
-      <a href="/tutoriales" class="btn btn-accent">Iniciar Sesión</a>
+      <a href="/tutoriales" class="btn btn-accent">Iniciar sesión</a>
     </div>
   {:else}
     <div class="bt-panel-header">

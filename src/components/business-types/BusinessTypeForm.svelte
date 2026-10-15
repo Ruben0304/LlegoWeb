@@ -304,7 +304,7 @@
       </svg>
     </div>
     <div>
-      <h2 class="bt-form-title">{isEditMode ? "Editar BusinessType" : "Crear BusinessType"}</h2>
+      <h2 class="bt-form-title">{isEditMode ? "Editar BusinessType" : "Crear tipo de negocio"}</h2>
       <p class="bt-form-subtitle">{isEditMode ? "Modifica los datos" : "Completa los datos del nuevo tipo"}</p>
     </div>
   </div>
@@ -332,7 +332,7 @@
   <form class="bt-business-type-form" onsubmit={handleSubmit}>
     <!-- Basic Info Section -->
     <div class="bt-section">
-      <h3 class="bt-section-title">Información Básica</h3>
+      <h3 class="bt-section-title">Información básica</h3>
       
       {#if !isEditMode}
         <div class="bt-form-group">
@@ -590,7 +590,7 @@
             <line x1="5" y1="12" x2="19" y2="12" />
           {/if}
         </svg>
-        {isEditMode ? "Guardar Cambios" : "Crear BusinessType"}
+        {isEditMode ? "Guardar cambios" : "Crear tipo de negocio"}
       {/if}
     </button>
   </form>

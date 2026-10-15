@@ -9,8 +9,16 @@
             isScrolled = window.scrollY > 50;
         };
 
+        const handleKeydown = (e: KeyboardEvent) => {
+            if (e.key === "Escape" && isMobileMenuOpen) closeMobileMenu();
+        };
+
         window.addEventListener("scroll", handleScroll, { passive: true });
-        return () => window.removeEventListener("scroll", handleScroll);
+        window.addEventListener("keydown", handleKeydown);
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            window.removeEventListener("keydown", handleKeydown);
+        };
     });
 
     function toggleMobileMenu() {
@@ -24,11 +32,12 @@
     }
 
     function handleDescargar(e: MouseEvent) {
-        e.preventDefault();
         closeMobileMenu();
         const hero = document.getElementById("inicio");
         const descargar = document.getElementById("descargar");
+        // Fuera de la home no hay botones de descarga: el enlace lleva a /#descargar.
         if (!hero || !descargar) return;
+        e.preventDefault();
 
         const heroVisible = hero.getBoundingClientRect().top >= -window.innerHeight * 0.5
             && hero.getBoundingClientRect().bottom > 0;
@@ -47,14 +56,14 @@
     }
 </script>
 
-<nav class="navbar" class:scrolled={isScrolled}>
+<nav class="navbar" class:scrolled={isScrolled} aria-label="Principal">
     <div class="navbar-container">
         <a href="/" class="logo" aria-label="Llegó - Inicio">
             <img src="/img/icon.png" width="36" height="36" loading="eager" decoding="async" alt="Llegó" class="logo-icon" />
             <span class="logo-text">Llegó</span>
         </a>
 
-        <div class="nav-links" class:open={isMobileMenuOpen}>
+        <div class="nav-links" id="nav-links" class:open={isMobileMenuOpen}>
             <a href="/#categorias" class="nav-link" onclick={closeMobileMenu}
                 >Categorías</a
             >
@@ -87,6 +96,7 @@
             class="mobile-menu-btn"
             aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={isMobileMenuOpen}
+            aria-controls="nav-links"
             onclick={toggleMobileMenu}
         >
             <span class="hamburger" class:open={isMobileMenuOpen}></span>
@@ -155,14 +165,7 @@
         font-size: 22px;
         font-weight: 700;
         letter-spacing: -0.02em;
-        background: linear-gradient(
-            135deg,
-            #fff 0%,
-            rgba(255, 255, 255, 0.8) 100%
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--color-text);
     }
 
     .nav-links {
@@ -187,11 +190,7 @@
         left: 0;
         width: 0;
         height: 1px;
-        background: linear-gradient(
-            90deg,
-            var(--color-secondary),
-            var(--color-button)
-        );
+        background: var(--color-secondary);
         transition: width 0.3s ease;
     }
 
@@ -307,11 +306,18 @@
             align-items: center;
             justify-content: center;
             gap: 32px;
-            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            visibility: hidden;
+            transition:
+                right 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0s linear 0.4s;
         }
 
         .nav-links.open {
             right: 0;
+            visibility: visible;
+            transition:
+                right 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0s;
         }
 
         .nav-link {

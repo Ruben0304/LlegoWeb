@@ -43,7 +43,7 @@ src/
 │   └── api/                  # Endpoints (proxy GraphQL con lista blanca, login social, descarga APK)
 ├── layouts/
 │   ├── Layout.astro          # Main layout wrapper with SEO metadata
-│   └── LegalLayout.astro     # Shell de las páginas legales/soporte (© dinámico)
+│   └── LegalLayout.astro     # Páginas legales/soporte: Navbar + Footer y columna de lectura
 ├── components/               # Svelte components organized by screen
 │   ├── common/               # Reusable components (Navbar, Footer, ComingSoon)
 │   ├── home/                 # Home page components (Hero, FeatureShowcase, etc.)
@@ -94,6 +94,14 @@ This minimizes initial JavaScript load.
 - Typography scale, spacing, border radius, shadows, transitions, z-index layers
 
 Always use these variables instead of hardcoded values.
+
+Design rules (from the `impeccable` and `design:*` skills in `.claude/skills/`):
+- No gradient text: highlight a word with `--color-highlight` (gold).
+- Secondary text uses `--color-text-variant` (0.6) or `--color-text-subtle` (0.55); lower alphas fail 4.5:1 contrast on black.
+- No kicker/eyebrow labels or pill badges above headings, no decorative grid backgrounds, no emoji as icons (inline SVG, stroke 1.75).
+- Primary buttons are white pills (hover gold), secondary are translucent pills; titles and buttons in Spanish sentence case ("Iniciar sesión").
+- Nothing that only reveals content on scroll or on desktop: mobile and `prefers-reduced-motion` must show the same content.
+- Check changes with `.claude/skills/impeccable/scripts/impeccable detect --json src` (and with a URL to scan the rendered page).
 
 #### 4. Svelte 5 Reactivity
 Components use Svelte 5's runes syntax:

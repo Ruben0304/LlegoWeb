@@ -4,7 +4,6 @@
  * Sin precios, métricas ni acciones que no existan todavía.
  */
 interface Props {
-  eyebrow: string;
   title: string;
   description: string;
   primaryHref: string;
@@ -13,14 +12,13 @@ interface Props {
   secondaryLabel?: string;
 }
 
-const { eyebrow, title, description, primaryHref, primaryLabel, secondaryHref, secondaryLabel } = Astro.props;
+const { title, description, primaryHref, primaryLabel, secondaryHref, secondaryLabel } = Astro.props;
 // Los enlaces http(s) (p. ej. WhatsApp) se abren en otra pestaña.
 const opensNewTab = primaryHref.startsWith('http');
 ---
 
 <section class="coming-soon">
   <div class="coming-soon-inner">
-    <span class="badge">{eyebrow}</span>
     <h1 class="title">{title}</h1>
     <p class="description">{description}</p>
     <div class="actions">
@@ -44,24 +42,13 @@ const opensNewTab = primaryHref.startsWith('http');
     align-items: center;
     justify-content: center;
     padding: 120px 20px 80px;
-    background: #000;
+    background: var(--color-background);
   }
 
   .coming-soon-inner {
     max-width: 560px;
     width: 100%;
     text-align: center;
-  }
-
-  .badge {
-    display: inline-flex;
-    padding: 6px 14px;
-    background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
-    color: var(--color-primary);
-    font-weight: 600;
-    font-size: 13px;
-    border-radius: 20px;
-    margin-bottom: 20px;
   }
 
   .title {
@@ -71,6 +58,7 @@ const opensNewTab = primaryHref.startsWith('http');
     letter-spacing: -0.02em;
     line-height: 1.15;
     margin-bottom: 16px;
+    text-wrap: balance;
   }
 
   .description {
@@ -78,6 +66,7 @@ const opensNewTab = primaryHref.startsWith('http');
     line-height: 1.7;
     color: rgba(255, 255, 255, 0.6);
     margin-bottom: 32px;
+    text-wrap: pretty;
   }
 
   .actions {
@@ -87,32 +76,4 @@ const opensNewTab = primaryHref.startsWith('http');
     justify-content: center;
   }
 
-  .btn {
-    display: inline-block;
-    padding: 14px 28px;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 15px;
-    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
-    color: var(--color-primary);
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(225, 199, 142, 0.3);
-  }
-
-  .btn-secondary {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #fff;
-  }
-
-  .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
 </style>

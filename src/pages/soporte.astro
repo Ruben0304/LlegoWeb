@@ -15,7 +15,7 @@ import {
     title="Soporte"
     description="Centro de soporte de Llegó. Encuentra respuestas a tus preguntas o contáctanos por correo o WhatsApp para ayudarte con tu pedido o cuenta."
 >
-    <h1>Centro de Soporte</h1>
+    <h1>Centro de soporte</h1>
     <p class="intro">
         Estamos aquí para ayudarte. Encuentra respuestas a las preguntas más frecuentes o contáctanos directamente.
     </p>
@@ -23,14 +23,18 @@ import {
     <!-- Contact box -->
     <div class="contact-box" id="contacto">
         <div class="contact-method">
-            <div class="contact-icon">✉️</div>
+            <div class="contact-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+            </div>
             <div>
                 <p class="contact-label">Escríbenos a</p>
                 <a href={supportMailtoUrl()} class="contact-email">{SUPPORT_EMAIL}</a>
             </div>
         </div>
         <div class="contact-method">
-            <div class="contact-icon">💬</div>
+            <div class="contact-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></svg>
+            </div>
             <div>
                 <p class="contact-label">O por WhatsApp</p>
                 <a href={supportWhatsappUrl()} class="contact-email" target="_blank" rel="noopener noreferrer">{SUPPORT_WHATSAPP_DISPLAY}</a>
@@ -161,9 +165,20 @@ import {
     }
 
     .contact-icon {
-        font-size: 2rem;
-        line-height: 1;
-        margin-top: 0.1rem;
+        flex-shrink: 0;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        color: var(--color-accent);
+        background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+    }
+
+    .contact-icon svg {
+        width: 22px;
+        height: 22px;
     }
 
     .contact-label {
@@ -222,6 +237,7 @@ import {
     }
 
     .faq-item summary {
+        min-height: 44px;
         padding: 1.1rem 1.25rem;
         font-size: 1rem;
         font-weight: 500;
@@ -296,8 +312,8 @@ import {
     .btn-contact {
         display: inline-block;
         padding: 0.85rem 2rem;
-        background: var(--color-button);
-        color: white;
+        background: #fff;
+        color: #000;
         border-radius: var(--radius-full);
         text-decoration: none;
         font-weight: 600;
@@ -306,11 +322,11 @@ import {
     }
 
     .btn-contact:hover {
-        opacity: 0.85;
+        background: var(--color-secondary);
     }
 
     @media (max-width: 640px) {
         h1 { font-size: 1.75rem; }
-        .contact-method { flex-direction: column; gap: 0.75rem; }
+
     }
 </style>
