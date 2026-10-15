@@ -32,6 +32,11 @@ const style = under ? `--print-under: ${under}` : undefined;
     display: block;
   }
 
+  /* hueco para tildes y signos que bajan de la línea anterior (¿, Ó) */
+  .print-line + .print-line {
+    padding-top: 0.1em;
+  }
+
   .print-accent {
     color: var(--print-accent, var(--ink-teal));
   }
