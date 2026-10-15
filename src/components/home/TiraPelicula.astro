@@ -1,0 +1,206 @@
+---
+/**
+ * Cómo funciona: las pantallas reales de la app como fotogramas de una tira
+ * de 16 mm, en el orden en que llega un pedido. En móvil la tira se desliza.
+ */
+import PrintTitle from "../common/PrintTitle.astro";
+
+const frames = [
+  {
+    code: "01",
+    title: "Explora",
+    text: "Desliza entre categorías y negocios, cerca de ti o en otro municipio.",
+    src: "captura-1-hero",
+    alt: "Sección de ropa en la app Llegó, con sus subcategorías",
+  },
+  {
+    code: "02",
+    title: "Habla con la IA",
+    text: "Mantén presionado y di lo que buscas. La búsqueda inteligente y la IA te lo encuentran y te recomiendan.",
+    src: "captura-restaurante-hero",
+    alt: "Sección de restaurantes con el aviso «Mantén presionado para encontrar lo que buscas»",
+  },
+  {
+    code: "03",
+    title: "Paga a tu manera",
+    text: "En CUP o en USD: por transferencia, en efectivo o desde el exterior.",
+    src: "captura-2-hero",
+    alt: "Monedero de Llegó con cuentas en USD y CUP",
+  },
+  {
+    code: "04",
+    title: "Recíbelo",
+    text: "A domicilio, programado para más tarde o recogido en la tienda.",
+    src: "captura-3-hero",
+    alt: "Perfil de una tienda en Llegó, con su tiempo de entrega",
+  },
+];
+---
+
+<section class="tira" id="como-funciona" aria-labelledby="tira-title">
+  <div class="container tira-head">
+    <PrintTitle id="tira-title" class="tira-title" lines={["Así llega", "tu pedido"]} under="var(--ink-orange)" />
+    <p class="tira-lede">Cuatro fotogramas, de la búsqueda a tu puerta.</p>
+  </div>
+
+  <div class="strip-scroller" tabindex="0" role="region" aria-label="Pasos para hacer un pedido (desliza para ver más)">
+    <ol class="strip">
+      {frames.map((f) => (
+        <li class="frame">
+          <p class="edge-code" aria-hidden="true">LLEGÓ <span>▸</span> {f.code}</p>
+          <div class="frame-window">
+            <img
+              src={`/img/${f.src}-320.webp`}
+              srcset={`/img/${f.src}-320.webp 320w, /img/${f.src}.webp 640w`}
+              sizes="240px"
+              width="640"
+              height="1390"
+              alt={f.alt}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div class="frame-caption">
+            <h3 class="frame-title"><span class="sr-only">Paso {Number(f.code)}: </span>{f.title}</h3>
+            <p class="frame-text">{f.text}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .tira {
+    background: var(--ink);
+    color: var(--paper);
+    padding: var(--section-y) 0;
+    overflow: hidden;
+  }
+
+  .tira-head {
+    display: grid;
+    gap: 16px;
+    margin-bottom: clamp(36px, 5vw, 64px);
+  }
+
+  :global(.tira-title) {
+    font-size: clamp(52px, 10vw, 128px);
+    color: var(--paper);
+  }
+
+  .tira-lede {
+    font-size: 18px;
+    color: rgba(255, 247, 230, 0.8);
+  }
+
+  .strip-scroller {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ink-orange) transparent;
+    padding: 0 var(--gutter) 8px;
+  }
+
+  .strip-scroller:focus-visible {
+    outline-offset: -3px;
+  }
+
+  /* La tira: base casi negra con las perforaciones arriba y abajo */
+  .strip {
+    --hole: 14px;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 264px;
+    gap: 0;
+    width: max-content;
+    margin: 0 auto;
+    padding: 34px 0;
+    background-color: #081515;
+    background-image:
+      radial-gradient(circle at 50% 50%, var(--ink) 5px, transparent 5.5px),
+      radial-gradient(circle at 50% 50%, var(--ink) 5px, transparent 5.5px);
+    background-size: 22px 22px, 22px 22px;
+    background-position: 0 6px, 0 calc(100% - 6px);
+    background-repeat: repeat-x;
+  }
+
+  .frame {
+    /* ancla el texto .sr-only del título: sin esto escapa del scroll y ensancha la página en móvil */
+    position: relative;
+    scroll-snap-align: center;
+    display: flex;
+    flex-direction: column;
+    padding: 0 12px;
+    border-right: 2px solid #1d2f2f;
+  }
+
+  .frame:last-child {
+    border-right: 0;
+  }
+
+  .edge-code {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--ink-orange);
+    margin-bottom: 8px;
+  }
+
+  .edge-code span {
+    color: var(--ink-sun);
+  }
+
+  .frame-window {
+    position: relative;
+    aspect-ratio: 640 / 1390;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #0f2222;
+  }
+
+  .frame-window img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Velo de luz naranja en el borde, como una fuga de luz del revelado */
+  .frame-window::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(236, 152, 68, 0.38), transparent 22%);
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  .frame-caption {
+    padding: 18px 2px 0;
+  }
+
+  .frame-title {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 0.95;
+    margin-bottom: 8px;
+    color: var(--ink-sun);
+  }
+
+  .frame-text {
+    font-size: 15px;
+    line-height: 1.5;
+    color: rgba(255, 247, 230, 0.86);
+  }
+
+  @media (min-width: 1100px) {
+    .strip {
+      grid-auto-columns: 272px;
+    }
+  }
+</style>

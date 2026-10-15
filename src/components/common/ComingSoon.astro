@@ -1,79 +1,145 @@
 ---
 /**
- * Página "Próximamente" reutilizable (hoy /plus).
+ * Página corta tipo cartel (hoy /plus y la 404): un campo de tinta con el
+ * titular en dos tintas y dos acciones.
  * Sin precios, métricas ni acciones que no existan todavía.
  */
+import PrintTitle from "./PrintTitle.astro";
+
 interface Props {
-  title: string;
+  /** Líneas del titular */
+  lines: string[];
   description: string;
   primaryHref: string;
   primaryLabel: string;
   secondaryHref?: string;
   secondaryLabel?: string;
+  /** Campo de tinta del cartel */
+  tone?: "orange" | "teal" | "sun";
 }
 
-const { title, description, primaryHref, primaryLabel, secondaryHref, secondaryLabel } = Astro.props;
+const { lines, description, primaryHref, primaryLabel, secondaryHref, secondaryLabel, tone = "orange" } = Astro.props;
 // Los enlaces http(s) (p. ej. WhatsApp) se abren en otra pestaña.
-const opensNewTab = primaryHref.startsWith('http');
+const opensNewTab = primaryHref.startsWith("http");
+const under = tone === "teal" ? "var(--ink-teal-dark)" : "var(--paper)";
 ---
 
-<section class="coming-soon">
+<section class:list={["coming-soon", `tone-${tone}`]}>
   <div class="coming-soon-inner">
-    <h1 class="title">{title}</h1>
+    <PrintTitle as="h1" class="cs-title" lines={lines} under={under} />
     <p class="description">{description}</p>
     <div class="actions">
       <a
         href={primaryHref}
-        class="btn btn-primary"
-        target={opensNewTab ? '_blank' : undefined}
-        rel={opensNewTab ? 'noopener noreferrer' : undefined}
-      >{primaryLabel}</a>
+        class:list={["ticket", { "ticket--paper": tone === "teal" }]}
+        target={opensNewTab ? "_blank" : undefined}
+        rel={opensNewTab ? "noopener noreferrer" : undefined}
+      >
+        <span class="ticket-big">{primaryLabel}</span>
+      </a>
       {secondaryHref && secondaryLabel && (
-        <a href={secondaryHref} class="btn btn-secondary">{secondaryLabel}</a>
+        <a href={secondaryHref} class="secondary-link">{secondaryLabel}</a>
       )}
     </div>
   </div>
+  <img class="cs-box" src="/img/logo-caja-720.webp" width="720" height="472" alt="" decoding="async" />
 </section>
 
 <style>
   .coming-soon {
-    min-height: 100vh;
+    position: relative;
+    min-height: min(100svh, 860px);
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 120px 20px 80px;
-    background: var(--color-background);
+    padding: calc(68px + 56px) var(--gutter) 72px;
+    overflow: hidden;
+  }
+
+  .tone-orange {
+    background: var(--ink-orange);
+    color: var(--ink);
+  }
+
+  .tone-teal {
+    background: var(--ink-teal);
+    color: var(--paper);
+  }
+
+  .tone-sun {
+    background: var(--ink-sun);
+    color: var(--ink);
   }
 
   .coming-soon-inner {
-    max-width: 560px;
+    position: relative;
+    z-index: 1;
+    max-width: 1240px;
     width: 100%;
-    text-align: center;
+    margin: 0 auto;
   }
 
-  .title {
-    font-size: clamp(28px, 6vw, 40px);
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: -0.02em;
-    line-height: 1.15;
-    margin-bottom: 16px;
-    text-wrap: balance;
+  :global(.cs-title) {
+    font-size: clamp(60px, 12vw, 160px);
+    max-width: 9ch;
+    margin-bottom: 28px;
   }
 
   .description {
-    font-size: 16px;
-    line-height: 1.7;
-    color: rgba(255, 255, 255, 0.6);
+    max-width: 44ch;
+    font-size: 19px;
+    line-height: 1.55;
+    font-weight: 500;
     margin-bottom: 32px;
-    text-wrap: pretty;
   }
 
   .actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    justify-content: center;
+    align-items: center;
+    gap: 14px 28px;
   }
 
+  .actions .ticket {
+    min-height: 56px;
+    padding: 10px 28px;
+  }
+
+  .secondary-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 6px;
+  }
+
+  /* La caja sale del cartel por la derecha */
+  .cs-box {
+    position: absolute;
+    right: -6%;
+    bottom: 6%;
+    width: clamp(220px, 40vw, 560px);
+    height: auto;
+    transform: rotate(-8deg);
+    opacity: 0.95;
+  }
+
+  @media (max-width: 700px) {
+    .cs-box {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      align-self: flex-end;
+    }
+
+    .coming-soon {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 24px;
+    }
+  }
 </style>

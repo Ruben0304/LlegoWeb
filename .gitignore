@@ -22,3 +22,8 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# impeccable: capturas de revisión y estado local (los briefs de .impeccable/surfaces sí se versionan)
+.impeccable/review/
+.impeccable/questions/
+.impeccable/config.local.json

@@ -1,0 +1,47 @@
+---
+/**
+ * Cierre: último cartel en tinta sol con las descargas.
+ */
+import PrintTitle from "../common/PrintTitle.astro";
+import StoreTickets from "../common/StoreTickets.astro";
+---
+
+<section class="cierre" aria-labelledby="cierre-title">
+  <div class="container cierre-inner">
+    <PrintTitle id="cierre-title" class="cierre-title" lines={["¿Qué pides", "hoy?"]} under="var(--ink-orange)" />
+    <div class="cierre-side">
+      <p class="cierre-text">Descarga Llegó gratis y haz tu primer pedido.</p>
+      <StoreTickets tone="ink" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .cierre {
+    background: var(--ink-sun);
+    color: var(--ink);
+    padding: clamp(72px, 10vw, 128px) 0;
+  }
+
+  .cierre-inner {
+    display: grid;
+    gap: 32px;
+    align-items: end;
+  }
+
+  :global(.cierre-title) {
+    font-size: clamp(64px, 14vw, 176px);
+  }
+
+  .cierre-text {
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  @media (min-width: 900px) {
+    .cierre-inner {
+      grid-template-columns: 1.4fr 1fr;
+    }
+  }
+</style>

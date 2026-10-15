@@ -1,0 +1,38 @@
+---
+/**
+ * Titular de cartel con registro de serigrafía: el texto en tinta principal y
+ * una segunda tinta desplazada debajo (sombra de texto). La clase .print vive
+ * en global.css; el script de Layout.astro hace que las tintas encajen al verlas.
+ */
+interface Props {
+  /** Etiqueta del titular */
+  as?: "h1" | "h2" | "h3";
+  /** Cada elemento es una línea del titular */
+  lines: string[];
+  /** Índice de la línea que va en la tinta de acento (opcional) */
+  accent?: number;
+  /** Segunda tinta (la de debajo) */
+  under?: string;
+  class?: string;
+  id?: string;
+}
+
+const { as: Tag = "h2", lines, accent, under, class: className = "", id } = Astro.props;
+const style = under ? `--print-under: ${under}` : undefined;
+---
+
+<Tag class:list={["print", "display", className]} style={style} id={id}>
+  {lines.map((line, i) => (
+    <span class:list={["print-line", { "print-accent": i === accent }]}>{line}</span>
+  ))}
+</Tag>
+
+<style>
+  .print-line {
+    display: block;
+  }
+
+  .print-accent {
+    color: var(--print-accent, var(--ink-teal));
+  }
+</style>

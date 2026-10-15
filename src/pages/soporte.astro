@@ -133,35 +133,34 @@ import {
 
 <style>
     h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        letter-spacing: -0.03em;
-        margin-bottom: 0.75rem;
+        font-family: var(--font-display);
+        font-size: clamp(2.75rem, 8vw, 4.75rem);
+        font-weight: 900;
+        text-transform: uppercase;
+        line-height: 0.92;
+        margin-bottom: 1rem;
     }
 
     .intro {
-        font-size: 1.1rem;
-        line-height: 1.7;
-        color: rgba(255,255,255,0.7);
+        font-size: 1.15rem;
+        line-height: 1.65;
         margin-bottom: 2.5rem;
     }
 
-    /* Contact box */
+    /* Contacto: un cartel teal */
     .contact-box {
-        display: flex;
-        flex-direction: column;
+        display: grid;
         gap: 1.25rem;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: var(--radius-xl);
+        background: var(--ink-teal);
+        color: var(--paper);
         padding: 1.75rem;
-        margin-bottom: 3rem;
+        margin-bottom: 3.5rem;
     }
 
     .contact-method {
         display: flex;
         align-items: flex-start;
-        gap: 1.25rem;
+        gap: 1rem;
     }
 
     .contact-icon {
@@ -171,9 +170,8 @@ import {
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 12px;
-        color: var(--color-accent);
-        background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+        background: var(--ink-sun);
+        color: var(--ink);
     }
 
     .contact-icon svg {
@@ -182,72 +180,64 @@ import {
     }
 
     .contact-label {
-        font-size: 0.8rem;
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--color-text-variant);
-        margin-bottom: 0.25rem;
-    }
-
-    .contact-email {
-        display: block;
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--color-accent);
-        text-decoration: none;
-        word-break: break-all;
+        letter-spacing: 0.02em;
+        color: var(--ink-sun);
         margin-bottom: 0.1rem;
     }
 
-    .contact-email:hover {
+    .contact-email {
+        display: inline-block;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--paper);
         text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 3px;
+        word-break: break-all;
     }
 
     .contact-note {
-        font-size: 0.85rem;
-        color: var(--color-text-variant);
+        font-size: 0.95rem;
         margin: 0;
     }
 
     /* FAQ */
     h2 {
-        font-size: 1.5rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
+        font-family: var(--font-display);
+        font-size: clamp(2rem, 5vw, 2.75rem);
+        font-weight: 900;
+        text-transform: uppercase;
+        line-height: 1;
         margin-bottom: 1.25rem;
     }
 
     .faq-list {
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
-        margin-bottom: 3rem;
+        margin-bottom: 3.5rem;
+        border-top: 3px solid var(--ink);
     }
 
     .faq-item {
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: var(--radius-lg);
-        overflow: hidden;
-        transition: border-color 0.2s;
-    }
-
-    .faq-item[open] {
-        border-color: rgba(178, 214, 154, 0.3);
+        border-bottom: 1px solid var(--ink-line);
     }
 
     .faq-item summary {
-        min-height: 44px;
-        padding: 1.1rem 1.25rem;
-        font-size: 1rem;
-        font-weight: 500;
+        min-height: 56px;
+        padding: 1.1rem 0;
+        font-size: 1.05rem;
+        font-weight: 700;
         cursor: pointer;
         list-style: none;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        color: var(--color-text);
-        user-select: none;
+        gap: 1rem;
+        color: var(--ink);
     }
 
     .faq-item summary::-webkit-details-marker {
@@ -255,78 +245,83 @@ import {
     }
 
     .faq-item summary::after {
-        content: '+';
-        font-size: 1.25rem;
-        color: var(--color-text-variant);
-        transition: transform 0.2s;
+        content: "+";
         flex-shrink: 0;
-        margin-left: 1rem;
+        width: 32px;
+        height: 32px;
+        display: grid;
+        place-items: center;
+        font-family: var(--font-display);
+        font-size: 1.6rem;
+        font-weight: 800;
+        background: var(--ink-orange);
+        color: var(--ink);
     }
 
     .faq-item[open] summary::after {
-        content: '−';
+        content: "−";
+        background: var(--ink-teal);
+        color: var(--paper);
+    }
+
+    .faq-item summary:hover {
+        color: var(--ink-teal);
     }
 
     .faq-body {
-        padding: 0 1.25rem 1.25rem;
-        border-top: 1px solid rgba(255,255,255,0.06);
+        padding: 0 0 1.25rem;
     }
 
     .faq-body p {
-        margin: 1rem 0 0;
+        margin: 0 0 0.75rem;
         line-height: 1.75;
-        color: rgba(255,255,255,0.7);
-        font-size: 0.95rem;
+        color: var(--ink-soft);
     }
 
     .faq-body a {
-        color: var(--color-accent);
-        text-decoration: none;
-    }
-
-    .faq-body a:hover {
+        color: var(--ink-teal);
+        font-weight: 600;
         text-decoration: underline;
+        text-underline-offset: 3px;
     }
 
-    /* Bottom CTA */
+    /* Cierre: cartel sol */
     .bottom-cta {
-        text-align: center;
-        padding: 3rem 2rem;
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: var(--radius-2xl);
+        padding: 2.5rem 2rem;
+        background: var(--ink-sun);
+        color: var(--ink);
     }
 
     .bottom-cta h3 {
-        font-size: 1.4rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
+        font-family: var(--font-display);
+        font-size: clamp(1.9rem, 5vw, 2.6rem);
+        font-weight: 900;
+        text-transform: uppercase;
+        line-height: 0.95;
+        margin-bottom: 0.75rem;
     }
 
     .bottom-cta p {
-        color: rgba(255,255,255,0.6);
         margin-bottom: 1.5rem;
-        font-size: 1rem;
+        font-size: 1.05rem;
     }
 
     .btn-contact {
-        display: inline-block;
-        padding: 0.85rem 2rem;
-        background: #fff;
-        color: #000;
-        border-radius: var(--radius-full);
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.95rem;
-        transition: opacity 0.2s;
+        display: inline-flex;
+        align-items: center;
+        min-height: 52px;
+        padding: 0.85rem 1.75rem;
+        background: var(--ink);
+        color: var(--paper);
+        border-radius: 6px;
+        font-family: var(--font-display);
+        font-size: 1.3rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        transition: background-color 0.2s ease;
     }
 
     .btn-contact:hover {
-        background: var(--color-secondary);
-    }
-
-    @media (max-width: 640px) {
-        h1 { font-size: 1.75rem; }
-
+        background: var(--ink-teal);
     }
 </style>

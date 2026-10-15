@@ -11,7 +11,7 @@ const description = "Gestiona los tutoriales para clientes y comerciantes de Lle
 ---
 
 <!-- noindex: panel de administración (también bloqueado en robots.txt). -->
-<Layout title={title} description={description} noindex>
+<Layout title={title} description={description} noindex theme="ink">
   <Navbar client:load />
   <main class="tutorial-page">
     <TutorialPanel client:load />
@@ -23,5 +23,8 @@ const description = "Gestiona los tutoriales para clientes y comerciantes de Lle
   .tutorial-page {
     min-height: 100vh;
     padding-top: 100px;
+    padding-bottom: 64px;
+    background: var(--color-background);
+    color: var(--color-text);
   }
 </style>

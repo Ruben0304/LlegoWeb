@@ -1,0 +1,175 @@
+---
+/**
+ * Las tres apps como tres carteles de la misma serie, pegados en la pared.
+ */
+import PrintTitle from "../common/PrintTitle.astro";
+
+const apps = [
+  {
+    id: "clientes",
+    name: "Llegó",
+    who: "Para quien compra",
+    text: "Encuentra todo tipo de negocios, pide y paga a tu manera. Desde Cuba o desde el exterior.",
+    href: "#descargar",
+    cta: "Descargar la app",
+  },
+  {
+    id: "negocios",
+    name: "LlegoBusiness",
+    who: "Para quien vende",
+    text: "Pedidos, catálogo, ajustes del negocio y finanzas. Crea combos y banners de promoción.",
+    href: "/negocios",
+    cta: "Vender en Llegó",
+  },
+  {
+    id: "mensajeros",
+    name: "Llego Mensajeros",
+    who: "Para quien entrega",
+    text: "Recoge en el negocio y entrega rápido y seguro, con cada pedido a la mano.",
+    href: "/negocios",
+    cta: "Ser mensajero",
+  },
+];
+---
+
+<section class="eco" aria-labelledby="eco-title">
+  <div class="container">
+    <PrintTitle id="eco-title" class="eco-title" lines={["Tres apps,", "un solo Llegó"]} accent={1} />
+
+    <ul class="eco-wall">
+      {apps.map((app) => (
+        <li class:list={["eco-poster", `eco-poster--${app.id}`]}>
+          <p class="eco-who">{app.who}</p>
+          <h3 class="eco-name">{app.name}</h3>
+          <p class="eco-text">{app.text}</p>
+          <a href={app.href} class="eco-cta">
+            {app.cta}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .eco {
+    background: var(--paper);
+    padding: var(--section-y) 0;
+  }
+
+  :global(.eco-title) {
+    font-size: clamp(52px, 10vw, 128px);
+    margin-bottom: clamp(40px, 6vw, 72px);
+  }
+
+  .eco-wall {
+    display: grid;
+    gap: 20px;
+  }
+
+  .eco-poster {
+    display: flex;
+    flex-direction: column;
+    padding: 28px 26px 26px;
+    min-height: 340px;
+  }
+
+  .eco-poster--clientes {
+    background: var(--ink-orange);
+    color: var(--ink);
+  }
+
+  .eco-poster--negocios {
+    background: var(--ink-teal);
+    color: var(--paper);
+  }
+
+  .eco-poster--mensajeros {
+    background: var(--ink-green);
+    color: var(--ink);
+  }
+
+  .eco-who {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .eco-name {
+    font-family: var(--font-display);
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: clamp(40px, 3.7vw, 54px);
+    line-height: 0.9;
+    margin-bottom: 18px;
+  }
+
+  .eco-poster--negocios .eco-name {
+    color: var(--ink-sun);
+  }
+
+  .eco-text {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 500;
+    max-width: 30ch;
+  }
+
+  .eco-cta {
+    margin-top: auto;
+    padding-top: 28px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    align-self: flex-start;
+    min-height: 44px;
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 6px;
+    text-decoration-color: transparent;
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  .eco-cta:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .eco-cta svg {
+    transition: transform 0.3s var(--ease-out);
+  }
+
+  .eco-cta:hover svg {
+    transform: translateX(5px);
+  }
+
+  @media (min-width: 900px) {
+    .eco-wall {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: start;
+      gap: 24px;
+    }
+
+    /* Pegados a mano: alturas y ángulos distintos */
+    .eco-poster--clientes {
+      min-height: 440px;
+      transform: rotate(-1.2deg);
+    }
+
+    .eco-poster--negocios {
+      min-height: 400px;
+      margin-top: 56px;
+      transform: rotate(0.8deg);
+    }
+
+    .eco-poster--mensajeros {
+      min-height: 420px;
+      margin-top: 20px;
+      transform: rotate(-0.6deg);
+    }
+  }
+</style>

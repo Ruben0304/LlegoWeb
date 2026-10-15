@@ -7,12 +7,12 @@ import BusinessTypePanel from '../components/business-types/BusinessTypePanel.sv
 import Footer from '../components/common/Footer.svelte';
 import '../styles/business-types.css';
 
-const title = "Gestión de Business Types";
+const title = "Tipos de negocio";
 const description = "Panel de administración para gestionar los tipos de negocio en Llegó.";
 ---
 
 <!-- noindex: panel de administración (también bloqueado en robots.txt). -->
-<Layout title={title} description={description} noindex>
+<Layout title={title} description={description} noindex theme="ink">
   <Navbar client:load />
   <main class="business-types-page">
     <BusinessTypePanel client:load />
@@ -24,5 +24,8 @@ const description = "Panel de administración para gestionar los tipos de negoci
   .business-types-page {
     min-height: 100vh;
     padding-top: 100px;
+    padding-bottom: 64px;
+    background: var(--color-background);
+    color: var(--color-text);
   }
 </style>

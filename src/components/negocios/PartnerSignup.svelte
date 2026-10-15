@@ -485,12 +485,13 @@
   }
 
   .title {
-    font-size: clamp(28px, 6vw, 40px);
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: clamp(56px, 11vw, 96px);
+    font-weight: 900;
+    text-transform: uppercase;
     color: var(--color-text);
-    letter-spacing: -0.02em;
-    line-height: 1.15;
-    margin-bottom: 12px;
+    line-height: 0.9;
+    margin-bottom: 16px;
   }
 
   .subtitle {
@@ -523,9 +524,9 @@
     gap: 10px;
     padding: 24px;
     text-align: left;
-    border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.04);
+    border-radius: 0;
+    border: 2px solid var(--ink);
+    background: #fffdf7;
     color: var(--color-text);
     font: inherit;
     cursor: pointer;
@@ -534,21 +535,23 @@
 
   .choice:hover,
   .choice:focus-visible {
-    transform: translateY(-2px);
-    border-color: var(--color-secondary);
+    transform: translateY(-2px) rotate(-0.5deg);
+    background: var(--ink-sun);
   }
 
   .choice-icon {
     display: inline-flex;
     padding: 10px;
-    border-radius: var(--radius-md);
-    background: rgba(225, 199, 142, 0.12);
-    color: var(--color-secondary);
+    background: var(--ink-sun);
+    color: var(--ink);
   }
 
   .choice-title {
-    font-size: var(--font-size-lg);
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1;
   }
 
   .choice-detail {
@@ -562,9 +565,9 @@
     flex-direction: column;
     gap: 16px;
     padding: 28px 24px;
-    border-radius: var(--radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.035);
+    border-radius: 0;
+    border: 2px solid var(--ink);
+    background: var(--paper-deep);
   }
 
   .card-top {
@@ -577,12 +580,15 @@
   .step-label {
     font-size: var(--font-size-sm);
     font-weight: 600;
-    color: var(--color-secondary);
+    color: var(--ink-teal);
   }
 
   .card-title {
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: 34px;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1;
     color: var(--color-text);
     letter-spacing: -0.01em;
   }
@@ -605,7 +611,7 @@
 
   .card-note a,
   .inline-link {
-    color: var(--color-secondary);
+    color: var(--ink-teal);
     text-decoration: underline;
   }
 
@@ -632,9 +638,9 @@
     max-width: 100%;
     height: 44px;
     border-radius: var(--radius-full);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    background: #fff;
-    color: #000;
+    border: none;
+    background: #000;
+    color: #fff;
     font: inherit;
     font-weight: 600;
     font-size: 15px;
@@ -656,8 +662,8 @@
   .spinner {
     width: 20px;
     height: 20px;
-    border: 3px solid rgba(225, 199, 142, 0.2);
-    border-top-color: var(--color-secondary);
+    border: 3px solid var(--ink-line);
+    border-top-color: var(--ink-teal);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -679,18 +685,18 @@
   }
 
   .status-pending {
-    background: rgba(225, 199, 142, 0.15);
-    color: var(--color-secondary);
+    background: var(--ink-sun);
+    color: var(--ink);
   }
 
   .status-approved {
-    background: rgba(178, 214, 154, 0.15);
-    color: var(--color-accent);
+    background: var(--ink-green);
+    color: var(--ink);
   }
 
   .status-rejected {
-    background: rgba(255, 107, 107, 0.12);
-    color: #ff8a8a;
+    background: rgba(200, 60, 40, 0.12);
+    color: #a3301c;
   }
 
   .summary {
@@ -738,18 +744,18 @@
   }
 
   .btn-primary {
-    background: #fff;
-    color: #000;
+    background: var(--ink);
+    color: var(--paper);
     transition: background-color var(--transition-fast);
   }
 
   .btn-primary:hover:not(:disabled) {
-    background: var(--color-secondary);
+    background: var(--ink-teal);
   }
 
   .btn-secondary {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: transparent;
+    border: 2px solid var(--ink);
     color: var(--color-text);
     align-self: flex-start;
   }
@@ -757,9 +763,9 @@
   .form-error {
     padding: 12px 14px;
     border-radius: var(--radius-md);
-    background: rgba(255, 59, 48, 0.1);
-    border: 1px solid rgba(255, 59, 48, 0.25);
-    color: #ff8a8a;
+    background: rgba(200, 60, 40, 0.1);
+    border: 2px solid rgba(163, 48, 28, 0.55);
+    color: #a3301c;
     font-size: var(--font-size-sm);
     line-height: 1.5;
   }
@@ -768,7 +774,7 @@
     padding: 10px 0;
     border: none;
     background: none;
-    color: var(--color-secondary);
+    color: var(--ink-teal);
     font: inherit;
     font-size: var(--font-size-sm);
     font-weight: 600;

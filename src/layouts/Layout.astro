@@ -1,4 +1,6 @@
 ---
+import "@fontsource-variable/big-shoulders-display";
+import "@fontsource-variable/figtree";
 import "../styles/global.css";
 import { SITE_URL } from "../lib/site";
 
@@ -17,6 +19,8 @@ interface Props {
     canonical?: string;
     /** Páginas con sesión o datos de cada usuario: fuera de los buscadores. */
     noindex?: boolean;
+    /** "ink" para los paneles internos: las mismas tintas sobre teal profundo. */
+    theme?: "paper" | "ink";
 }
 
 const {
@@ -26,6 +30,7 @@ const {
     image = DEFAULT_OG_IMAGE,
     canonical,
     noindex = false,
+    theme = "paper",
 } = Astro.props;
 
 const robots = noindex ? "noindex, nofollow" : "index, follow";
@@ -96,7 +101,7 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
         {isDefaultImage && <meta name="twitter:image:alt" content={DEFAULT_OG_IMAGE_ALT} />}
 
         <!-- Theme Color -->
-        <meta name="theme-color" content="#023133" />
+        <meta name="theme-color" content={theme === "ink" ? "#011f20" : "#fff7e6"} />
         <meta name="msapplication-TileColor" content="#023133" />
 
         <!-- Generator -->
@@ -120,7 +125,29 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
             }).replace(/</g, "\\u003c")}
         />
     </head>
-    <body>
+    <body data-theme={theme}>
         <slot />
+        <script>
+            // Registro de serigrafía (.print): las dos tintas encajan al entrar en pantalla.
+            const motionOk = window.matchMedia("(prefers-reduced-motion: no-preference)").matches;
+            if (motionOk && "IntersectionObserver" in window) {
+                const settle = (el: Element) =>
+                    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove("reg-pending")));
+                const io = new IntersectionObserver(
+                    (entries) => {
+                        for (const entry of entries) {
+                            if (!entry.isIntersecting) continue;
+                            settle(entry.target);
+                            io.unobserve(entry.target);
+                        }
+                    },
+                    { threshold: 0.35 },
+                );
+                document.querySelectorAll(".print").forEach((el) => {
+                    el.classList.add("reg-pending");
+                    io.observe(el);
+                });
+            }
+        </script>
     </body>
 </html>

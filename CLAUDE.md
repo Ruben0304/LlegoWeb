@@ -45,8 +45,8 @@ src/
 │   ├── Layout.astro          # Main layout wrapper with SEO metadata
 │   └── LegalLayout.astro     # Páginas legales/soporte: Navbar + Footer y columna de lectura
 ├── components/               # Svelte components organized by screen
-│   ├── common/               # Reusable components (Navbar, Footer, ComingSoon)
-│   ├── home/                 # Home page components (Hero, FeatureShowcase, etc.)
+│   ├── common/               # Navbar, Footer, ComingSoon, PrintTitle (titular a dos tintas), StoreTickets (descargas)
+│   ├── home/                 # Home en Astro sin JS: Hero, Cartelera, TiraPelicula, DosOrillas, Ecosistema, Cierre
 │   ├── tutoriales/           # Panel admin de tutoriales (TutorialPanel, TutorialForm, ...)
 │   ├── negocios/             # Registro de socios (PartnerSignup, PartnerForm)
 │   └── business-types/       # Panel admin de tipos de negocio
@@ -72,8 +72,9 @@ src/
 All pages use [Layout.astro](src/layouts/Layout.astro) which handles:
 - SEO metadata (title, description, keywords, OG tags)
 - Structured data (JSON-LD)
-- Global CSS import
-- Intersection Observer setup for scroll animations
+- Global CSS import and the self-hosted fonts (Big Shoulders Display, Figtree)
+- `theme` prop: `"paper"` (default) or `"ink"` for the admin panels
+- The script that settles `.print` titles into register when they scroll into view
 
 Pages pass props to Layout:
 ```astro
@@ -87,21 +88,15 @@ Astro components use client directives to control JavaScript hydration:
 
 This minimizes initial JavaScript load.
 
-#### 3. CSS Variables System
-[global.css](src/styles/global.css) defines a comprehensive design system with CSS custom properties:
-- Brand colors (`--color-primary`, `--color-secondary`, etc.)
-- Category gradients (`--gradient-restaurants`, `--gradient-clothing`, etc.)
-- Typography scale, spacing, border radius, shadows, transitions, z-index layers
-
-Always use these variables instead of hardcoded values.
-
-Design rules (from the `impeccable` and `design:*` skills in `.claude/skills/`):
-- No gradient text: highlight a word with `--color-highlight` (gold).
-- Secondary text uses `--color-text-variant` (0.6) or `--color-text-subtle` (0.55); lower alphas fail 4.5:1 contrast on black.
-- No kicker/eyebrow labels or pill badges above headings, no decorative grid backgrounds, no emoji as icons (inline SVG, stroke 1.75).
-- Primary buttons are white pills (hover gold), secondary are translucent pills; titles and buttons in Spanish sentence case ("Iniciar sesión").
-- Nothing that only reveals content on scroll or on desktop: mobile and `prefers-reduced-motion` must show the same content.
-- Check changes with `.claude/skills/impeccable/scripts/impeccable detect --json src` (and with a URL to scan the rendered page).
+#### 3. Design system ("carteles serigrafiados")
+The full system is in [DESIGN.md](DESIGN.md); product facts in [PRODUCT.md](PRODUCT.md). In short:
+- Paper ground (`--paper`) and the logo's flat inks in fields that own whole sections: `--ink-teal`, `--ink-orange`, `--ink-green`, `--ink-sun`; text in `--ink` (deep teal). Tokens live in [global.css](src/styles/global.css); older role names (`--color-text`, `--color-background`, ...) are aliases.
+- Headlines: `PrintTitle.astro` (Big Shoulders Display, uppercase) with a second ink offset via `text-shadow` that settles into register on scroll. Body: Figtree.
+- Actions are cinema tickets (`.ticket`, notched stub); downloads always go through `StoreTickets.astro`.
+- Contrast: orange and sun fields take `--ink` text; teal fields take `--paper`. Never orange or sun text on paper.
+- No gradient text, no eyebrow labels above headings, no emoji icons (two-ink SVG), no glass. Mobile and `prefers-reduced-motion` show the same content.
+- `/tutoriales` and `/business-types` render with `data-theme="ink"` (dark teal); they only borrow type and palette.
+- Check changes with `.claude/skills/impeccable/scripts/impeccable detect --json src` (or a URL; set `IMPECCABLE_BROWSER` to a Chromium binary). `cream-palette` is expected: the cream is the logo's.
 
 #### 4. Svelte 5 Reactivity
 Components use Svelte 5's runes syntax:
@@ -109,10 +104,10 @@ Components use Svelte 5's runes syntax:
 - `$derived(expression)` for computed values
 - Standard `onMount()` lifecycle
 
-Example from [Hero.svelte](src/components/home/Hero.svelte):
+Example from [Navbar.svelte](src/components/common/Navbar.svelte):
 ```ts
-let scrollY = $state(0);
-let opacity = $derived(Math.max(0, 1 - scrollY / (windowHeight * 0.6)));
+let isScrolled = $state(false);
+let isMobileMenuOpen = $state(false);
 ```
 
 #### 5. Component Organization
@@ -123,16 +118,16 @@ Components are organized by screen/feature for better maintainability:
 ---
 // From index files (recommended)
 import { Navbar, Footer } from '@/components/common';
-import { Hero, FeatureShowcase } from '@/components/home';
+import { Hero, Cartelera } from '@/components/home';
 
 // Or individual imports
-import Hero from '@/components/home/Hero.svelte';
+import Hero from '@/components/home/Hero.astro';
 ---
 ```
 
 **Component folders:**
 - `common/` - Shared components (Navbar, Footer, ComingSoon)
-- `home/` - Homepage components (Hero, DeliveryShowcase, FeatureShowcase, ScrollytellingHowItWorks)
+- `home/` - Homepage sections as Astro components with no client JS (Hero, Cartelera, TiraPelicula, DosOrillas, Ecosistema, Cierre)
 - `tutoriales/` - Admin tutorials panel (TutorialPanel, TutorialForm, TutorialList, uploaders)
 - `negocios/` - Registro de socios en /negocios (PartnerSignup: elegir tipo, login, formulario y estado; PartnerForm)
 - `business-types/` - Admin business types panel
@@ -173,10 +168,9 @@ const tutorials = await getTutorials(jwt);
 - Main client: `src/lib/shared/graphql.ts`
 - See `src/lib/README.md` for detailed documentation
 
-#### 7. Scroll Animations
-- Layout includes an Intersection Observer that adds `.animate-in` class to `.animate-on-scroll` elements
-- Staggered animation delays using nth-child selectors
-- Parallax effects in Hero using scroll-based transforms
+#### 7. Motion
+- `.print` titles: the second ink starts offset and settles into register when the title enters the viewport (script in `Layout.astro`); already settled without JS or with reduced motion.
+- The hero box slides in once on load; the mobile menu opens as a full orange poster (`clip-path`).
 
 #### 8. Language & Content
 - All content is in **Spanish** (ES)
@@ -185,10 +179,10 @@ const tutorials = await getTutorials(jwt);
 
 ## Development Notes
 
-- The site uses a dark theme with Apple-inspired design (see CSS variables)
-- Responsive breakpoints: 1024px (desktop), 1280px (large desktop)
-- Image assets are in `/public/img/`
-- Theme color is `#023133` (teal)
+- Light paper theme with the logo's inks (see DESIGN.md); admin panels use the dark `ink` theme
+- Responsive breakpoints: 900px (two-column sections), 1024px (desktop hero)
+- Image assets are in `/public/img/`; `logo-caja-*.webp` are crops of `icon.png`. Rasters carry their origin (`impeccable embed-prompt --scan public/img`)
+- Theme color is `#fff7e6` (paper)
 
 ## Contrato GraphQL con el backend (CI)
 

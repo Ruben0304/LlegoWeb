@@ -15,8 +15,9 @@ const description = "La página que buscas no existe o cambió de dirección.";
   <Navbar client:load />
   <main>
     <ComingSoon
-      title="No encontramos esta página"
-      description="Puede que el enlace esté mal escrito o que la página ya no exista. Vuelve al inicio o escríbenos si necesitas ayuda."
+      lines={["Este pedido", "no llegó"]}
+      tone="teal"
+      description="No encontramos esta página: puede que el enlace esté mal escrito o que ya no exista. Vuelve al inicio o escríbenos si necesitas ayuda."
       primaryHref="/"
       primaryLabel="Volver al inicio"
       secondaryHref="/soporte"

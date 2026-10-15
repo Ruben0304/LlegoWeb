@@ -1,0 +1,150 @@
+---
+/**
+ * Los dos lados de la familia, en dos campos de tinta enfrentados: quien pide
+ * en Cuba y quien paga desde fuera. La caja cruza la costura entre los dos.
+ */
+---
+
+<section class="orillas" id="dos-orillas" aria-label="Desde Cuba o desde el exterior">
+  <div class="orilla orilla-cuba">
+    <div class="orilla-inner">
+      <h2 class="orilla-title">En Cuba,<br />pides.</h2>
+      <p class="orilla-text">
+        Busca cualquier negocio, cerca o en otro municipio, y elige cómo te llega: a domicilio,
+        programado para más tarde o recogido en la tienda.
+      </p>
+      <ul class="orilla-list">
+        <li>Pagas en CUP o en USD</li>
+        <li>Por transferencia o en efectivo</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="orilla orilla-fuera">
+    <div class="orilla-inner">
+      <h2 class="orilla-title">Desde fuera,<br />pagas.</h2>
+      <p class="orilla-text">
+        ¿Tu familia está en Cuba? Págale el pedido desde el exterior, también en moneda
+        extranjera, y Llegó se lo lleva hasta la puerta.
+      </p>
+      <ul class="orilla-list">
+        <li>Mismos negocios y mismos pedidos</li>
+        <li>Lo recibe tu familia en Cuba</li>
+      </ul>
+    </div>
+  </div>
+
+  <img
+    class="orilla-box"
+    src="/img/logo-caja-320.webp"
+    width="320"
+    height="210"
+    alt=""
+    loading="lazy"
+    decoding="async"
+  />
+</section>
+
+<style>
+  .orillas {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .orilla {
+    padding: clamp(64px, 9vw, 120px) var(--gutter);
+  }
+
+  .orilla-inner {
+    max-width: 520px;
+  }
+
+  .orilla-cuba {
+    background: var(--ink-teal);
+    color: var(--paper);
+  }
+
+  .orilla-fuera {
+    background: var(--ink-orange);
+    color: var(--ink);
+  }
+
+  .orilla-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: clamp(56px, 9vw, 112px);
+    line-height: 0.88;
+    margin-bottom: 24px;
+  }
+
+  .orilla-cuba .orilla-title {
+    color: var(--ink-sun);
+  }
+
+  .orilla-text {
+    font-size: 18px;
+    line-height: 1.55;
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+
+  .orilla-list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .orilla-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+
+  .orilla-list li::before {
+    content: "";
+    flex-shrink: 0;
+    width: 22px;
+    height: 10px;
+    border-radius: 0 999px 999px 0;
+    background: currentColor;
+  }
+
+  /* La caja cruza la costura entre las dos orillas */
+  .orilla-box {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: clamp(120px, 26vw, 200px);
+    height: auto;
+    transform: translate(-50%, -50%) rotate(-8deg);
+    filter: drop-shadow(8px 10px 0 rgba(2, 49, 51, 0.25));
+    pointer-events: none;
+  }
+
+  @media (min-width: 900px) {
+    .orillas {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .orilla-cuba {
+      display: flex;
+      justify-content: flex-end;
+      padding-right: clamp(80px, 9vw, 140px);
+    }
+
+    .orilla-fuera {
+      padding-left: clamp(80px, 9vw, 140px);
+    }
+
+    .orilla-box {
+      top: 46%;
+      transform: translate(-50%, -50%) rotate(8deg) scaleX(-1);
+    }
+  }
+</style>

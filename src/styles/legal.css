@@ -1,42 +1,48 @@
-/* Llegó - Estilos del texto de las páginas legales (/privacidad, /terminos, /eliminar-cuenta).
-   Se activan con la clase .legal-prose en el contenedor del documento. */
+/* Llegó - Texto de las páginas legales (/privacidad, /terminos, /eliminar-cuenta).
+   Se activan con la clase .legal-prose en el contenedor del documento.
+   Modo lectura: papel, tinta teal profunda, columna de ~66 caracteres. */
 
-/* Columna de lectura: ~70 caracteres por línea */
 .legal-prose {
-  max-width: 66ch;
+  max-width: 36rem;
   margin: 0 auto;
   font-size: 1.0625rem;
+  color: var(--ink);
 }
 
 .legal-prose h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  margin-bottom: 0.5rem;
-  color: var(--color-text);
-  text-wrap: balance;
-  line-height: 1.15;
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 8vw, 4.75rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.92;
+  letter-spacing: -0.005em;
+  margin-bottom: 1rem;
+  color: var(--ink);
 }
 
 .legal-prose .last-updated {
-  color: var(--color-text-variant);
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--ink-sun);
+  color: var(--ink);
   font-size: 0.9rem;
+  font-weight: 600;
   margin-bottom: 2rem;
 }
 
 .legal-prose .intro {
-  font-size: 1.1rem;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.15rem;
+  line-height: 1.65;
+  color: var(--ink);
   margin-bottom: 2.5rem;
   padding-bottom: 2.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 3px solid var(--ink);
 }
 
 .legal-prose section {
   margin-bottom: 2.5rem;
   padding-bottom: 2.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--ink-line);
 }
 
 .legal-prose section:last-child {
@@ -44,23 +50,25 @@
 }
 
 .legal-prose h2 {
-  font-size: 1.3rem;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 1.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 1;
   margin-bottom: 1rem;
-  color: var(--color-secondary);
-  letter-spacing: -0.01em;
+  color: var(--ink-teal);
 }
 
 .legal-prose h3 {
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 700;
   margin: 1.5rem 0 0.75rem;
-  color: var(--color-text);
+  color: var(--ink);
 }
 
 .legal-prose p {
   line-height: 1.75;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--ink-soft);
   margin-bottom: 1rem;
 }
 
@@ -71,7 +79,7 @@
 }
 
 .legal-prose ul {
-  list-style: disc;
+  list-style: square;
 }
 
 .legal-prose ol {
@@ -80,19 +88,25 @@
 
 .legal-prose li {
   line-height: 1.75;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--ink-soft);
   margin-bottom: 0.5rem;
 }
 
+.legal-prose li::marker {
+  color: var(--ink-orange-dark);
+}
+
 .legal-prose strong {
-  color: var(--color-text);
-  font-weight: 600;
+  color: var(--ink);
+  font-weight: 700;
 }
 
 .legal-prose a {
-  color: var(--color-accent);
+  color: var(--ink-teal);
+  font-weight: 600;
   text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+  text-decoration-thickness: 2px;
+  text-decoration-color: color-mix(in srgb, var(--ink-teal) 35%, transparent);
   text-underline-offset: 3px;
 }
 
@@ -102,9 +116,8 @@
 
 /* Recuadro para avisos destacados (p. ej. plazos de eliminación) */
 .legal-prose .callout {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-lg);
+  background: var(--paper-deep);
+  box-shadow: inset 0 0 0 2px var(--ink);
   padding: 1.25rem 1.5rem;
   margin-bottom: 1rem;
 }
@@ -113,10 +126,4 @@
 .legal-prose .callout ul:last-child,
 .legal-prose .callout ol:last-child {
   margin-bottom: 0;
-}
-
-@media (max-width: 640px) {
-  .legal-prose h1 {
-    font-size: 1.75rem;
-  }
 }

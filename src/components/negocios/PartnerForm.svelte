@@ -232,8 +232,8 @@
     width: 100%;
     padding: 12px 14px;
     border-radius: var(--radius-md);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: rgba(255, 255, 255, 0.04);
+    border: 2px solid var(--ink);
+    background: #fffdf7;
     color: var(--color-text);
     font: inherit;
     font-size: var(--font-size-base);
@@ -247,14 +247,14 @@
 
   input:focus,
   textarea:focus {
-    outline: 2px solid color-mix(in srgb, var(--color-secondary) 45%, transparent);
+    outline: 3px solid color-mix(in srgb, var(--ink-teal) 40%, transparent);
     outline-offset: 1px;
-    border-color: var(--color-secondary);
-    background: rgba(255, 255, 255, 0.07);
+    border-color: var(--ink-teal);
+    background: #fff;
   }
 
   input[aria-invalid="true"] {
-    border-color: rgba(255, 107, 107, 0.7);
+    border-color: #a3301c;
   }
 
   .field-help,
@@ -268,15 +268,15 @@
   }
 
   .field-error {
-    color: #ff8a8a;
+    color: #a3301c;
   }
 
   .form-error {
     padding: 12px 14px;
     border-radius: var(--radius-md);
-    background: rgba(255, 59, 48, 0.1);
-    border: 1px solid rgba(255, 59, 48, 0.25);
-    color: #ff8a8a;
+    background: rgba(200, 60, 40, 0.1);
+    border: 2px solid rgba(163, 48, 28, 0.55);
+    color: #a3301c;
     font-size: var(--font-size-sm);
     line-height: 1.5;
   }
@@ -293,12 +293,12 @@
   }
 
   .btn-primary {
-    background: #fff;
-    color: #000;
+    background: var(--ink);
+    color: var(--paper);
   }
 
   .btn-primary:hover:not(:disabled) {
-    background: var(--color-secondary);
+    background: var(--ink-teal);
   }
 
   .btn:disabled {

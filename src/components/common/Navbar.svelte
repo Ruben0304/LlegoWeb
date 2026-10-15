@@ -4,20 +4,29 @@
     let isScrolled = $state(false);
     let isMobileMenuOpen = $state(false);
 
+    const links = [
+        { href: "/#categorias", label: "Categorías" },
+        { href: "/#como-funciona", label: "Cómo funciona" },
+        { href: "/plus", label: "Llegó+" },
+        { href: "/negocios", label: "Negocios y mensajeros" },
+    ];
+
     onMount(() => {
         const handleScroll = () => {
-            isScrolled = window.scrollY > 50;
+            isScrolled = window.scrollY > 8;
         };
 
         const handleKeydown = (e: KeyboardEvent) => {
             if (e.key === "Escape" && isMobileMenuOpen) closeMobileMenu();
         };
 
+        handleScroll();
         window.addEventListener("scroll", handleScroll, { passive: true });
         window.addEventListener("keydown", handleKeydown);
         return () => {
             window.removeEventListener("scroll", handleScroll);
             window.removeEventListener("keydown", handleKeydown);
+            document.body.style.overflow = "";
         };
     });
 
@@ -30,65 +39,33 @@
         isMobileMenuOpen = false;
         document.body.style.overflow = "";
     }
-
-    function handleDescargar(e: MouseEvent) {
-        closeMobileMenu();
-        const hero = document.getElementById("inicio");
-        const descargar = document.getElementById("descargar");
-        // Fuera de la home no hay botones de descarga: el enlace lleva a /#descargar.
-        if (!hero || !descargar) return;
-        e.preventDefault();
-
-        const heroVisible = hero.getBoundingClientRect().top >= -window.innerHeight * 0.5
-            && hero.getBoundingClientRect().bottom > 0;
-
-        const fireHighlight = () => {
-            window.dispatchEvent(new CustomEvent("llego:highlight-download"));
-        };
-
-        if (heroVisible) {
-            fireHighlight();
-        } else {
-            hero.scrollIntoView({ behavior: "smooth" });
-            // Wait for scroll to finish before firing the highlight
-            setTimeout(fireHighlight, 700);
-        }
-    }
 </script>
 
-<nav class="navbar" class:scrolled={isScrolled} aria-label="Principal">
-    <div class="navbar-container">
-        <a href="/" class="logo" aria-label="Llegó - Inicio">
-            <img src="/img/icon.png" width="36" height="36" loading="eager" decoding="async" alt="Llegó" class="logo-icon" />
+<header class="navbar" class:scrolled={isScrolled} class:menu-open={isMobileMenuOpen}>
+    <nav class="navbar-container" aria-label="Principal">
+        <a href="/" class="logo" aria-label="Llegó, ir al inicio" onclick={closeMobileMenu}>
+            <img
+                src="/img/logo-caja-320.webp"
+                width="320"
+                height="210"
+                alt=""
+                class="logo-icon"
+                decoding="async"
+            />
             <span class="logo-text">Llegó</span>
         </a>
 
         <div class="nav-links" id="nav-links" class:open={isMobileMenuOpen}>
-            <a href="/#categorias" class="nav-link" onclick={closeMobileMenu}
-                >Categorías</a
-            >
-            <a href="/#como-funciona" class="nav-link" onclick={closeMobileMenu}
-                >Cómo funciona</a
-            >
-            <a href="/plus" class="nav-link" onclick={closeMobileMenu}>Llegó+</a
-            >
-            <a href="/negocios" class="nav-link" onclick={closeMobileMenu}
-                >Negocios y mensajeros</a
-            >
-            <a href="/#descargar" class="nav-cta" onclick={handleDescargar}>
-                <span>Descargar</span>
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                >
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
+            {#each links as link (link.href)}
+                <a href={link.href} class="nav-link" onclick={closeMobileMenu}>{link.label}</a>
+            {/each}
+            <a href="/#descargar" class="ticket nav-cta" onclick={closeMobileMenu}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 3v12" />
+                    <path d="m7 10 5 5 5-5" />
+                    <path d="M5 21h14" />
                 </svg>
+                <span>Descargar</span>
             </a>
         </div>
 
@@ -101,17 +78,8 @@
         >
             <span class="hamburger" class:open={isMobileMenuOpen}></span>
         </button>
-    </div>
-</nav>
-
-{#if isMobileMenuOpen}
-    <div
-        class="mobile-overlay"
-        onclick={closeMobileMenu}
-        role="button"
-        tabindex="-1"
-    ></div>
-{/if}
+    </nav>
+</header>
 
 <style>
     .navbar {
@@ -120,134 +88,114 @@
         left: 0;
         right: 0;
         z-index: var(--z-navbar);
-        padding: 16px 0;
-        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        background: transparent;
+        background: var(--paper);
+        box-shadow: 0 1px 0 transparent;
+        transition: box-shadow 0.3s ease;
     }
 
     .navbar.scrolled {
-        background: rgba(0, 0, 0, 0.8);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-bottom: none;
-        padding: 12px 0;
+        box-shadow: 0 2px 0 var(--ink);
     }
 
     .navbar-container {
-        max-width: 1200px;
+        max-width: 1240px;
         margin: 0 auto;
-        padding: 0 24px;
+        padding: 10px var(--gutter);
+        min-height: 68px;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        gap: 24px;
     }
 
     .logo {
         display: flex;
         align-items: center;
-        gap: 12px;
-        z-index: 10;
+        gap: 10px;
+        z-index: 2;
+        color: var(--ink);
     }
 
     .logo-icon {
-        width: 36px;
-        height: 36px;
-        object-fit: contain;
-        transition: transform 0.3s ease;
-        mix-blend-mode: screen;
+        width: 50px;
+        height: auto;
+        transition: transform 0.4s var(--ease-out);
     }
 
     .logo:hover .logo-icon {
-        transform: scale(1.05);
+        transform: translateX(4px);
     }
 
     .logo-text {
-        font-size: 22px;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        color: var(--color-text);
+        font-family: var(--font-display);
+        font-size: 30px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.01em;
+        line-height: 1;
     }
 
     .nav-links {
         display: flex;
         align-items: center;
-        gap: 36px;
+        gap: 28px;
     }
 
     .nav-link {
         position: relative;
-        font-size: 14px;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.7);
-        transition: color 0.3s ease;
-        letter-spacing: -0.01em;
+        padding: 10px 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--ink);
     }
 
     .nav-link::after {
         content: "";
         position: absolute;
-        bottom: -4px;
         left: 0;
-        width: 0;
-        height: 1px;
-        background: var(--color-secondary);
-        transition: width 0.3s ease;
-    }
-
-    .nav-link:hover {
-        color: #fff;
+        right: 0;
+        bottom: 4px;
+        height: 4px;
+        background: var(--ink-orange);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.35s var(--ease-out);
     }
 
     .nav-link:hover::after {
-        width: 100%;
+        transform: scaleX(1);
     }
 
     .nav-cta {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        color: #000;
-        background: #fff;
-        padding: 10px 20px;
-        border-radius: 100px;
-        transition: all 0.3s ease;
-    }
-
-    .nav-cta:hover {
-        background: var(--color-secondary);
-        transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(225, 199, 142, 0.3);
-    }
-
-    .nav-cta svg {
-        transition: transform 0.3s ease;
-    }
-
-    .nav-cta:hover svg {
-        transform: translateY(2px);
+        min-height: 44px;
+        padding: 8px 20px 8px 18px;
+        font-family: var(--font-display);
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
     }
 
     .mobile-menu-btn {
         display: none;
-        width: 44px;
-        height: 44px;
+        width: 48px;
+        height: 48px;
         align-items: center;
         justify-content: center;
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        padding: 0;
-        z-index: 10;
+        z-index: 2;
+        margin-right: -10px;
+    }
+
+    .hamburger,
+    .hamburger::before,
+    .hamburger::after {
+        width: 26px;
+        height: 3px;
+        background: var(--ink);
+        transition: transform 0.3s var(--ease-out), background-color 0.2s ease;
     }
 
     .hamburger {
         position: relative;
-        width: 22px;
-        height: 2px;
-        background: #fff;
-        transition: all 0.3s ease;
     }
 
     .hamburger::before,
@@ -255,18 +203,14 @@
         content: "";
         position: absolute;
         left: 0;
-        width: 22px;
-        height: 2px;
-        background: #fff;
-        transition: all 0.3s ease;
     }
 
     .hamburger::before {
-        top: -7px;
+        top: -8px;
     }
 
     .hamburger::after {
-        top: 7px;
+        top: 8px;
     }
 
     .hamburger.open {
@@ -274,60 +218,56 @@
     }
 
     .hamburger.open::before {
-        transform: translateY(7px) rotate(45deg);
+        transform: translateY(8px) rotate(45deg);
     }
 
     .hamburger.open::after {
-        transform: translateY(-7px) rotate(-45deg);
+        transform: translateY(-8px) rotate(-45deg);
     }
 
-    .mobile-overlay {
-        display: none;
-    }
-
-    @media (max-width: 768px) {
-        .navbar.scrolled {
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-
+    @media (max-width: 900px) {
         .mobile-menu-btn {
             display: flex;
         }
 
+        .navbar.menu-open {
+            background: var(--ink-orange);
+        }
+
+        /* Menú a pantalla completa: un cartel naranja con los enlaces en grande */
         .nav-links {
             position: fixed;
-            top: 0;
-            right: -100%;
-            width: 100%;
-            height: 100vh;
-            background: linear-gradient(180deg, #0a0a0a 0%, #111 100%);
+            inset: 0;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            gap: 32px;
+            gap: 4px;
+            padding: 96px var(--gutter) 48px;
+            overflow: hidden;
+            background: var(--ink-orange);
             visibility: hidden;
+            clip-path: inset(0 0 100% 0);
             transition:
-                right 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                visibility 0s linear 0.4s;
+                clip-path 0.5s var(--ease-out),
+                visibility 0s linear 0.5s;
         }
 
         .nav-links.open {
-            right: 0;
             visibility: visible;
+            clip-path: inset(0 0 0 0);
             transition:
-                right 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                clip-path 0.5s var(--ease-out),
                 visibility 0s;
         }
 
         .nav-link {
-            font-size: 24px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .nav-link:hover {
-            color: #fff;
+            font-family: var(--font-display);
+            font-size: clamp(36px, 10vw, 64px);
+            max-width: 100%;
+            font-weight: 800;
+            text-transform: uppercase;
+            line-height: 1;
+            padding: 6px 0;
         }
 
         .nav-link::after {
@@ -335,37 +275,21 @@
         }
 
         .nav-cta {
-            font-size: 18px;
-            padding: 16px 40px;
-            margin-top: 16px;
-        }
-
-        .mobile-overlay {
-            display: block;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: calc(var(--z-navbar) - 1);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+            margin-top: 28px;
+            min-height: 56px;
+            font-size: 24px;
+            padding: 10px 28px 10px 24px;
         }
     }
 
     @media (prefers-reduced-motion: reduce) {
-        .navbar,
         .nav-links,
-        .nav-link,
-        .nav-cta,
+        .nav-links.open,
         .hamburger,
         .hamburger::before,
-        .hamburger::after {
-            transition: none !important;
-        }
-
-        .navbar.scrolled,
-        .mobile-overlay {
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
+        .hamburger::after,
+        .logo-icon {
+            transition: none;
         }
     }
 </style>
