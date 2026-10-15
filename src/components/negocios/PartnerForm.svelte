@@ -284,7 +284,7 @@
   .btn {
     padding: 14px 28px;
     border: none;
-    border-radius: var(--radius-full);
+    border-radius: 6px;
     font: inherit;
     font-weight: 600;
     font-size: 15px;

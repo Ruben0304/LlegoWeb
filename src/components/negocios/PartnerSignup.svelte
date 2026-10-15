@@ -734,7 +734,7 @@
     display: inline-block;
     min-height: 44px;
     padding: 12px 24px;
-    border-radius: var(--radius-full);
+    border-radius: 6px;
     border: none;
     font: inherit;
     font-weight: 600;

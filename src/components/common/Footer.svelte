@@ -147,7 +147,7 @@
     text-decoration-color: var(--ink-sun);
   }
 
-  /* La firma: LLEGÓ impreso a todo el ancho, en tinta más oscura sobre el teal */
+  /* La firma: LLEGÓ impreso a todo el ancho, en tinta sol sobre el teal */
   .footer-wordmark {
     margin: 88px 0 0;
     font-family: var(--font-display);
