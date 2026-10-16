@@ -3,6 +3,10 @@
 
     let isScrolled = $state(false);
     let isMobileMenuOpen = $state(false);
+    // Ruta del pedido: la caja avanza con el scroll y llega a la casa al final
+    let routeEl = $state<HTMLDivElement | null>(null);
+    let arrived = $state(false);
+    let rafId = 0;
 
     const links = [
         { href: "/#categorias", label: "Categorías" },
@@ -12,8 +16,17 @@
     ];
 
     onMount(() => {
+        const updateRoute = () => {
+            rafId = 0;
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+            routeEl?.style.setProperty("--p", p.toFixed(4));
+            arrived = p > 0.985;
+        };
+
         const handleScroll = () => {
             isScrolled = window.scrollY > 8;
+            if (!rafId) rafId = requestAnimationFrame(updateRoute);
         };
 
         const handleKeydown = (e: KeyboardEvent) => {
@@ -22,10 +35,13 @@
 
         handleScroll();
         window.addEventListener("scroll", handleScroll, { passive: true });
+        window.addEventListener("resize", handleScroll, { passive: true });
         window.addEventListener("keydown", handleKeydown);
         return () => {
             window.removeEventListener("scroll", handleScroll);
+            window.removeEventListener("resize", handleScroll);
             window.removeEventListener("keydown", handleKeydown);
+            if (rafId) cancelAnimationFrame(rafId);
             document.body.style.overflow = "";
         };
     });
@@ -79,6 +95,19 @@
             <span class="hamburger" class:open={isMobileMenuOpen}></span>
         </button>
     </nav>
+
+    <!-- Tu pedido en camino: avance de la página como un trayecto (decorativo) -->
+    <div class="route" class:arrived bind:this={routeEl} aria-hidden="true">
+        <div class="route-track">
+            <span class="route-road"></span>
+            <img class="route-box" src="/img/logo-caja-320.webp" width="320" height="210" alt="" decoding="async" />
+            <svg class="route-home" viewBox="0 0 28 26">
+                <path class="roof" d="M1 12 14 2l13 10z" />
+                <rect class="wall" x="4" y="11" width="20" height="14" />
+                <path class="door" d="M11 25v-6a3 3 0 0 1 6 0v6z" />
+            </svg>
+        </div>
+    </div>
 </header>
 
 <style>
@@ -94,7 +123,93 @@
     }
 
     .navbar.scrolled {
+        box-shadow: none;
+    }
+
+    /* La ruta: una franja fina bajo la barra, visible al hacer scroll */
+    .route {
+        --p: 0;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 100%;
+        height: 24px;
+        background: var(--paper);
         box-shadow: 0 2px 0 var(--ink);
+        opacity: 0;
+        transform: translateY(-6px);
+        pointer-events: none;
+        transition:
+            opacity 0.3s ease,
+            transform 0.3s var(--ease-out);
+    }
+
+    .navbar.scrolled .route {
+        opacity: 1;
+        transform: none;
+    }
+
+    .navbar.menu-open .route {
+        opacity: 0;
+    }
+
+    .route-track {
+        position: relative;
+        max-width: 1240px;
+        height: 100%;
+        margin: 0 auto;
+        padding: 0 var(--gutter);
+        container-type: inline-size;
+    }
+
+    .route-road {
+        position: absolute;
+        left: var(--gutter);
+        right: calc(var(--gutter) + 18px);
+        top: 13px;
+        border-top: 2px dashed var(--ink-teal);
+    }
+
+    .route-box {
+        position: absolute;
+        left: var(--gutter);
+        top: 1px;
+        width: 34px;
+        height: auto;
+        transform: translateX(calc(var(--p) * (100cqw - 58px)));
+        will-change: transform;
+    }
+
+    .route-home {
+        position: absolute;
+        right: var(--gutter);
+        top: 2px;
+        width: 20px;
+        height: 19px;
+    }
+
+    .route-home .roof {
+        fill: var(--ink-orange);
+    }
+
+    .route-home .wall {
+        fill: var(--ink-sun);
+        stroke: var(--ink);
+        stroke-width: 1.5;
+    }
+
+    .route-home .door {
+        fill: var(--ink-teal);
+    }
+
+    .route.arrived .route-home {
+        animation: home-arrive 0.6s var(--ease-out);
+    }
+
+    @keyframes home-arrive {
+        40% {
+            transform: translateY(-4px) scale(1.15);
+        }
     }
 
     .navbar-container {
@@ -288,8 +403,13 @@
         .hamburger,
         .hamburger::before,
         .hamburger::after,
-        .logo-icon {
+        .logo-icon,
+        .route {
             transition: none;
+        }
+
+        .route.arrived .route-home {
+            animation: none;
         }
     }
 </style>

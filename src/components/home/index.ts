@@ -8,3 +8,5 @@ export { default as TiraPelicula } from './TiraPelicula.astro';
 export { default as DosOrillas } from './DosOrillas.astro';
 export { default as Ecosistema } from './Ecosistema.astro';
 export { default as Cierre } from './Cierre.astro';
+export { default as Marquesina } from './Marquesina.astro';
+export { default as BarraDescarga } from './BarraDescarga.astro';

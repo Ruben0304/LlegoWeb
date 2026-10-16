@@ -34,16 +34,19 @@ function friendlyError(status: number, message: string): Response {
 <meta name="robots" content="noindex, nofollow">
 <title>Descarga no disponible | Llegó</title>
 <style>
+  /* Mismas tintas que el sitio (DESIGN.md), sin fuentes propias: página mínima */
   body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-    background: #000; color: #fff; padding: 24px; box-sizing: border-box;
+    background: #fff7e6; color: #023133; padding: 24px; box-sizing: border-box;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-  main { max-width: 420px; text-align: center; }
-  h1 { font-size: 1.5rem; margin: 0 0 12px; }
-  p { color: rgba(255, 255, 255, 0.7); line-height: 1.5; margin: 0 0 24px; }
-  a { display: inline-block; margin: 4px; padding: 12px 20px; border-radius: 999px; text-decoration: none;
-    background: #E1C78E; color: #023133; font-weight: 600; }
-  a.secondary { background: transparent; color: #E1C78E; border: 1px solid rgba(225, 199, 142, 0.5); }
-  .note { margin: 24px 0 0; font-size: 0.875rem; }
+  main { max-width: 440px; text-align: center; }
+  h1 { font-family: 'Arial Narrow', 'Roboto Condensed', sans-serif; font-size: 2.4rem; font-weight: 900;
+    text-transform: uppercase; line-height: 1; margin: 0 0 14px; text-shadow: 0.045em 0.035em 0 #ec9844; }
+  p { color: rgba(2, 49, 51, 0.8); line-height: 1.5; margin: 0 0 24px; }
+  a { display: inline-flex; align-items: center; min-height: 48px; margin: 4px; padding: 10px 20px;
+    border-radius: 6px; text-decoration: none; background: #023133; color: #fff7e6; font-weight: 700; }
+  a.secondary { background: transparent; color: #023133; box-shadow: inset 0 0 0 2px #023133; }
+  a:focus-visible { outline: 3px solid #127368; outline-offset: 3px; }
+  .note { margin: 24px 0 0; font-size: 0.9rem; }
 </style>
 </head>
 <body>

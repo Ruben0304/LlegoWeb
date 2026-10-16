@@ -1,0 +1,117 @@
+---
+/**
+ * Marquesina de cine (como las de los cines de La Habana): bombillas arriba y
+ * abajo y la cartelera desfilando. Decorativa: repite lo que dice la página.
+ * El bucle se pausa fuera de pantalla (data-loop, script de Layout.astro) y
+ * con movimiento reducido queda quieta.
+ */
+const items = [
+  "Restaurantes",
+  "Ropa",
+  "Mercado",
+  "Agro",
+  "Perfumería",
+  "Pide desde Cuba",
+  "Paga desde fuera",
+  "Recógelo en tienda",
+  "Prográmalo para más tarde",
+];
+---
+
+<div class="marquesina" aria-hidden="true" data-loop>
+  <div class="bulbs"></div>
+  <div class="track">
+    <div class="run">
+      {[0, 1].map(() => (
+        <div class="run-half">
+          {items.map((item) => (
+            <>
+              <span class="item">{item}</span>
+              <img class="sep" src="/img/logo-caja-320.webp" width="320" height="210" alt="" loading="lazy" decoding="async" />
+            </>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+  <div class="bulbs bulbs-bottom"></div>
+</div>
+
+<style>
+  .marquesina {
+    position: relative;
+    background: var(--ink);
+    color: var(--ink-sun);
+    overflow: hidden;
+  }
+
+  /* Hileras de bombillas: dos capas que se alternan, como un letrero de cine */
+  .bulbs {
+    height: 18px;
+    background-image:
+      radial-gradient(circle, var(--ink-sun) 3.5px, transparent 4px),
+      radial-gradient(circle, rgba(250, 216, 147, 0.35) 3.5px, transparent 4px);
+    background-size: 24px 18px, 24px 18px;
+    background-position: 0 50%, 12px 50%;
+    background-repeat: repeat-x;
+  }
+
+  .track {
+    padding: 10px 0;
+    border-block: 2px solid var(--ink-teal);
+  }
+
+  .run {
+    display: flex;
+    width: max-content;
+  }
+
+  .run-half {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .item {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+    padding: 0 22px;
+    text-shadow: 0.045em 0.035em 0 var(--ink-orange-dark);
+  }
+
+  .sep {
+    width: 46px;
+    height: auto;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .run {
+      animation: marquee 48s linear infinite;
+    }
+
+    .bulbs {
+      animation: bulbs 1.4s steps(1) infinite;
+    }
+
+    .marquesina.is-off .run,
+    .marquesina.is-off .bulbs {
+      animation-play-state: paused;
+    }
+
+    @keyframes marquee {
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    @keyframes bulbs {
+      50% {
+        background-position: 12px 50%, 0 50%;
+      }
+    }
+  }
+</style>

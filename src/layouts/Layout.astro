@@ -148,6 +148,35 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
                     io.observe(el);
                 });
             }
+
+            // [data-reveal]: la sección hace su entrada (carteles que se pegan,
+            // fotogramas que se encienden) al aparecer. Sin JS o con movimiento
+            // reducido se ve tal cual.
+            if (motionOk && "IntersectionObserver" in window) {
+                const reveal = new IntersectionObserver(
+                    (entries) => {
+                        for (const entry of entries) {
+                            if (!entry.isIntersecting) continue;
+                            entry.target.classList.remove("is-pending");
+                            reveal.unobserve(entry.target);
+                        }
+                    },
+                    { threshold: 0.2 },
+                );
+                document.querySelectorAll("[data-reveal]").forEach((el) => {
+                    if (el.getBoundingClientRect().top < window.innerHeight * 0.8) return;
+                    el.classList.add("is-pending");
+                    reveal.observe(el);
+                });
+            }
+
+            // [data-loop]: los bucles decorativos se pausan fuera de pantalla.
+            if ("IntersectionObserver" in window) {
+                const loops = new IntersectionObserver((entries) => {
+                    for (const entry of entries) entry.target.classList.toggle("is-off", !entry.isIntersecting);
+                });
+                document.querySelectorAll("[data-loop]").forEach((el) => loops.observe(el));
+            }
         </script>
     </body>
 </html>

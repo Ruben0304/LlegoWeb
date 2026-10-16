@@ -358,3 +358,13 @@ Native `details` rows under a 3px ink top rule, hairline Ink Rule separators, 56
 - **Don't** use Burnt Orange or Shadow Teal for text, or sun text on teal below display size.
 - **Don't** hide content until scroll or show different content on desktop and mobile; registration only moves the under-ink.
 - **Don't** bring tickets, posters or registration into the ink-mode admin panels; they inherit type and palette only.
+
+## Motion additions (scroll and fixed components)
+
+- **Ruta del pedido**: the page scroll is the order's trip. A 24px paper band under the navbar carries a dashed teal road; the logo box moves along it (`--p`, 0 to 1) and the house at the end hops when the page ends.
+- **Marquesina**: ink band with sun bulbs (two alternating layers, `steps(1)`) and the categories in Big Shoulders sun with an orange under-ink, scrolling at 48s per loop; paused offscreen and static with reduced motion.
+- **Pegada de carteles**: posters enter tilted and settle (`--i` stagger of 80ms); on hover the second ink slides further out of register.
+- **Proyección**: film frames start dark (brightness 0.12, sepia) and light up one after another (0.28s apart).
+- **El mar**: a sun-on-dark-teal wave strip between the two shores; the box crosses it from the abroad side to Cuba, scroll-linked.
+- **Barra de descarga** (mobile only): orange fixed bar with two tickets, shown between the hero tickets and the closing poster.
+

@@ -171,6 +171,12 @@ const tutorials = await getTutorials(jwt);
 #### 7. Motion
 - `.print` titles: the second ink starts offset and settles into register when the title enters the viewport (script in `Layout.astro`); already settled without JS or with reduced motion.
 - The hero box slides in once on load; the mobile menu opens as a full orange poster (`clip-path`).
+- **Ruta del pedido** (focal): under the navbar, the logo box travels a dashed route with the page scroll and reaches a little house at the end (`Navbar.svelte`, `--p`).
+- `Marquesina.astro`: cinema marquee with bulbs and the categories scrolling; `[data-loop]` loops pause offscreen (script in `Layout.astro`).
+- `[data-reveal]` sections enter once when scrolled into view: posters get pasted on the wall (Cartelera), film frames light up in order (TiraPelicula). Content is visible without JS.
+- DosOrillas: a sea strip between the two fields; the box crosses it from abroad to Cuba with `animation-timeline: view()` (static where unsupported).
+- `BarraDescarga.astro`: fixed download bar on mobile between the hero tickets and the closing poster.
+- Every effect has a `prefers-reduced-motion` path (static).
 
 #### 8. Language & Content
 - All content is in **Spanish** (ES)

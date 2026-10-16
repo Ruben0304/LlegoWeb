@@ -91,9 +91,9 @@ const posters: Poster[] = [
       </p>
     </header>
 
-    <ul class="wall">
-      {posters.map((p) => (
-        <li class:list={["poster", `poster--${p.id}`]} style={`--field: ${p.field}; --fg: ${p.fg}; --a: ${p.a}; --b: ${p.b}`}>
+    <ul class="wall" data-reveal>
+      {posters.map((p, i) => (
+        <li class:list={["poster", `poster--${p.id}`]} style={`--field: ${p.field}; --fg: ${p.fg}; --a: ${p.a}; --b: ${p.b}; --i: ${i}`}>
           <svg class="poster-art" viewBox="0 0 120 120" aria-hidden="true">
             <g class="layer-a" set:html={p.art} />
             <g class="layer-b" set:html={p.art} />
@@ -153,6 +153,33 @@ const posters: Poster[] = [
 
   .poster--perfumeria {
     box-shadow: inset 0 0 0 2px var(--ink);
+  }
+
+  /* Pegada de carteles: cada uno cae en la pared, ligeramente torcido, y se asienta */
+  @media (prefers-reduced-motion: no-preference) {
+    .poster {
+      transition:
+        transform 0.7s var(--ease-out) calc(var(--i) * 80ms),
+        opacity 0.4s ease calc(var(--i) * 80ms);
+    }
+
+    .wall.is-pending .poster {
+      opacity: 0;
+      transform: translateY(28px) rotate(calc(-3deg + var(--i) * 1.5deg)) scale(1.04);
+    }
+
+    .poster:hover {
+      transform: rotate(-0.8deg) translateY(-3px);
+      transition-delay: 0s;
+    }
+
+    .poster:hover .poster-art :global(.layer-b) {
+      transform: translate(7px, 5px);
+    }
+
+    .poster-art :global(.layer-b) {
+      transition: transform 0.4s var(--ease-out);
+    }
   }
 
   .poster-art {

@@ -1,0 +1,97 @@
+---
+/**
+ * Barra fija de descarga en móvil: aparece cuando el visitante ya pasó las
+ * entradas del primer cartel y se esconde al llegar al cierre (que tiene las
+ * suyas). En escritorio no se muestra: la barra de navegación ya lleva
+ * "Descargar".
+ */
+import { ANDROID_DOWNLOAD_PATH, APP_STORE_URL } from "@/lib/site";
+---
+
+<div class="barra" id="barra-descarga" hidden>
+  <p class="barra-text">Descarga Llegó</p>
+  <a href={APP_STORE_URL} class="ticket barra-ticket">App Store</a>
+  <a href={ANDROID_DOWNLOAD_PATH} class="ticket ticket--paper barra-ticket">APK</a>
+</div>
+
+<script>
+  const bar = document.getElementById("barra-descarga");
+  const hero = document.getElementById("descargar");
+  // Al llegar al cierre o al pie (que ya tienen sus descargas) la barra se va
+  const ends = [document.querySelector(".cierre"), document.querySelector("footer")].filter(Boolean) as Element[];
+  if (bar && hero && "IntersectionObserver" in window) {
+    let pastHero = false;
+    let atClose = false;
+    const update = () => {
+      const show = pastHero && !atClose;
+      bar.hidden = false;
+      bar.classList.toggle("is-on", show);
+      bar.inert = !show;
+    };
+    new IntersectionObserver(([entry]) => {
+      pastHero = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+      update();
+    }).observe(hero);
+    const visibleEnds = new Set<Element>();
+    const endObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) visibleEnds.add(entry.target);
+        else visibleEnds.delete(entry.target);
+      }
+      atClose = visibleEnds.size > 0;
+      update();
+    });
+    ends.forEach((el) => endObserver.observe(el));
+  }
+</script>
+
+<style>
+  .barra {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom));
+    background: var(--ink-orange);
+    box-shadow: 0 -2px 0 var(--ink);
+    transform: translateY(110%);
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .barra.is-on {
+    transform: none;
+  }
+
+  .barra-text {
+    flex: 1;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .barra-ticket {
+    min-height: 44px;
+    padding: 8px 16px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 900px) {
+    .barra {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .barra {
+      transition: none;
+    }
+  }
+</style>

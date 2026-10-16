@@ -44,9 +44,9 @@ const frames = [
   </div>
 
   <div class="strip-scroller" tabindex="0" role="region" aria-label="Pasos para hacer un pedido (desliza para ver más)">
-    <ol class="strip">
-      {frames.map((f) => (
-        <li class="frame">
+    <ol class="strip" data-reveal>
+      {frames.map((f, i) => (
+        <li class="frame" style={`--i: ${i}`}>
           <p class="edge-code" aria-hidden="true">LLEGÓ <span class="edge-mark"></span> {f.code}</p>
           <div class="frame-window">
             <img
@@ -186,6 +186,32 @@ const frames = [
     background: linear-gradient(90deg, rgba(236, 152, 68, 0.38), transparent 22%);
     mix-blend-mode: screen;
     pointer-events: none;
+  }
+
+  /* Proyección: al llegar a la tira, los fotogramas se encienden uno tras otro */
+  @media (prefers-reduced-motion: no-preference) {
+    .frame-window img,
+    .frame-caption {
+      transition:
+        filter 0.7s ease calc(0.15s + var(--i) * 0.28s),
+        opacity 0.7s ease calc(0.15s + var(--i) * 0.28s);
+    }
+
+    .frame-window::after {
+      transition: opacity 0.9s ease calc(0.15s + var(--i) * 0.28s);
+    }
+
+    .strip.is-pending .frame-window img {
+      filter: brightness(0.12) sepia(0.6);
+    }
+
+    .strip.is-pending .frame-caption {
+      opacity: 0.15;
+    }
+
+    .strip.is-pending .frame-window::after {
+      opacity: 0;
+    }
   }
 
   .frame-caption {

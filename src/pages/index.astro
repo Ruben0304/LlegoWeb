@@ -2,7 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/common/Navbar.svelte";
 import Footer from "../components/common/Footer.svelte";
-import { Hero, Cartelera, TiraPelicula, DosOrillas, Ecosistema, Cierre } from "../components/home";
+import { Hero, Marquesina, Cartelera, TiraPelicula, DosOrillas, Ecosistema, Cierre, BarraDescarga } from "../components/home";
 
 const title =
     "Llegó | Delivery en Cuba con IA: restaurantes, ropa, mercado y más";
@@ -14,6 +14,7 @@ const description =
     <Navbar client:load />
     <main>
         <Hero />
+        <Marquesina />
         <Cartelera />
         <TiraPelicula />
         <DosOrillas />
@@ -21,4 +22,5 @@ const description =
         <Cierre />
     </main>
     <Footer />
+    <BarraDescarga />
 </Layout>
