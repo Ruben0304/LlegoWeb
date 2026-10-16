@@ -51,19 +51,21 @@
 
   const KIND_COPY: Record<
     PartnerRequestKind,
-    { choice: string; detail: string; noun: string; app: PartnerApp }
+    { choice: string; detail: string; noun: string; app: PartnerApp; points: string[] }
   > = {
     BUSINESS: {
       choice: "Quiero vender en Llegó",
       detail: "Registra tu negocio y recibe pedidos de clientes cerca de ti.",
       noun: "vender en Llegó",
       app: PARTNER_APPS.business,
+      points: ["Pedidos, catálogo y finanzas", "Combos y banners de promoción"],
     },
     COURIER: {
       choice: "Quiero ser mensajero",
       detail: "Reparte pedidos en tu zona y gana dinero con cada entrega.",
       noun: "ser mensajero",
       app: PARTNER_APPS.courier,
+      points: ["Pedidos cerca de ti", "Entregas rápidas y seguras"],
     },
   };
 
@@ -293,13 +295,22 @@
 </script>
 
 <section class="partner">
-  <div class="partner-inner">
-    <header class="partner-header">
-      <h1 class="title">Súmate a Llegó</h1>
-      <p class="subtitle">
-        Vende en Llegó o reparte pedidos en tu zona. Envía tu solicitud y te llamaremos para conocerte.
-      </p>
-    </header>
+  <header class="partner-band">
+    <div class="band-inner">
+      <div class="band-copy">
+        <h1 class="title print display">
+          <span class="print-line">Súmate</span>
+          <span class="print-line">a Llegó</span>
+        </h1>
+        <p class="subtitle">
+          Vende en Llegó o reparte pedidos en tu zona. Envía tu solicitud y te llamaremos para conocerte.
+        </p>
+      </div>
+      <img class="band-box" src="/img/logo-caja-720.webp" width="720" height="472" alt="" decoding="async" />
+    </div>
+  </header>
+
+  <div class="partner-inner" class:wide={view === "choose"}>
 
     {#if session && view !== "choose"}
       <div class="session-bar">
@@ -311,32 +322,49 @@
     {#if view === "choose"}
       <div class="choices">
         {#each OPTIONS as option (option)}
-          <button type="button" class="choice" onclick={() => chooseKind(option)}>
-            <span class="choice-icon" aria-hidden="true">
+          <button type="button" class={["choice", option === "BUSINESS" ? "choice--business" : "choice--courier"]} onclick={() => chooseKind(option)}>
+            <svg class="choice-art" viewBox="0 0 120 100" aria-hidden="true">
               {#if option === "BUSINESS"}
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 9l1.5-5h15L21 9" />
-                  <path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0V9z" />
-                  <path d="M5 13v7h14v-7" />
-                  <path d="M10 20v-4h4v4" />
-                </svg>
+                <!-- tienda con toldo, a dos tintas -->
+                <g class="ink-a">
+                  <rect x="18" y="40" width="84" height="54" />
+                  <path d="M10 40 20 14h80l10 26z" />
+                </g>
+                <g class="ink-b">
+                  <path d="M10 40h20v6a10 10 0 0 1-20 0zM50 40h20v6a10 10 0 0 1-20 0zM90 40h20v6a10 10 0 0 1-20 0z" />
+                  <rect x="30" y="58" width="22" height="36" />
+                  <rect x="62" y="58" width="28" height="20" />
+                </g>
               {:else}
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="5.5" cy="17.5" r="3.5" />
-                  <circle cx="18.5" cy="17.5" r="3.5" />
-                  <path d="M15 6h2l3 11.5" />
-                  <path d="M5.5 17.5L9 9h6l-3.5 8.5" />
-                  <path d="M12 6h-2" />
-                </svg>
+                <!-- moto de reparto con la caja -->
+                <g class="ink-a">
+                  <circle cx="26" cy="74" r="18" />
+                  <circle cx="94" cy="74" r="18" />
+                  <rect x="12" y="24" width="34" height="26" />
+                </g>
+                <g class="ink-b">
+                  <path class="line" d="M26 74 46 50h34l14 24M74 50l-6-22h12" />
+                  <circle cx="26" cy="74" r="7" />
+                  <circle cx="94" cy="74" r="7" />
+                </g>
               {/if}
-            </span>
+            </svg>
             <span class="choice-title">{KIND_COPY[option].choice}</span>
             <span class="choice-detail">{KIND_COPY[option].detail}</span>
+            <span class="choice-points">
+              {#each KIND_COPY[option].points as point}
+                <span>{point}</span>
+              {/each}
+            </span>
+            <span class="choice-go">
+              Empezar
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </span>
           </button>
         {/each}
       </div>
     {:else if copy}
-      <div class="card">
+      <div class={["card", kind === "BUSINESS" ? "card--business" : "card--courier"]}>
         <div class="card-top">
           <span class="step-label">{copy.choice}</span>
           <button type="button" class="link-button" onclick={backToChoice}>Cambiar</button>
@@ -468,36 +496,76 @@
 <style>
   .partner {
     min-height: 100vh;
-    padding: 120px 20px 80px;
+    padding: 0 0 96px;
     background: var(--color-background);
   }
 
-  .partner-inner {
-    max-width: 640px;
+  /* Cabecera: un cartel verde (la tinta de los socios) con la caja */
+  .partner-band {
+    background: var(--ink-green);
+    color: var(--ink);
+    padding: calc(68px + clamp(32px, 6vw, 64px)) var(--gutter) clamp(40px, 6vw, 64px);
+    margin-bottom: clamp(32px, 5vw, 56px);
+    overflow: hidden;
+  }
+
+  .band-inner {
+    max-width: 1100px;
     margin: 0 auto;
+    display: grid;
+    gap: 24px;
+    align-items: end;
+  }
+
+  .title {
+    font-size: clamp(64px, 13vw, 144px);
+    font-weight: 900;
+    color: var(--ink);
+    margin-bottom: 18px;
+    --print-under: var(--ink-sun);
+  }
+
+  .title .print-line {
+    display: block;
+  }
+
+  .title .print-line + .print-line {
+    padding-top: 0.1em;
+  }
+
+  .subtitle {
+    max-width: 40ch;
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  .band-box {
+    width: clamp(180px, 34vw, 380px);
+    height: auto;
+    justify-self: end;
+    transform: rotate(-8deg);
+    filter: drop-shadow(8px 10px 0 rgba(2, 49, 51, 0.22));
+  }
+
+  .partner-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 var(--gutter);
     display: flex;
     flex-direction: column;
     gap: 24px;
   }
 
-  .partner-header {
-    text-align: center;
+  .partner-inner.wide {
+    max-width: 1100px;
   }
 
-  .title {
-    font-family: var(--font-display);
-    font-size: clamp(56px, 11vw, 96px);
-    font-weight: 900;
-    text-transform: uppercase;
-    color: var(--color-text);
-    line-height: 0.9;
-    margin-bottom: 16px;
-  }
-
-  .subtitle {
-    font-size: var(--font-size-base);
-    line-height: 1.7;
-    color: var(--color-text-variant);
+  @media (min-width: 900px) {
+    .band-inner {
+      grid-template-columns: 1.4fr 1fr;
+    }
   }
 
   .session-bar {
@@ -513,61 +581,158 @@
 
   .choices {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 
+  /* Cada opción es un cartel entero que se puede pulsar */
   .choice {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
-    padding: 24px;
+    gap: 12px;
+    min-height: 360px;
+    padding: 28px 26px 26px;
     text-align: left;
+    border: 0;
     border-radius: 0;
-    border: 2px solid var(--ink);
-    background: #fffdf7;
-    color: var(--color-text);
     font: inherit;
     cursor: pointer;
-    transition: transform var(--transition-fast), border-color var(--transition-fast);
+    transition: transform 0.3s var(--ease-out);
+  }
+
+  .choice--business {
+    background: var(--ink-teal);
+    color: var(--paper);
+    --art-a: var(--ink-sun);
+    --art-b: var(--ink-teal-dark);
+  }
+
+  .choice--courier {
+    background: var(--ink-orange);
+    color: var(--ink);
+    --art-a: var(--ink-cream);
+    --art-b: var(--ink-teal);
   }
 
   .choice:hover,
   .choice:focus-visible {
-    transform: translateY(-2px) rotate(-0.5deg);
-    background: var(--ink-sun);
+    transform: translateY(-4px) rotate(-0.6deg);
   }
 
-  .choice-icon {
-    display: inline-flex;
-    padding: 10px;
-    background: var(--ink-sun);
-    color: var(--ink);
+  .choice-art {
+    width: 132px;
+    height: auto;
+    margin-bottom: 8px;
+    overflow: visible;
+  }
+
+  .choice-art .ink-a {
+    fill: var(--art-a);
+  }
+
+  .choice-art .ink-b {
+    fill: var(--art-b);
+    stroke: var(--art-b);
+    stroke-width: 0;
+    transform: translate(4px, 3px);
+    mix-blend-mode: multiply;
+  }
+
+  .choice-art .line {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   .choice-title {
     font-family: var(--font-display);
-    font-size: 30px;
-    font-weight: 800;
+    font-size: clamp(36px, 5vw, 52px);
+    font-weight: 900;
     text-transform: uppercase;
-    line-height: 1;
+    line-height: 0.95;
+  }
+
+  .choice--business .choice-title {
+    color: var(--ink-sun);
   }
 
   .choice-detail {
-    font-size: var(--font-size-sm);
-    line-height: 1.6;
-    color: var(--color-text-variant);
+    max-width: 34ch;
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.5;
   }
 
+  .choice-points {
+    display: grid;
+    gap: 6px;
+  }
+
+  .choice-points span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .choice-points span::before {
+    content: "";
+    width: 18px;
+    height: 8px;
+    border-radius: 0 999px 999px 0;
+    background: currentColor;
+  }
+
+  .choice-go {
+    margin-top: auto;
+    padding-top: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 6px;
+  }
+
+  .choice-go svg {
+    transition: transform 0.3s var(--ease-out);
+  }
+
+  .choice:hover .choice-go svg {
+    transform: translateX(6px);
+  }
+
+  @media (min-width: 900px) {
+    .choices {
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .choice--courier {
+      margin-top: 48px;
+    }
+  }
+
+  /* La solicitud: una hoja de papel con la franja de tinta de su tipo */
   .card {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding: 28px 24px;
+    padding: 0 24px 28px;
     border-radius: 0;
     border: 2px solid var(--ink);
-    background: var(--paper-deep);
+    background: #fffdf7;
   }
 
   .card-top {
@@ -575,12 +740,29 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    margin: 0 -24px 8px;
+    padding: 12px 24px;
+  }
+
+  .card--business .card-top {
+    background: var(--ink-teal);
+    color: var(--paper);
+  }
+
+  .card--courier .card-top {
+    background: var(--ink-orange);
+    color: var(--ink);
   }
 
   .step-label {
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    color: var(--ink-teal);
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .card-top .link-button {
+    color: inherit;
   }
 
   .card-title {
@@ -796,12 +978,13 @@
   }
 
   @media (max-width: 480px) {
-    .partner {
-      padding: 100px 16px 64px;
+    .card {
+      padding: 0 18px 22px;
     }
 
-    .card {
-      padding: 22px 18px;
+    .card-top {
+      margin: 0 -18px 8px;
+      padding: 12px 18px;
     }
   }
 </style>
