@@ -1,0 +1,83 @@
+---
+/**
+ * Selector flotante para comparar versiones del diseño (ver src/lib/version.ts).
+ * Solo se pinta para quien activó la vista previa y si hay otra versión a la
+ * que cambiar. Estilos propios y neutros: es igual en las dos ramas.
+ */
+import { PREVIEW_COOKIE, PROXY_HEADER, redesignOrigin } from "@/lib/version";
+
+const proxied = Astro.request.headers.get(PROXY_HEADER) === "1";
+const enabled = Astro.cookies.get(PREVIEW_COOKIE)?.value === "1" && (proxied || redesignOrigin() !== null);
+const current = proxied ? "rediseno" : "actual";
+const path = Astro.url.pathname + Astro.url.search;
+const to = encodeURIComponent(path);
+---
+
+{enabled && (
+  <div class="llego-vs" role="region" aria-label="Versión del diseño">
+    <span class="llego-vs-label">Diseño</span>
+    <a href={`/version?v=actual&to=${to}`} aria-current={current === "actual" ? "true" : undefined}>Actual</a>
+    <a href={`/version?v=rediseno&to=${to}`} aria-current={current === "rediseno" ? "true" : undefined}>Rediseño</a>
+    <a href={`/comparar?ruta=${encodeURIComponent(Astro.url.pathname)}`}>Comparar</a>
+    <a href="/version?v=salir" class="llego-vs-close" aria-label="Ocultar el selector de versiones">×</a>
+  </div>
+  <script is:inline>
+    // Dentro de /comparar las páginas van en iframes: ahí sobra el selector.
+    if (window.self !== window.top) document.querySelector(".llego-vs")?.remove();
+  </script>
+)}
+
+<style is:global>
+  .llego-vs {
+    position: fixed;
+    left: 12px;
+    bottom: 12px;
+    z-index: 2147483000;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+    border-radius: 999px;
+    background: #111;
+    color: #fff;
+    font: 600 13px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: 0;
+    text-transform: none;
+    box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.5);
+  }
+
+  .llego-vs-label {
+    padding: 0 8px 0 10px;
+    color: #bbb;
+  }
+
+  .llego-vs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 999px;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .llego-vs a:hover {
+    background: #2a2a2a;
+  }
+
+  .llego-vs a[aria-current="true"] {
+    background: #fff;
+    color: #111;
+  }
+
+  .llego-vs a:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+
+  .llego-vs .llego-vs-close {
+    padding: 0 10px;
+    font-size: 18px;
+    color: #bbb;
+  }
+</style>

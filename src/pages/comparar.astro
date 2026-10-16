@@ -1,0 +1,145 @@
+---
+/**
+ * Las dos versiones del diseño lado a lado (ver src/lib/version.ts): a la
+ * izquierda este servicio (rama main) y a la derecha el servicio del rediseño.
+ * Página interna: no usa el Layout del sitio para verse igual en las dos ramas.
+ */
+export const prerender = false;
+
+import { PREVIEW_COOKIE, VERSION_COOKIE, redesignOrigin, safePath } from "@/lib/version";
+
+const origin = redesignOrigin();
+const ruta = safePath(Astro.url.searchParams.get("ruta"));
+const cookieOptions = { path: "/", sameSite: "lax" as const, maxAge: 60 * 60 * 24 * 30, secure: Astro.url.protocol === "https:" };
+// El panel izquierdo es la versión actual; el selector queda visible al salir de aquí.
+Astro.cookies.set(VERSION_COOKIE, "actual", cookieOptions);
+Astro.cookies.set(PREVIEW_COOKIE, "1", cookieOptions);
+
+const rutas = [
+  ["/", "Inicio"],
+  ["/negocios", "Negocios y mensajeros"],
+  ["/plus", "Llegó+"],
+  ["/soporte", "Soporte"],
+  ["/privacidad", "Privacidad"],
+  ["/eliminar-cuenta", "Eliminar cuenta"],
+  ["/no-existe", "Página 404"],
+];
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Comparar diseños | Llegó</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      * { box-sizing: border-box; margin: 0; }
+      html, body { height: 100%; }
+      body {
+        display: flex;
+        flex-direction: column;
+        background: #1a1a1a;
+        color: #fff;
+        font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px 16px;
+        padding: 10px 16px;
+        background: #111;
+        border-bottom: 1px solid #333;
+      }
+      h1 { font-size: 15px; margin-right: auto; }
+      label { display: flex; align-items: center; gap: 8px; color: #bbb; }
+      select, button, .link {
+        min-height: 34px;
+        padding: 0 12px;
+        border-radius: 8px;
+        border: 1px solid #444;
+        background: #222;
+        color: #fff;
+        font: inherit;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+      }
+      button[aria-pressed="true"] { background: #fff; color: #111; border-color: #fff; }
+      main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #333; min-height: 0; }
+      .pane { display: flex; flex-direction: column; min-height: 0; background: #1a1a1a; }
+      .pane-head { display: flex; justify-content: space-between; gap: 8px; padding: 6px 12px; color: #bbb; font-size: 13px; }
+      .pane-head a { color: #fff; }
+      .frame-wrap { flex: 1; display: flex; justify-content: center; min-height: 0; overflow: auto; }
+      iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+      body.mobile iframe { width: 390px; flex: none; }
+      .missing { max-width: 640px; margin: 48px auto; padding: 0 20px; }
+      .missing p { margin-top: 12px; color: #ccc; }
+      code { background: #222; padding: 2px 6px; border-radius: 4px; }
+      @media (max-width: 800px) { main { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; } }
+    </style>
+  </head>
+  <body>
+    {origin ? (
+      <>
+        <header>
+          <h1>Comparar diseños</h1>
+          <label>
+            Página
+            <select id="ruta">
+              {rutas.map(([value, label]) => <option value={value} selected={value === ruta}>{label}</option>)}
+            </select>
+          </label>
+          <div role="group" aria-label="Tamaño">
+            <button type="button" id="desktop" aria-pressed="true">Escritorio</button>
+            <button type="button" id="mobile" aria-pressed="false">Móvil</button>
+          </div>
+          <a class="link" href={`/version?v=actual&to=${encodeURIComponent(ruta)}`}>Salir</a>
+        </header>
+        <main>
+          <section class="pane" aria-label="Versión actual">
+            <div class="pane-head"><span>Actual (main)</span><a id="open-actual" href={`/version?v=actual&to=${encodeURIComponent(ruta)}`}>Abrir</a></div>
+            <div class="frame-wrap"><iframe id="frame-actual" title="Versión actual" src={ruta}></iframe></div>
+          </section>
+          <section class="pane" aria-label="Rediseño">
+            <div class="pane-head"><span>Rediseño (claude/rediseno)</span><a id="open-rediseno" href={`/version?v=rediseno&to=${encodeURIComponent(ruta)}`}>Abrir</a></div>
+            <div class="frame-wrap"><iframe id="frame-rediseno" title="Rediseño" src={origin + ruta}></iframe></div>
+          </section>
+        </main>
+        <script is:inline define:vars={{ origin }}>
+          const select = document.getElementById("ruta");
+          const actual = document.getElementById("frame-actual");
+          const rediseno = document.getElementById("frame-rediseno");
+          const openActual = document.getElementById("open-actual");
+          const openRediseno = document.getElementById("open-rediseno");
+          select.addEventListener("change", () => {
+            const ruta = select.value;
+            actual.src = ruta;
+            rediseno.src = origin + ruta;
+            openActual.href = "/version?v=actual&to=" + encodeURIComponent(ruta);
+            openRediseno.href = "/version?v=rediseno&to=" + encodeURIComponent(ruta);
+            history.replaceState(null, "", "?ruta=" + encodeURIComponent(ruta));
+          });
+          const desktop = document.getElementById("desktop");
+          const mobile = document.getElementById("mobile");
+          const setMobile = (on) => {
+            document.body.classList.toggle("mobile", on);
+            mobile.setAttribute("aria-pressed", String(on));
+            desktop.setAttribute("aria-pressed", String(!on));
+          };
+          desktop.addEventListener("click", () => setMobile(false));
+          mobile.addEventListener("click", () => setMobile(true));
+        </script>
+      </>
+    ) : (
+      <div class="missing">
+        <h1>Falta la segunda versión</h1>
+        <p>Para comparar, despliega la rama <code>claude/rediseno</code> como otro servicio y pon su URL en la variable <code>REDESIGN_ORIGIN</code> de este servicio.</p>
+        <p><a class="link" href="/">Volver al inicio</a></p>
+      </div>
+    )}
+  </body>
+</html>

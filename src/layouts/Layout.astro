@@ -3,6 +3,7 @@ import "@fontsource-variable/big-shoulders-display";
 import "@fontsource-variable/figtree";
 import "../styles/global.css";
 import { SITE_URL } from "../lib/site";
+import VersionSwitch from "../components/common/VersionSwitch.astro";
 
 /** Imagen para redes por defecto: 1200x630, generada a partir de public/img/icon.png. */
 const DEFAULT_OG_IMAGE = "/og-image.jpg";
@@ -149,5 +150,6 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
                 });
             }
         </script>
+        <VersionSwitch />
     </body>
 </html>

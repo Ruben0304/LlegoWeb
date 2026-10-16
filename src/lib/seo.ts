@@ -11,4 +11,4 @@
 export const PUBLIC_PAGES = ['/', '/plus', '/soporte', '/privacidad', '/terminos', '/eliminar-cuenta'] as const;
 
 /** Prefijos que los rastreadores no deben visitar. */
-export const DISALLOWED_PATHS = ['/tutoriales', '/business-types', '/auth/', '/api/'] as const;
+export const DISALLOWED_PATHS = ['/tutoriales', '/business-types', '/auth/', '/api/', '/version', '/comparar'] as const;
