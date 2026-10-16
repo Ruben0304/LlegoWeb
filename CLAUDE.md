@@ -83,8 +83,8 @@ Pages pass props to Layout:
 
 #### 2. Component Hydration Strategy
 Astro components use client directives to control JavaScript hydration:
-- `client:load` - Critical interactive components (Navbar, Hero)
-- `client:visible` - Defer loading until component is visible (Footer, FeatureShowcase)
+- `client:load` - Interactive components (Navbar, PartnerSignup, admin panels)
+- Static sections (home, Footer) render on the server with no client JS
 
 This minimizes initial JavaScript load.
 
@@ -220,13 +220,3 @@ usuario. Por eso el CI valida las operaciones contra el schema **real de producc
   del backend antes de que lo noten los usuarios.
 - El script es idéntico en todos los repos cliente (iOS, Android, Business, Mensajeros, web
   y panel admin); si lo modificas, cópialo a los demás.
-
-## Vista previa del rediseño en el mismo dominio
-
-El rediseño vive en la rama `claude/rediseno`. Para verlo y compararlo sin cambiar el dominio:
-
-- Despliega `claude/rediseno` como **otro servicio** (con las mismas variables de entorno que este) y pon su URL pública en `REDESIGN_ORIGIN` del servicio de `main`.
-- `/comparar` muestra las dos versiones lado a lado (escritorio o móvil, por página) y activa la vista previa para ese navegador.
-- Con la vista previa activa aparece un selector flotante (`VersionSwitch.astro`) en todas las páginas: "Actual" / "Rediseño". Con la cookie `llego_version=rediseno`, `src/middleware.ts` reenvía la petición al otro servicio y devuelve su respuesta en este dominio (con `noindex`). `/version?v=salir` lo quita.
-- Los visitantes sin la cookie no ven nada distinto. Sin `REDESIGN_ORIGIN` no hay reenvío.
-- `src/lib/version.ts`, `src/middleware.ts`, `VersionSwitch.astro` y `src/pages/comparar.astro` deben ser iguales en las dos ramas.
