@@ -52,15 +52,15 @@ const posters: Poster[] = [
     art: `<path class="a" d="M22 40h76l-8 66H30z"/><path class="b-line" d="M42 40c0-26 36-26 36 0"/><path class="b" d="M28 52h64l-2 12H30z"/>`,
   },
   {
-    id: "agro",
-    title: "Agro",
-    text: "Productos frescos directo del campo.",
+    id: "farmacia",
+    title: "Farmacia",
+    text: "Medicinas y lo del botiquín, sin salir de casa.",
     field: "var(--ink-green)",
     fg: "var(--ink)",
-    a: "var(--ink-orange)",
+    a: "var(--paper)",
     b: "var(--ink-teal)",
-    // mango con hoja
-    art: `<path class="a" d="M60 30c26 0 42 22 38 46-4 22-24 32-42 30-22-2-38-20-34-44 3-18 18-32 38-32z"/><path class="b" d="M60 32c-4-14 4-24 20-26-2 14-8 22-20 26z"/><path class="b-line" d="M60 32c2-6 4-10 8-14"/>`,
+    // cruz de farmacia y una cápsula
+    art: `<path class="a" d="M44 14h32v30h30v32H76v30H44V76H14V44h30z"/><path class="b" d="M72 92a13 13 0 0 1 0-18l18-18a13 13 0 0 1 18 18L90 92a13 13 0 0 1-18 0z"/>`,
   },
   {
     id: "perfumeria",
@@ -72,6 +72,17 @@ const posters: Poster[] = [
     b: "var(--ink-orange)",
     // frasco con atomizador
     art: `<rect class="a" x="30" y="46" width="60" height="62" rx="10"/><rect class="b" x="50" y="30" width="20" height="16" rx="2"/><path class="b-line" d="M70 36h14M84 36c6 0 10 4 10 10"/><circle class="b" cx="96" cy="52" r="7"/><rect class="b" x="40" y="66" width="40" height="22" rx="3"/>`,
+  },
+  {
+    id: "y-mas",
+    title: "Y más",
+    text: "Ferreterías, dulcerías, regalos, electrónica… Si un negocio lo vende, cabe en Llegó.",
+    field: "var(--ink)",
+    fg: "var(--paper)",
+    a: "var(--ink-sun)",
+    b: "var(--ink-orange)",
+    // caja abierta de la que sale de todo
+    art: `<path class="a" d="M20 62h80v46H20z"/><path class="a" d="M20 62 8 46h40l12 16zM100 62l12-16H72L60 62z"/><path class="b" d="M53 12h12v14h14v12H65v14H53V38H39V26h14z"/><circle class="b" cx="95" cy="24" r="6"/><circle class="b" cx="24" cy="30" r="4"/><path class="b-line" d="M60 62v46M34 80h14"/>`,
   },
 ];
 ---
@@ -153,6 +164,19 @@ const posters: Poster[] = [
 
   .poster--perfumeria {
     box-shadow: inset 0 0 0 2px var(--ink);
+  }
+
+  /* El último cartel no cierra la lista: deja la pared abierta a cualquier negocio */
+  .poster--y-mas {
+    grid-column: span 2;
+  }
+
+  .poster--y-mas .poster-art {
+    width: 36%;
+  }
+
+  .poster--y-mas .poster-text {
+    max-width: 24ch;
   }
 
   /* Pegada de carteles: cada uno cae en la pared, ligeramente torcido, y se asienta */
@@ -276,21 +300,35 @@ const posters: Poster[] = [
       grid-column: 4 / span 2;
     }
 
-    .poster--agro {
+    .poster--farmacia {
       grid-column: 6 / span 1;
       grid-row: span 2;
     }
 
     .poster--perfumeria {
-      grid-column: 1 / span 5;
+      grid-column: 1 / span 3;
     }
 
-    .poster--agro .poster-art {
+    .poster--y-mas {
+      grid-column: 4 / span 2;
+    }
+
+    .poster--farmacia .poster-art {
       width: 80%;
     }
 
-    .poster--agro .poster-title {
-      font-size: 44px;
+    /* Columna estrecha: el titular se ajusta al ancho del cartel */
+    .poster--farmacia {
+      container-type: inline-size;
+      padding-inline: 20px;
+    }
+
+    .poster--farmacia .poster-title {
+      font-size: min(36px, calc((100cqi - 40px) / 2.75));
+    }
+
+    .poster--y-mas .poster-text {
+      max-width: 19ch;
     }
 
     .poster--restaurantes .poster-art {

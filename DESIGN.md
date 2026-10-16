@@ -210,7 +210,7 @@ The palette is the logo's own inks printed flat on cream paper, with deep teal-i
 
 ### Tertiary
 - **Sun** (ink-sun): the light accent field and the highlight ink. The closing poster ("¿Qué pides hoy?"), the 404, headline lines and labels printed on teal or deep ink, footer column titles and the giant LLEGÓ wordmark, icon tiles, "last updated" stamp, text selection.
-- **Field Green** (ink-green): the third field. Agro and Llego Mensajeros posters, the approved state, the second trail behind the hero box. Ink on it is 5.9:1.
+- **Field Green** (ink-green): the third field. Farmacia and Llego Mensajeros posters, the approved state, the second trail behind the hero box. Ink on it is 5.9:1.
 - **Leaf** (ink-leaf): fill for illustrations on paper posters and the link/accent color in ink mode.
 
 ### Neutral
@@ -260,7 +260,7 @@ The palette is the logo's own inks printed flat on cream paper, with deep teal-i
 
 The page is a vertical stack of full-bleed posters. Each section paints its ink edge to edge and holds its content in a 1240px container with a fluid gutter (`gutter`), and breathes with `section-y` top and bottom. The navbar is fixed at 68px, so first posters add `calc(68px + …)` of top padding and every `[id]` target has `scroll-margin-top: 88px`.
 
-Compositions are asymmetric two-column splits rather than centred stacks: hero 1.15fr / 1fr (copy left, art right), section heads 1.3fr / 1fr with the lede bottom-aligned to the headline, closing poster 1.4fr / 1fr. The category wall is a 6-column mosaic with 200px rows and uneven spans (Restaurantes 3×2, Agro 1×2, Perfumería 5×1); on phones it collapses to two columns with Restaurantes spanning both. Dos orillas splits the viewport into two equal ink fields with the box straddling the seam. The ecosystem wall is three posters at different heights and angles (−1.2°, 0.8°, −0.6°), as if pasted by hand. "Cómo funciona" is a horizontally scrolling 16mm film strip with scroll-snap on every width, keyboard focusable.
+Compositions are asymmetric two-column splits rather than centred stacks: hero 1.15fr / 1fr (copy left, art right), section heads 1.3fr / 1fr with the lede bottom-aligned to the headline, closing poster 1.4fr / 1fr. The category wall is a 6-column mosaic with 200px rows and uneven spans (Restaurantes 3×2, Farmacia 1×2, Perfumería 3×1, "Y más" 2×1 in ink to leave the wall open to any business); on phones it collapses to two columns with Restaurantes and "Y más" spanning both. Dos orillas splits the viewport into two equal ink fields with the box straddling the seam. The ecosystem wall is three posters at different heights and angles (−1.2°, 0.8°, −0.6°), as if pasted by hand. "Cómo funciona" is a horizontally scrolling 16mm film strip with scroll-snap on every width, keyboard focusable.
 
 Read mode (legal, support, account deletion) drops the posters for a 720px reading column on paper, with posters reappearing only as boxed accents (teal contact box, sun closing box).
 
