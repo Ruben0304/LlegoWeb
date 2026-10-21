@@ -7,6 +7,7 @@
     deleteTutorial,
     toggleTutorialActive,
   } from "@/lib/tutorial";
+  import { startAppleSignIn } from "@/lib/auth/session";
   import TutorialForm from "./TutorialForm.svelte";
   import TutorialList from "./TutorialList.svelte";
 
@@ -181,27 +182,8 @@
     errorMessage = "";
 
     try {
-      const response = await fetch(`${BACKEND_URL}/apple/start`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-
-      if (!response.ok) {
-        console.error(`Apple Sign In: el backend respondió HTTP ${response.status}`);
-        throw new Error("No se pudo iniciar el flujo de Apple Sign In");
-      }
-
-      const data = await response.json();
-
-      if (!data.auth_url) {
-        throw new Error("No se recibió la URL de autenticación");
-      }
-
-      if (data.state) {
-        sessionStorage.setItem("apple_auth_state", data.state);
-      }
-
-      window.location.assign(data.auth_url);
+      // Mismo flujo que /negocios: redirect_scheme web y state comprobado en /auth/callback
+      await startAppleSignIn(BACKEND_URL, "/tutoriales");
     } catch (error) {
       console.error("Error en Apple Sign In:", error instanceof Error ? error.message : error);
       errorMessage = error instanceof Error ? error.message : "Error al iniciar sesión con Apple";

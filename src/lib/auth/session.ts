@@ -98,6 +98,24 @@ export function setReturnTo(path: string) {
   }
 }
 
+/** `state` del login con Apple en curso: /auth/callback solo acepta un token que traiga este mismo. */
+const APPLE_STATE_KEY = 'llego.auth.appleState';
+
+/**
+ * Comprueba (y borra) el `state` guardado al empezar el login con Apple. Sin esto,
+ * un enlace /auth/callback?token=<token de otra cuenta> metería a la víctima en esa
+ * cuenta (y su solicitud de socio iría a parar a ella).
+ */
+export function consumeAppleState(received: string | null): boolean {
+  try {
+    const expected = sessionStorage.getItem(APPLE_STATE_KEY);
+    sessionStorage.removeItem(APPLE_STATE_KEY);
+    return !!expected && !!received && expected === received;
+  } catch {
+    return false;
+  }
+}
+
 /** Destino guardado por setReturnTo (y lo borra), o `fallback`. */
 export function consumeReturnTo(fallback: string): string {
   try {
@@ -187,9 +205,14 @@ export async function startAppleSignIn(backendUrl: string, returnTo: string): Pr
   if (!response.ok) {
     throw new Error('No se pudo iniciar sesión con Apple. Inténtalo de nuevo.');
   }
-  const data = (await response.json().catch(() => null)) as { auth_url?: string } | null;
-  if (!data?.auth_url || !isAppleAuthUrl(data.auth_url)) {
+  const data = (await response.json().catch(() => null)) as { auth_url?: string; state?: string } | null;
+  if (!data?.auth_url || !data.state || !isAppleAuthUrl(data.auth_url)) {
     throw new Error('No se pudo iniciar sesión con Apple. Inténtalo de nuevo.');
+  }
+  try {
+    sessionStorage.setItem(APPLE_STATE_KEY, data.state);
+  } catch {
+    throw new Error('Tu navegador no deja guardar datos de la sesión. Usa Google o desactiva el modo privado estricto.');
   }
   setReturnTo(returnTo);
   window.location.assign(data.auth_url);

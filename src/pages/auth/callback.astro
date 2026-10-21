@@ -149,7 +149,7 @@ import "@fontsource-variable/figtree";
     </div>
 
     <script>
-      import { consumeReturnTo, decodeJwtPayload, storeSession } from '@/lib/auth/session';
+      import { consumeAppleState, consumeReturnTo, decodeJwtPayload, storeSession } from '@/lib/auth/session';
 
       // Si nadie pidió volver a otra página (p. ej. /negocios), el login web es
       // el del panel de tutoriales.
@@ -201,6 +201,7 @@ import "@fontsource-variable/figtree";
           const token = params.get('token');
           const error = params.get('error');
           const errorMessage = params.get('message');
+          const state = params.get('state');
 
           // El JWT llega en la URL (?token=...). Se quita de la barra y del
           // historial antes de nada: así no queda en "atrás", en el historial del
@@ -214,6 +215,16 @@ import "@fontsource-variable/figtree";
             showError(
               'Error de autenticación',
               errorMessage || 'No se pudo completar la autenticación. Por favor intenta nuevamente.',
+              consumeReturnTo('/')
+            );
+            return;
+          }
+
+          // El token solo vale si este navegador empezó el login (mismo state)
+          if (token && !consumeAppleState(state)) {
+            showError(
+              'No se pudo verificar el inicio de sesión',
+              'Este enlace no viene de un inicio de sesión que empezaras aquí. Vuelve a entrar desde la página.',
               consumeReturnTo('/')
             );
             return;
