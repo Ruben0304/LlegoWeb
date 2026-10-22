@@ -13,12 +13,12 @@ All commands are run from the root of the project:
 
 ## Project Overview
 
-This is a marketing website for **Llegó**, a Spanish-language shopping app with AI capabilities. Built with Astro and Svelte.
+This is a marketing website for **Llegó**, a Spanish-language shopping app with AI capabilities. Built with Astro 7 and Svelte 5.
 
 ## Architecture
 
 ### Tech Stack
-- **Astro 5**: Static site generator and framework
+- **Astro 7**: framework (needs Node >= 22.23.4, pinned in `package.json` `engines`)
 - **Svelte 5**: Component framework (using modern `$state` and `$derived` runes)
 - **TypeScript**: Type safety with strict config
 
