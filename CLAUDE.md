@@ -18,7 +18,7 @@ This is a marketing website for **Llegó**, a Spanish-language shopping app with
 ## Architecture
 
 ### Tech Stack
-- **Astro 7**: framework (needs Node >= 22.23.4, pinned in `package.json` `engines`)
+- **Astro 7.4.1** (exact): 7.4.2+ needs Node >= 22.23.4 and the Railway builder has 22.22, so a newer Astro fails to deploy (the old build stays up). `engines` and CI use Node 22.22.0; raise them together with Astro.
 - **Svelte 5**: Component framework (using modern `$state` and `$derived` runes)
 - **TypeScript**: Type safety with strict config
 
