@@ -1,4 +1,4 @@
-# Comprueba que la web instala y compila (`npm ci && npm run build`, Astro SSR).
+# Comprueba que la web instala, compila (`npm ci && npm run build`, Astro SSR) y pasa `astro check`.
 # El contrato GraphQL con el backend se valida en graphql-contract.yml.
 name: Build web
 
@@ -38,3 +38,6 @@ jobs:
           PUBLIC_BACKEND_URL: https://llegobackend-production.up.railway.app
           PUBLIC_GOOGLE_CLIENT_ID: ci-build-sin-login-real
         run: npm run build
+
+      - name: Comprobar tipos (astro check)
+        run: npx astro check

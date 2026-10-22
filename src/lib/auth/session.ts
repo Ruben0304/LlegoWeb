@@ -179,7 +179,8 @@ export async function exchangeGoogleCredential(credential: string): Promise<Auth
     const message = data && 'error' in data && data.error ? data.error : 'No se pudo iniciar sesión con Google.';
     throw new Error(message);
   }
-  return data;
+  // `'error' in data` no estrecha el tipo porque `error` es opcional: sin error es AuthResponse
+  return data as AuthResponse;
 }
 
 /**
