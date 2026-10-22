@@ -22,6 +22,9 @@
   --ink-orange-dark: #d99600;     /* Tangerine oscurecido para hover y bordes */
   --ink-sun: #f9c764;             /* Little Sun Dress */
   --ink-cream: #fff7e6;
+  --paper-bright: #ffffff;
+  --error-ink: #a3301c;           /* errores sobre papel (7,1:1) */
+  --error-wash: rgba(163, 48, 28, 0.1);
 
   /* Texto sobre papel */
   --ink-soft: rgba(18, 73, 57, 0.82);
@@ -104,9 +107,9 @@
 /* Paneles internos (/tutoriales, /business-types): mismas tintas sobre teal
    profundo. Sus estilos están escritos para fondo oscuro. */
 [data-theme='ink'] {
-  --color-background: #011f20;
-  --color-surface: #032a2b;
-  --color-surface-variant: #06393a;
+  --color-background: #0b2a21;   /* Country Squire oscurecido */
+  --color-surface: #10352a;
+  --color-surface-variant: #164236;
   --color-text: #fff7e6;
   --color-text-variant: rgba(255, 247, 230, 0.72);
   --color-text-subtle: rgba(255, 247, 230, 0.62);
@@ -117,6 +120,9 @@
   --color-highlight: var(--ink-sun);
   --color-link: var(--ink-leaf);
   --color-focus: var(--ink-sun);
+  /* Estados sobre fondo oscuro (los rojos y verdes de iOS que había no son de la marca) */
+  --color-danger: #ff8a75;
+  --color-ok: #8fd3a8;
   color-scheme: dark;
 }
 
@@ -392,7 +398,7 @@ html {
 }
 
 [data-theme='ink'] {
-  scrollbar-color: var(--ink-teal) #011f20;
+  scrollbar-color: var(--ink-teal) #0b2a21;
 }
 
 /* Responsive breakpoints reference:

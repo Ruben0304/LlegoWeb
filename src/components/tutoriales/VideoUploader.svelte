@@ -325,10 +325,10 @@
     align-items: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-sm) var(--spacing-md);
-    background: rgba(255, 59, 48, 0.1);
-    border: 1px solid rgba(255, 59, 48, 0.3);
+    background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
     border-radius: var(--radius-md);
-    color: #ff6b6b;
+    color: var(--color-danger);
     font-size: var(--font-size-sm);
     animation: slideIn 0.3s ease;
   }
@@ -341,14 +341,14 @@
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-xs);
     font-weight: 500;
-    color: #ff6b6b;
-    background: rgba(255, 59, 48, 0.15);
+    color: var(--color-danger);
+    background: color-mix(in srgb, var(--color-danger) 15%, transparent);
     border-radius: var(--radius-sm);
     transition: all var(--transition-base);
   }
 
   .retry-btn:hover {
-    background: rgba(255, 59, 48, 0.25);
+    background: color-mix(in srgb, var(--color-danger) 25%, transparent);
   }
 
   @keyframes slideIn {
@@ -377,7 +377,7 @@
   }
 
   .upload-area.dragging {
-    background: rgba(225, 199, 142, 0.1);
+    background: color-mix(in srgb, var(--ink-sun) 10%, transparent);
     border-color: var(--color-secondary);
     border-style: solid;
   }
@@ -401,7 +401,7 @@
 
   .upload-area:hover:not(:disabled) .upload-icon,
   .upload-area.dragging .upload-icon {
-    background: rgba(225, 199, 142, 0.15);
+    background: color-mix(in srgb, var(--ink-sun) 15%, transparent);
     color: var(--color-secondary);
     transform: scale(1.05);
   }
@@ -503,14 +503,14 @@
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-xs);
     font-weight: 500;
-    color: #ff6b6b;
-    background: rgba(255, 59, 48, 0.1);
+    color: var(--color-danger);
+    background: color-mix(in srgb, var(--color-danger) 10%, transparent);
     border-radius: var(--radius-md);
     transition: all var(--transition-base);
   }
 
   .remove-video-btn:hover:not(:disabled) {
-    background: rgba(255, 59, 48, 0.2);
+    background: color-mix(in srgb, var(--color-danger) 20%, transparent);
   }
 
   .remove-video-btn:disabled {

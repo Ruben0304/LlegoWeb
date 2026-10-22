@@ -402,7 +402,7 @@
     justify-content: center;
     background: linear-gradient(
       135deg,
-      rgba(225, 199, 142, 0.2) 0%,
+      color-mix(in srgb, var(--ink-sun) 20%, transparent) 0%,
       rgba(211, 170, 122, 0.2) 100%
     );
     border-radius: var(--radius-lg);
@@ -687,7 +687,7 @@
   .tutorial-app-target {
     font-size: var(--font-size-xs);
     color: var(--color-secondary);
-    background: rgba(225, 199, 142, 0.15);
+    background: color-mix(in srgb, var(--ink-sun) 15%, transparent);
     padding: 2px 8px;
     border-radius: var(--radius-sm);
     font-weight: 500;
@@ -703,8 +703,8 @@
 
   .tutorial-tag {
     font-size: var(--font-size-xs);
-    color: #5ac8fa;
-    background: rgba(90, 200, 250, 0.15);
+    color: var(--color-link);
+    background: color-mix(in srgb, var(--color-link) 15%, transparent);
     padding: 2px 8px;
     border-radius: var(--radius-sm);
     font-weight: 500;
@@ -744,18 +744,18 @@
   }
 
   .toggle-btn.active {
-    color: #34c759;
-    background: rgba(52, 199, 89, 0.1);
+    color: var(--color-ok);
+    background: color-mix(in srgb, var(--color-ok) 10%, transparent);
   }
 
   .edit-btn:hover {
-    color: #5ac8fa;
-    background: rgba(90, 200, 250, 0.1);
+    color: var(--color-link);
+    background: color-mix(in srgb, var(--color-link) 10%, transparent);
   }
 
   .delete-btn:hover {
-    color: #ff6b6b;
-    background: rgba(255, 59, 48, 0.1);
+    color: var(--color-danger);
+    background: color-mix(in srgb, var(--color-danger) 10%, transparent);
   }
 
   .delete-confirm {
@@ -763,7 +763,7 @@
     align-items: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-xs) var(--spacing-sm);
-    background: rgba(255, 59, 48, 0.1);
+    background: color-mix(in srgb, var(--color-danger) 10%, transparent);
     border-radius: var(--radius-md);
     animation: fadeIn 0.2s ease;
   }
@@ -781,7 +781,7 @@
 
   .delete-confirm span {
     font-size: var(--font-size-xs);
-    color: #ff6b6b;
+    color: var(--color-danger);
   }
 
   .confirm-yes,
@@ -795,11 +795,11 @@
 
   .confirm-yes {
     color: #fff;
-    background: #ff3b30;
+    background: var(--color-danger);
   }
 
   .confirm-yes:hover {
-    background: #ff6b6b;
+    background: var(--color-danger);
   }
 
   .confirm-no {

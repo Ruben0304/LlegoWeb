@@ -414,8 +414,8 @@
     justify-content: center;
     background: linear-gradient(
       135deg,
-      rgba(90, 132, 103, 0.2) 0%,
-      rgba(178, 214, 154, 0.2) 100%
+      color-mix(in srgb, var(--color-ok) 20%, transparent) 0%,
+      color-mix(in srgb, var(--color-ok) 20%, transparent) 100%
     );
     border-radius: var(--radius-lg);
     color: var(--color-accent);
@@ -439,10 +439,10 @@
     align-items: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
-    background: rgba(52, 199, 89, 0.1);
-    border: 1px solid rgba(52, 199, 89, 0.3);
+    background: color-mix(in srgb, var(--color-ok) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-ok) 30%, transparent);
     border-radius: var(--radius-md);
-    color: #34c759;
+    color: var(--color-ok);
     font-size: var(--font-size-sm);
     margin-bottom: var(--spacing-lg);
     animation: slideIn 0.3s ease;
@@ -464,10 +464,10 @@
     align-items: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-md);
-    background: rgba(255, 59, 48, 0.1);
-    border: 1px solid rgba(255, 59, 48, 0.3);
+    background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
     border-radius: var(--radius-md);
-    color: #ff6b6b;
+    color: var(--color-danger);
     font-size: var(--font-size-sm);
     margin-bottom: var(--spacing-lg);
     animation: slideIn 0.3s ease;
@@ -492,7 +492,7 @@
   }
 
   .required {
-    color: #ff6b6b;
+    color: var(--color-danger);
     margin-left: 2px;
   }
 
@@ -526,7 +526,7 @@
     outline: none;
     border-color: var(--color-secondary);
     background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 4px rgba(225, 199, 142, 0.1);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--ink-sun) 10%, transparent);
   }
 
   .form-group textarea {
@@ -581,7 +581,7 @@
   }
 
   .radio-option:has(input[type="radio"]:checked) {
-    background: rgba(225, 199, 142, 0.1);
+    background: color-mix(in srgb, var(--ink-sun) 10%, transparent);
     border-color: var(--color-secondary);
   }
 
@@ -614,7 +614,7 @@
 
   .submit-btn:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(225, 199, 142, 0.3);
+    box-shadow: 0 10px 30px color-mix(in srgb, var(--ink-sun) 30%, transparent);
   }
 
   .submit-btn:disabled {

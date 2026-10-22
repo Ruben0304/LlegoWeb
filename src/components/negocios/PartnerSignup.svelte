@@ -732,7 +732,7 @@
     padding: 0 24px 28px;
     border-radius: 0;
     border: 2px solid var(--ink);
-    background: #fffdf7;
+    background: var(--paper-bright);
   }
 
   .card-top {
@@ -877,8 +877,8 @@
   }
 
   .status-rejected {
-    background: rgba(200, 60, 40, 0.12);
-    color: #a3301c;
+    background: var(--error-wash);
+    color: var(--error-ink);
   }
 
   .summary {
@@ -945,9 +945,9 @@
   .form-error {
     padding: 12px 14px;
     border-radius: var(--radius-md);
-    background: rgba(200, 60, 40, 0.1);
+    background: var(--error-wash);
     border: 2px solid rgba(163, 48, 28, 0.55);
-    color: #a3301c;
+    color: var(--error-ink);
     font-size: var(--font-size-sm);
     line-height: 1.5;
   }

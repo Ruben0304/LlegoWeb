@@ -233,7 +233,7 @@
     padding: 12px 14px;
     border-radius: var(--radius-md);
     border: 2px solid var(--ink);
-    background: #fffdf7;
+    background: var(--paper-bright);
     color: var(--color-text);
     font: inherit;
     font-size: var(--font-size-base);
@@ -254,7 +254,7 @@
   }
 
   input[aria-invalid="true"] {
-    border-color: #a3301c;
+    border-color: var(--error-ink);
   }
 
   .field-help,
@@ -268,15 +268,15 @@
   }
 
   .field-error {
-    color: #a3301c;
+    color: var(--error-ink);
   }
 
   .form-error {
     padding: 12px 14px;
     border-radius: var(--radius-md);
-    background: rgba(200, 60, 40, 0.1);
+    background: var(--error-wash);
     border: 2px solid rgba(163, 48, 28, 0.55);
-    color: #a3301c;
+    color: var(--error-ink);
     font-size: var(--font-size-sm);
     line-height: 1.5;
   }

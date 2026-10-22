@@ -596,10 +596,10 @@
     align-items: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-md) var(--spacing-lg);
-    background: rgba(255, 59, 48, 0.08);
-    border: 1px solid rgba(255, 59, 48, 0.2);
+    background: color-mix(in srgb, var(--color-danger) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-danger) 20%, transparent);
     border-radius: 12px;
-    color: #ff6b6b;
+    color: var(--color-danger);
     font-size: var(--font-size-sm);
     margin-bottom: var(--spacing-xl);
   }
@@ -622,12 +622,11 @@
     max-width: 320px;
     height: 54px;
     padding: 0 24px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
-      Roboto, sans-serif;
+    font-family: var(--font-family);
     font-size: 17px;
     font-weight: 500;
     letter-spacing: -0.01em;
-    color: #1d1d1f;
+    color: var(--color-surface);
     background: #ffffff;
     border: none;
     border-radius: 12px;
@@ -676,8 +675,7 @@
     max-width: 320px;
     height: 54px;
     padding: 0 24px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI",
-      Roboto, sans-serif;
+    font-family: var(--font-family);
     font-size: 17px;
     font-weight: 500;
     letter-spacing: -0.01em;
@@ -694,7 +692,7 @@
 
   .apple-signin-btn:hover:not(:disabled) {
     transform: scale(1.02);
-    background: #1a1a1a;
+    background: var(--color-surface);
     box-shadow:
       0 2px 8px rgba(0, 0, 0, 0.4),
       0 8px 24px rgba(0, 0, 0, 0.3);
@@ -768,7 +766,7 @@
     width: 18px;
     height: 18px;
     border: 2px solid rgba(0, 0, 0, 0.1);
-    border-top-color: #1d1d1f;
+    border-top-color: var(--color-surface);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -898,8 +896,8 @@
   }
 
   .logout-btn:hover {
-    color: #ff6b6b;
-    background: rgba(255, 59, 48, 0.1);
+    color: var(--color-danger);
+    background: color-mix(in srgb, var(--color-danger) 10%, transparent);
   }
 
   /* Dashboard Content */

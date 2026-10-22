@@ -17,8 +17,14 @@ colors:
   ink-mute: "rgba(18, 73, 57, 0.7)"
   ink-line: "rgba(18, 73, 57, 0.16)"
   error-ink: "#a3301c"
-  night: "#011f20"
-  night-surface: "#032a2b"
+  error-wash: "rgba(163, 48, 28, 0.1)"
+  night: "#0b2a21"
+  night-surface: "#10352a"
+  night-danger: "#ff8a75"
+  night-ok: "#8fd3a8"
+  film: "#0a221b"
+  film-rule: "#1e3d33"
+  film-frame: "#11302a"
 typography:
   display:
     fontFamily: "'Montserrat Variable', 'Arial Black', sans-serif"

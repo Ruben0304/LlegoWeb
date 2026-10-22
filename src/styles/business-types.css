@@ -188,7 +188,7 @@
   font-size: var(--font-size-xs);
   color: var(--color-secondary);
   padding: 2px 6px;
-  background: rgba(225, 199, 142, 0.1);
+  background: color-mix(in srgb, var(--ink-sun) 10%, transparent);
   border-radius: var(--radius-sm);
 }
 
@@ -223,13 +223,13 @@
 }
 
 .bt-status-badge.active {
-  background: rgba(52, 199, 89, 0.1);
-  color: #34c759;
+  background: color-mix(in srgb, var(--color-ok) 10%, transparent);
+  color: var(--color-ok);
 }
 
 .bt-status-badge.inactive {
-  background: rgba(255, 59, 48, 0.1);
-  color: #ff6b6b;
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+  color: var(--color-danger);
 }
 
 /* Buttons */
@@ -265,7 +265,7 @@
 
 .bt-create-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(225, 199, 142, 0.3);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--ink-sun) 30%, transparent);
 }
 
 /* Empty State */
@@ -343,17 +343,17 @@
 
 .bt-action-btn.edit:hover {
   color: var(--color-secondary);
-  background: rgba(225, 199, 142, 0.1);
+  background: color-mix(in srgb, var(--ink-sun) 10%, transparent);
 }
 
 .bt-action-btn.delete {
-  color: #ff6b6b;
-  background: rgba(255, 59, 48, 0.1);
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
 }
 
 .bt-action-btn.delete:hover {
   color: #fff;
-  background: #ff6b6b;
+  background: var(--color-danger);
 }
 
 /* Confirm Delete */
@@ -365,19 +365,19 @@
 }
 
 .confirm-delete span {
-  color: #ff6b6b;
+  color: var(--color-danger);
 }
 
 .confirm-btn {
   padding: 4px 8px;
   font-size: var(--font-size-xs);
   color: #fff;
-  background: #ff6b6b;
+  background: var(--color-danger);
   border-radius: var(--radius-sm);
 }
 
 .confirm-btn:hover {
-  background: #ff5252;
+  background: var(--color-danger);
 }
 
 .cancel-btn {
@@ -411,7 +411,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(90, 132, 103, 0.2) 0%, rgba(178, 214, 154, 0.2) 100%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-ok) 20%, transparent) 0%, color-mix(in srgb, var(--color-ok) 20%, transparent) 100%);
   border-radius: var(--radius-lg);
   color: var(--color-accent);
   flex-shrink: 0;
@@ -490,7 +490,7 @@
   outline: none;
   border-color: var(--color-secondary);
   background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 4px rgba(225, 199, 142, 0.1);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ink-sun) 10%, transparent);
 }
 
 .bt-form-group textarea {
@@ -548,7 +548,7 @@
 
 .bt-submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(225, 199, 142, 0.3);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--ink-sun) 30%, transparent);
 }
 
 .bt-submit-btn:disabled {
@@ -580,14 +580,14 @@
 
 .bt-remove-feature-btn {
   padding: var(--spacing-xs);
-  color: #ff6b6b;
-  background: rgba(255, 59, 48, 0.1);
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
   border-radius: var(--radius-sm);
   transition: all var(--transition-base);
 }
 
 .bt-remove-feature-btn:hover {
-  background: rgba(255, 59, 48, 0.2);
+  background: color-mix(in srgb, var(--color-danger) 20%, transparent);
 }
 
 .bt-add-feature-btn {
@@ -600,14 +600,14 @@
   font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--color-secondary);
-  background: rgba(225, 199, 142, 0.1);
-  border: 1px dashed rgba(225, 199, 142, 0.3);
+  background: color-mix(in srgb, var(--ink-sun) 10%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--ink-sun) 30%, transparent);
   border-radius: var(--radius-lg);
   transition: all var(--transition-base);
 }
 
 .bt-add-feature-btn:hover {
-  background: rgba(225, 199, 142, 0.15);
+  background: color-mix(in srgb, var(--ink-sun) 15%, transparent);
   border-color: var(--color-secondary);
 }
 
@@ -636,7 +636,7 @@
 }
 
 .bt-upload-area.dragging {
-  background: rgba(225, 199, 142, 0.1);
+  background: color-mix(in srgb, var(--ink-sun) 10%, transparent);
   border-color: var(--color-secondary);
   border-style: solid;
 }
@@ -654,7 +654,7 @@
 }
 
 .bt-upload-area:hover .bt-upload-icon {
-  background: rgba(225, 199, 142, 0.15);
+  background: color-mix(in srgb, var(--ink-sun) 15%, transparent);
   color: var(--color-secondary);
   transform: scale(1.05);
 }
@@ -705,14 +705,14 @@
   padding: var(--spacing-xs) var(--spacing-sm);
   font-size: var(--font-size-xs);
   font-weight: 500;
-  color: #ff6b6b;
-  background: rgba(255, 59, 48, 0.1);
+  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
   border-radius: var(--radius-md);
   transition: all var(--transition-base);
 }
 
 .bt-remove-file-btn:hover {
-  background: rgba(255, 59, 48, 0.2);
+  background: color-mix(in srgb, var(--color-danger) 20%, transparent);
 }
 
 /* Toggle Switch */
@@ -778,7 +778,7 @@
 }
 
 .bt-toggle-switch input:checked + .bt-toggle-slider {
-  background: #34c759;
+  background: var(--color-ok);
 }
 
 .bt-toggle-switch input:checked + .bt-toggle-slider::before {
@@ -791,10 +791,10 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-md);
-  background: rgba(52, 199, 89, 0.1);
-  border: 1px solid rgba(52, 199, 89, 0.3);
+  background: color-mix(in srgb, var(--color-ok) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-ok) 30%, transparent);
   border-radius: var(--radius-md);
-  color: #34c759;
+  color: var(--color-ok);
   font-size: var(--font-size-sm);
   margin-bottom: var(--spacing-lg);
   animation: slideIn 0.3s ease;
@@ -805,10 +805,10 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-md);
-  background: rgba(255, 59, 48, 0.1);
-  border: 1px solid rgba(255, 59, 48, 0.3);
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
   border-radius: var(--radius-md);
-  color: #ff6b6b;
+  color: var(--color-danger);
   font-size: var(--font-size-sm);
   margin-bottom: var(--spacing-lg);
   animation: slideIn 0.3s ease;
@@ -826,7 +826,7 @@
 }
 
 .bt-required {
-  color: #ff6b6b;
+  color: var(--color-danger);
   margin-left: 2px;
 }
 
