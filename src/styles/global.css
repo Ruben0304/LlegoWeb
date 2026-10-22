@@ -1,28 +1,32 @@
 /* Llegó - Global Styles
  *
- * Mundo visual: carteles serigrafiados. Papel crema como suelo y las tintas
- * planas del logo de la caja (teal, verde, naranja, sol) en campos que ocupan
- * secciones enteras. El texto va en teal profundo. Ver DESIGN.md.
+ * Mundo visual: carteles serigrafiados con la paleta del Manual de marca Llegó
+ * Delivery 2026: dos verdes (#176545, #124939) y dos amarillos (#F9B41E, #F9C764)
+ * en campos planos que ocupan secciones enteras, sobre papel blanco. Como mucho
+ * tres colores de la paleta por sección. El texto va en verde profundo. Ver DESIGN.md.
+ *
+ * Los nombres de las tintas (teal, orange, sun...) se conservan por compatibilidad
+ * con los componentes; sus valores ya son los del manual.
  */
 
 :root {
   /* Tintas (sacadas del logo) */
-  --paper: #fff7e6;
-  --paper-deep: #fbedcb;
-  --ink: #023133;
-  --ink-teal: #127368;
-  --ink-teal-dark: #0b5a52;
-  --ink-green: #8cb462;
-  --ink-leaf: #a6c863;
-  --ink-orange: #ec9844;
-  --ink-orange-dark: #c8711f;
-  --ink-sun: #fad893;
-  --ink-cream: #fbf2d6;
+  --paper: #ffffff;
+  --paper-deep: #fef1d8;          /* Little Sun Dress al 25 % sobre blanco */
+  --ink: #124939;                 /* Country Squire */
+  --ink-teal: #176545;            /* Jade Mussel Green */
+  --ink-teal-dark: #124939;       /* Country Squire */
+  --ink-green: #d1e5d9;           /* Jade al 20 %: campo claro, lleva texto oscuro */
+  --ink-leaf: #e6f0ea;            /* Jade al 10 % */
+  --ink-orange: #f9b41e;          /* Tangerine Twist */
+  --ink-orange-dark: #d99600;     /* Tangerine oscurecido para hover y bordes */
+  --ink-sun: #f9c764;             /* Little Sun Dress */
+  --ink-cream: #fff7e6;
 
   /* Texto sobre papel */
-  --ink-soft: rgba(2, 49, 51, 0.8);
-  --ink-mute: rgba(2, 49, 51, 0.7);
-  --ink-line: rgba(2, 49, 51, 0.16);
+  --ink-soft: rgba(18, 73, 57, 0.82);
+  --ink-mute: rgba(18, 73, 57, 0.72);
+  --ink-line: rgba(18, 73, 57, 0.16);
 
   /* Roles (los componentes usan estos nombres) */
   --color-primary: var(--ink);
@@ -41,8 +45,10 @@
   --color-focus: var(--ink-teal);
 
   /* Typography */
-  --font-display: 'Big Shoulders Display Variable', 'Arial Narrow', 'Roboto Condensed', sans-serif;
-  --font-family: 'Figtree Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Manual: Moon Get Heavy para titulares (sin licencia aún) y Montserrat para textos.
+     Por ahora Montserrat en todo; los titulares en su peso más grueso. */
+  --font-display: 'Montserrat Variable', 'Arial Black', sans-serif;
+  --font-family: 'Montserrat Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -75,10 +81,10 @@
   --radius-full: 9999px;
 
   /* Sombras: tinta que cae sobre el papel, siempre desplazada y suave */
-  --shadow-sm: 0 1px 2px rgba(2, 49, 51, 0.12);
-  --shadow-md: 0 6px 14px -6px rgba(2, 49, 51, 0.28);
-  --shadow-lg: 0 18px 36px -16px rgba(2, 49, 51, 0.38);
-  --shadow-xl: 0 32px 64px -28px rgba(2, 49, 51, 0.5);
+  --shadow-sm: 0 1px 2px rgba(18, 73, 57, 0.12);
+  --shadow-md: 0 6px 14px -6px rgba(18, 73, 57, 0.28);
+  --shadow-lg: 0 18px 36px -16px rgba(18, 73, 57, 0.38);
+  --shadow-xl: 0 32px 64px -28px rgba(18, 73, 57, 0.5);
 
   /* Transitions */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -206,9 +212,9 @@ p {
 /* Titular de cartel: condensado, en mayúsculas, apretado */
 .display {
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   /* holgura para las tildes de la línea de abajo (LLEGÓ, LÓS) */
   line-height: 0.98;
 }

@@ -61,7 +61,7 @@
     <nav class="navbar-container" aria-label="Principal">
         <a href="/" class="logo" aria-label="Llegó, ir al inicio" onclick={closeMobileMenu}>
             <img
-                src="/img/logo-caja-320.webp"
+                src="/img/isotipo.svg"
                 width="320"
                 height="210"
                 alt=""
@@ -100,7 +100,7 @@
     <div class="route" class:arrived bind:this={routeEl} aria-hidden="true">
         <div class="route-track">
             <span class="route-road"></span>
-            <img class="route-box" src="/img/logo-caja-320.webp" width="320" height="210" alt="" decoding="async" />
+            <img class="route-box" src="/img/isotipo.svg" width="320" height="212" alt="" decoding="async" />
             <svg class="route-home" viewBox="0 0 28 26">
                 <path class="roof" d="M1 12 14 2l13 10z" />
                 <rect class="wall" x="4" y="11" width="20" height="14" />

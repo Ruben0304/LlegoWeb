@@ -306,7 +306,7 @@
           Vende en Llegó o reparte pedidos en tu zona. Envía tu solicitud y te llamaremos para conocerte.
         </p>
       </div>
-      <img class="band-box" src="/img/logo-caja-720.webp" width="720" height="472" alt="" decoding="async" />
+      <img class="band-box" src="/img/isotipo.svg" width="720" height="477" alt="" decoding="async" />
     </div>
   </header>
 

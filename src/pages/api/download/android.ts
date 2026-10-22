@@ -36,16 +36,16 @@ function friendlyError(status: number, message: string): Response {
 <style>
   /* Mismas tintas que el sitio (DESIGN.md), sin fuentes propias: página mínima */
   body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-    background: #fff7e6; color: #023133; padding: 24px; box-sizing: border-box;
+    background: #ffffff; color: #124939; padding: 24px; box-sizing: border-box;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
   main { max-width: 440px; text-align: center; }
-  h1 { font-family: 'Arial Narrow', 'Roboto Condensed', sans-serif; font-size: 2.4rem; font-weight: 900;
-    text-transform: uppercase; line-height: 1; margin: 0 0 14px; text-shadow: 0.045em 0.035em 0 #ec9844; }
-  p { color: rgba(2, 49, 51, 0.8); line-height: 1.5; margin: 0 0 24px; }
+  h1 { font-family: inherit; font-size: 2.2rem; font-weight: 900;
+    text-transform: uppercase; line-height: 1; margin: 0 0 14px; text-shadow: 0.045em 0.035em 0 #f9b41e; }
+  p { color: rgba(18, 73, 57, 0.8); line-height: 1.5; margin: 0 0 24px; }
   a { display: inline-flex; align-items: center; min-height: 48px; margin: 4px; padding: 10px 20px;
-    border-radius: 6px; text-decoration: none; background: #023133; color: #fff7e6; font-weight: 700; }
-  a.secondary { background: transparent; color: #023133; box-shadow: inset 0 0 0 2px #023133; }
-  a:focus-visible { outline: 3px solid #127368; outline-offset: 3px; }
+    border-radius: 6px; text-decoration: none; background: #176545; color: #ffffff; font-weight: 700; }
+  a.secondary { background: transparent; color: #124939; box-shadow: inset 0 0 0 2px #124939; }
+  a:focus-visible { outline: 3px solid #f9b41e; outline-offset: 3px; }
   .note { margin: 24px 0 0; font-size: 0.9rem; }
 </style>
 </head>

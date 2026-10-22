@@ -69,6 +69,7 @@ const apps = [
     flex-direction: column;
     padding: 28px 26px 26px;
     min-height: 340px;
+    container-type: inline-size;
   }
 
   .eco-poster--clientes {
@@ -90,7 +91,8 @@ const apps = [
     font-family: var(--font-display);
     font-weight: 900;
     text-transform: uppercase;
-    font-size: clamp(40px, 3.7vw, 54px);
+    /* Montserrat es ancha: «LlegoBusiness» (13 letras) tiene que caber en el ancho del cartel */
+    font-size: min(46px, calc((100cqi - 52px) / 8.4));
     line-height: 0.9;
     margin-bottom: 18px;
   }

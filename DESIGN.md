@@ -1,76 +1,76 @@
 ---
 name: Llegó
-description: Silkscreen posters in the logo's flat inks on cream paper; the order (the box) is the figure of every poster.
+description: Silkscreen posters in the logo's flat inks (manual de identidad) on white paper; the order (the box) is the figure of every poster.
 colors:
-  ink: "#023133"
-  ink-teal: "#127368"
-  ink-teal-dark: "#0b5a52"
-  ink-orange: "#ec9844"
-  ink-orange-dark: "#c8711f"
-  ink-green: "#8cb462"
-  ink-leaf: "#a6c863"
-  ink-sun: "#fad893"
-  paper: "#fff7e6"
-  paper-deep: "#fbedcb"
-  paper-bright: "#fffdf7"
-  ink-soft: "rgba(2, 49, 51, 0.8)"
-  ink-mute: "rgba(2, 49, 51, 0.7)"
-  ink-line: "rgba(2, 49, 51, 0.16)"
+  ink: "#124939"
+  ink-teal: "#176545"
+  ink-teal-dark: "#124939"
+  ink-orange: "#f9b41e"
+  ink-orange-dark: "#d99600"
+  ink-green: "#d1e5d9"
+  ink-leaf: "#e6f0ea"
+  ink-sun: "#f9c764"
+  paper: "#ffffff"
+  paper-deep: "#fef1d8"
+  paper-bright: "#ffffff"
+  ink-soft: "rgba(18, 73, 57, 0.8)"
+  ink-mute: "rgba(18, 73, 57, 0.7)"
+  ink-line: "rgba(18, 73, 57, 0.16)"
   error-ink: "#a3301c"
   night: "#011f20"
   night-surface: "#032a2b"
 typography:
   display:
-    fontFamily: "'Big Shoulders Display Variable', 'Arial Narrow', 'Roboto Condensed', sans-serif"
+    fontFamily: "'Montserrat Variable', 'Arial Black', sans-serif"
     fontSize: "clamp(62px, 9.4vw, 128px)"
     fontWeight: 900
     lineHeight: 0.98
     letterSpacing: "-0.01em"
   headline:
-    fontFamily: "'Big Shoulders Display Variable', 'Arial Narrow', 'Roboto Condensed', sans-serif"
+    fontFamily: "'Montserrat Variable', 'Arial Black', sans-serif"
     fontSize: "clamp(52px, 10vw, 128px)"
     fontWeight: 800
     lineHeight: 0.98
     letterSpacing: "-0.01em"
   title:
-    fontFamily: "'Big Shoulders Display Variable', 'Arial Narrow', 'Roboto Condensed', sans-serif"
+    fontFamily: "'Montserrat Variable', 'Arial Black', sans-serif"
     fontSize: "30px"
     fontWeight: 800
     lineHeight: 0.95
   label:
-    fontFamily: "'Big Shoulders Display Variable', 'Arial Narrow', 'Roboto Condensed', sans-serif"
+    fontFamily: "'Montserrat Variable', 'Arial Black', sans-serif"
     fontSize: "22px"
     fontWeight: 800
     lineHeight: 1
     letterSpacing: "0.02em"
   ticket:
-    fontFamily: "'Big Shoulders Display Variable', 'Arial Narrow', 'Roboto Condensed', sans-serif"
+    fontFamily: "'Montserrat Variable', 'Arial Black', sans-serif"
     fontSize: "1.6rem"
     fontWeight: 800
     lineHeight: 1.15
     letterSpacing: "0.01em"
   lede:
-    fontFamily: "'Figtree Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    fontFamily: "'Montserrat Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     fontSize: "clamp(17px, 1.6vw, 20px)"
     fontWeight: 500
     lineHeight: 1.55
   body:
-    fontFamily: "'Figtree Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    fontFamily: "'Montserrat Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.6
   body-sm:
-    fontFamily: "'Figtree Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    fontFamily: "'Montserrat Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     fontSize: "15px"
     fontWeight: 500
     lineHeight: 1.5
   prose:
-    fontFamily: "'Figtree Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    fontFamily: "'Montserrat Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     fontSize: "1.0625rem"
     fontWeight: 400
     lineHeight: 1.75
   caption:
-    fontFamily: "'Figtree Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    fontFamily: "'Montserrat Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     fontSize: "0.75rem"
     fontWeight: 600
     lineHeight: 1.15
@@ -175,6 +175,17 @@ components:
 
 # Design System: Llegó
 
+## Identidad (manual de marca, oct 2026)
+
+El manual de identidad del logo (`MANUAL_DE_IDENTIDADLOGO.pdf`, fuera del repo) manda sobre todo lo de abajo. Lo que fija:
+
+- **Paleta (máx. 3 a la vez en una pieza):** Little Sun Dress `#F9C764` (`--ink-sun`), Tangerine Twist `#F9B41E` (`--ink-orange`), Jade Mussel Green `#176545` (`--ink-teal`) y Country Squire `#124939` (`--ink`, el texto). Los nombres de tokens (`teal`, `orange`) se conservan por compatibilidad; los valores son los del manual. `--ink-green` y `--ink-leaf` son tintes claros del verde Jade para campos suaves (Farmacia, Mensajeros, /negocios), no colores nuevos. El fondo es blanco (`--paper`); el crema del logo antiguo queda como `--paper-deep`/`--ink-cream`.
+- **Letra:** Montserrat (variable, autoalojada con `@fontsource-variable/montserrat`) para todo: titulares en 900 y mayúsculas, texto en 400 a 600. La letra del logotipo (Moon Get Heavy) no tiene licencia web y solo vive dentro de los SVG del logo.
+- **Logos (`public/img`):** `logo-horizontal.svg` (verde), `logo-horizontal-blanco.svg` (sobre verde), `logo-vertical.svg`, `isotipo.svg` (la mano con la caja, verde) e `isotipo-amarillo.svg` (sobre verde). Son vectores extraídos del PDF del manual: no se redibujan a mano. `favicon.svg` es el isotipo amarillo sobre un cuadrado verde redondeado y `og-image.jpg` el logo blanco sobre verde Jade.
+- **Montserrat es ancha:** los titulares de carteles estrechos se ajustan con consultas de contenedor (`container-type: inline-size` y `cqi` según el número de letras, ver `Cartelera.astro` y `Ecosistema.astro`). Comprobar siempre a 360 px.
+
+Las secciones siguientes describen el sistema de carteles; donde dicen Big Shoulders o Figtree, léase Montserrat, y donde dicen crema o teal, los valores del manual.
+
 ## Overview
 
 **Creative North Star: "The Poster That Arrives" (El cartel que llega)**
@@ -230,14 +241,14 @@ The palette is the logo's own inks printed flat on cream paper, with deep teal-i
 
 **The Ink-On-Ink Rule.** Text on paper, orange, sun, green and deep paper is always Deep Teal Ink. Text on Logo Teal and on Deep Teal Ink is paper, or sun for display-size lines only (sun on teal is 4.2:1, large text only).
 
-**The Paper Floor Rule.** Never pure white (#fff) or pure black on the public site; the lightest surface is Bright Paper and the darkest is Deep Teal Ink. The Sign in with Apple button keeps Apple's black because Apple requires it.
+**The Paper Floor Rule.** The page floor is white (the logo manual's background); never pure black. The darkest surface is Country Squire (`--ink`). The Sign in with Apple button keeps Apple's black because Apple requires it.
 
 ## Typography
 
-**Display Font:** Big Shoulders Display Variable (with Arial Narrow, Roboto Condensed)
-**Body Font:** Figtree Variable (with -apple-system, Segoe UI, Roboto)
+**Display Font:** Montserrat Variable 900, uppercase, letter-spacing -0.02em (fallback Arial Black)
+**Body Font:** Montserrat Variable 400 to 600 (fallback -apple-system, Segoe UI, Roboto)
 
-**Character:** A condensed Chicago-poster grotesque shouting in uppercase over a friendly, round humanist sans that does all the explaining. The display face is the poster; Figtree is the small print.
+**Character:** One geometric family, as the logo manual asks: the poster voice is Montserrat Black in uppercase, the small print is the same family at regular weight.
 
 ### Hierarchy
 - **Display** (900, clamp(62px, 9.4vw, 128px), 0.98): the hero headline only ("Pide lo que / quieras. / Llegó."), and the ComingSoon posters at clamp(60px, 12vw, 160px).
@@ -252,7 +263,7 @@ The palette is the logo's own inks printed flat on cream paper, with deep teal-i
 - **Caption** (600, 0.75rem, 85% opacity): the small line on a ticket ("Descargar en", "Descargar para Android").
 
 ### Named Rules
-**The Two Voices Rule.** Big Shoulders is always uppercase and only for headlines, titles, labels, tickets and the wordmark. Figtree is never uppercase and carries every sentence a visitor has to read. Titles and buttons are written in Spanish sentence case in the source; the uppercase comes from CSS.
+**The Two Voices Rule.** Display weight (900) is always uppercase and only for headlines, titles, labels, tickets and the wordmark. Running text is never uppercase and carries every sentence a visitor has to read. Titles and buttons are written in Spanish sentence case in the source; the uppercase comes from CSS.
 
 **The Room For The Accent Rule.** Display lines are stacked tight (0.9 to 0.98) but each printed line after the first gets `padding-top: 0.1em`, so Ó, Í and ¿ never collide with the line above. Never go below 0.9 line-height on Spanish uppercase.
 
@@ -271,8 +282,8 @@ Breakpoints are content-driven: 640px (reading column padding), 700px (ComingSoo
 The system is flat paper. Depth is a print effect: a translucent second pass of ink, offset down and to the right with zero blur, as if the screen printer laid the same shape twice. It is reserved for the two figures (the logo box and the phone with the real app) and for the headline registration. Surfaces, posters, cards and buttons sit flat on the paper with no shadow; when a container needs an edge it gets a 2px ink border or inset ring, and the navbar gets a 2px ink rule once the page scrolls.
 
 ### Shadow Vocabulary
-- **Box pass** (`filter: drop-shadow(10px 14px 0 rgba(2, 49, 51, 0.22))`, 8px 10px at 0.2 to 0.25 for smaller boxes): under the logo box wherever it appears.
-- **Phone pass** (`box-shadow: 14px 18px 0 -2px rgba(2, 49, 51, 0.28), 0 32px 64px -28px rgba(2, 49, 51, 0.5)`): the hero phone only; the one place a soft shadow is layered under the ink pass.
+- **Box pass** (`filter: drop-shadow(10px 14px 0 rgba(18, 73, 57, 0.22))`, 8px 10px at 0.2 to 0.25 for smaller boxes): under the logo box wherever it appears.
+- **Phone pass** (`box-shadow: 14px 18px 0 -2px rgba(18, 73, 57, 0.28), 0 32px 64px -28px rgba(18, 73, 57, 0.5)`): the hero phone only; the one place a soft shadow is layered under the ink pass.
 - **Scroll rule** (`box-shadow: 0 2px 0 #023133`): the navbar after 8px of scroll.
 - **Headline registration** (`text-shadow: 0.045em 0.035em 0 <under-ink>`): see Print title.
 

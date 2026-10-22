@@ -104,7 +104,7 @@ const posters: Poster[] = [
 
     <ul class="wall" data-reveal>
       {posters.map((p, i) => (
-        <li class:list={["poster", `poster--${p.id}`]} style={`--field: ${p.field}; --fg: ${p.fg}; --a: ${p.a}; --b: ${p.b}; --i: ${i}`}>
+        <li class:list={["poster", `poster--${p.id}`]} style={`--field: ${p.field}; --fg: ${p.fg}; --a: ${p.a}; --b: ${p.b}; --i: ${i}; --letras: ${p.title.length}`}>
           <svg class="poster-art" viewBox="0 0 120 120" aria-hidden="true">
             <g class="layer-a" set:html={p.art} />
             <g class="layer-b" set:html={p.art} />
@@ -151,10 +151,12 @@ const posters: Poster[] = [
     flex-direction: column;
     justify-content: flex-end;
     min-height: 240px;
-    padding: 20px 18px 22px;
+    --pad-x: 18px;
+    padding: 20px var(--pad-x) 22px;
     background: var(--field);
     color: var(--fg);
     overflow: hidden;
+    container-type: inline-size;
   }
 
   .poster--restaurantes {
@@ -257,7 +259,8 @@ const posters: Poster[] = [
     font-family: var(--font-display);
     font-weight: 900;
     text-transform: uppercase;
-    font-size: clamp(28px, 7.4vw, 64px);
+    /* Montserrat Black es ancha: el titular cabe en el cartel según sus letras */
+    font-size: min(64px, calc((100cqi - 2 * var(--pad-x)) / (var(--letras) * 0.64)));
     line-height: 0.9;
     margin-bottom: 8px;
   }
@@ -284,7 +287,8 @@ const posters: Poster[] = [
 
     .poster {
       min-height: 0;
-      padding: 28px 28px 30px;
+      --pad-x: 28px;
+      padding: 28px var(--pad-x) 30px;
     }
 
     .poster--restaurantes {
@@ -317,14 +321,8 @@ const posters: Poster[] = [
       width: 80%;
     }
 
-    /* Columna estrecha: el titular se ajusta al ancho del cartel */
     .poster--farmacia {
-      container-type: inline-size;
-      padding-inline: 20px;
-    }
-
-    .poster--farmacia .poster-title {
-      font-size: min(36px, calc((100cqi - 40px) / 2.75));
+      --pad-x: 20px;
     }
 
     .poster--y-mas .poster-text {

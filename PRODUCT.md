@@ -50,7 +50,7 @@ The website explains the apps, gets people to download them (App Store, Android 
 ## Brand Commitments
 
 - Name: **Llegó** (customers), **LlegoBusiness**, **Llego Mensajeros**, **Llegó+**.
-- The logo is binding: the box in motion (`public/img/icon.png`, colours teal, green, orange and cream). Everything else (palette, type, dark or light, layout) is open for the redesign.
+- The logo and its identity manual are binding (oct 2026): the hand with the box (`public/img/isotipo.svg`, logos in `public/img/logo-*.svg`), the palette Little Sun Dress `#F9C764`, Tangerine Twist `#F9B41E`, Jade Mussel Green `#176545` and Country Squire `#124939` (at most three at a time), and Montserrat. Layout and the poster system are ours (see DESIGN.md).
 
 ## Evidence on Hand
 

@@ -72,7 +72,7 @@ src/
 All pages use [Layout.astro](src/layouts/Layout.astro) which handles:
 - SEO metadata (title, description, keywords, OG tags)
 - Structured data (JSON-LD)
-- Global CSS import and the self-hosted fonts (Big Shoulders Display, Figtree)
+- Global CSS import and the self-hosted font (Montserrat, per the logo manual)
 - `theme` prop: `"paper"` (default) or `"ink"` for the admin panels
 - The script that settles `.print` titles into register when they scroll into view
 
@@ -90,13 +90,14 @@ This minimizes initial JavaScript load.
 
 #### 3. Design system ("carteles serigrafiados")
 The full system is in [DESIGN.md](DESIGN.md); product facts in [PRODUCT.md](PRODUCT.md). In short:
-- Paper ground (`--paper`) and the logo's flat inks in fields that own whole sections: `--ink-teal`, `--ink-orange`, `--ink-green`, `--ink-sun`; text in `--ink` (deep teal). Tokens live in [global.css](src/styles/global.css); older role names (`--color-text`, `--color-background`, ...) are aliases.
-- Headlines: `PrintTitle.astro` (Big Shoulders Display, uppercase) with a second ink offset via `text-shadow` that settles into register on scroll. Body: Figtree.
+- White paper ground (`--paper`) and the logo's flat inks in fields that own whole sections: `--ink-teal` (Jade green), `--ink-orange` (Tangerine), `--ink-green` (light Jade tint), `--ink-sun`; text in `--ink` (Country Squire). Tokens live in [global.css](src/styles/global.css); older role names (`--color-text`, `--color-background`, ...) are aliases.
+- Headlines: `PrintTitle.astro` (Montserrat 900, uppercase) with a second ink offset via `text-shadow` that settles into register on scroll. Body: Montserrat.
+- Identity manual (oct 2026): palette `#F9C764`, `#F9B41E`, `#176545`, `#124939` (max three at a time) on white; logos are SVGs extracted from the manual in `public/img` (`logo-horizontal*.svg`, `logo-vertical.svg`, `isotipo*.svg`). Montserrat is wide: narrow poster titles size themselves with container queries; check 360px.
 - Actions are cinema tickets (`.ticket`, notched stub); downloads always go through `StoreTickets.astro`.
 - Contrast: orange and sun fields take `--ink` text; teal fields take `--paper`. Never orange or sun text on paper.
 - No gradient text, no eyebrow labels above headings, no emoji icons (two-ink SVG), no glass. Mobile and `prefers-reduced-motion` show the same content.
 - `/tutoriales` and `/business-types` render with `data-theme="ink"` (dark teal); they only borrow type and palette.
-- Check changes with `.claude/skills/impeccable/scripts/impeccable detect --json src` (or a URL; set `IMPECCABLE_BROWSER` to a Chromium binary). `cream-palette` is expected: the cream is the logo's.
+- Check changes with `.claude/skills/impeccable/scripts/impeccable detect --json src` (or a URL; set `IMPECCABLE_BROWSER` to a Chromium binary).
 
 #### 4. Svelte 5 Reactivity
 Components use Svelte 5's runes syntax:
@@ -185,10 +186,10 @@ const tutorials = await getTutorials(jwt);
 
 ## Development Notes
 
-- Light paper theme with the logo's inks (see DESIGN.md); admin panels use the dark `ink` theme
+- Light white-paper theme with the logo manual's inks (see DESIGN.md); admin panels use the dark `ink` theme
 - Responsive breakpoints: 900px (two-column sections), 1024px (desktop hero)
-- Image assets are in `/public/img/`; `logo-caja-*.webp` are crops of `icon.png`. Rasters carry their origin (`impeccable embed-prompt --scan public/img`)
-- Theme color is `#fff7e6` (paper)
+- Image assets are in `/public/img/`; the logo and isotipo are SVG. Rasters carry their origin (`impeccable embed-prompt --scan public/img`)
+- Theme color is `#ffffff` (paper)
 
 ## Contrato GraphQL con el backend (CI)
 

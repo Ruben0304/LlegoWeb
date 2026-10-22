@@ -1,10 +1,9 @@
 ---
-import "@fontsource-variable/big-shoulders-display";
-import "@fontsource-variable/figtree";
+import "@fontsource-variable/montserrat";
 import "../styles/global.css";
 import { SITE_URL } from "../lib/site";
 
-/** Imagen para redes por defecto: 1200x630, generada a partir de public/img/icon.png. */
+/** Imagen para redes por defecto: 1200x630, logo horizontal blanco sobre verde Jade (manual de identidad). */
 const DEFAULT_OG_IMAGE = "/og-image.jpg";
 const DEFAULT_OG_IMAGE_ALT = "Llegó: delivery en Cuba con IA";
 
@@ -101,8 +100,8 @@ const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
         {isDefaultImage && <meta name="twitter:image:alt" content={DEFAULT_OG_IMAGE_ALT} />}
 
         <!-- Theme Color -->
-        <meta name="theme-color" content={theme === "ink" ? "#011f20" : "#fff7e6"} />
-        <meta name="msapplication-TileColor" content="#023133" />
+        <meta name="theme-color" content={theme === "ink" ? "#011f20" : "#ffffff"} />
+        <meta name="msapplication-TileColor" content="#124939" />
 
         <!-- Generator -->
         <meta name="generator" content={Astro.generator} />

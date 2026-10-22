@@ -1,7 +1,6 @@
 ---
 // Auth callback page - handles OAuth redirects from backend
-import "@fontsource-variable/big-shoulders-display";
-import "@fontsource-variable/figtree";
+import "@fontsource-variable/montserrat";
 ---
 
 <!doctype html>
@@ -22,9 +21,9 @@ import "@fontsource-variable/figtree";
 
       /* Mismas tintas que el sitio (ver DESIGN.md); página suelta, sin Layout */
       body {
-        font-family: 'Figtree Variable', -apple-system, 'Segoe UI', Roboto, sans-serif;
-        background: #fff7e6;
-        color: #023133;
+        font-family: 'Montserrat Variable', -apple-system, 'Segoe UI', Roboto, sans-serif;
+        background: #ffffff;
+        color: #124939;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -51,7 +50,7 @@ import "@fontsource-variable/figtree";
         left: 0;
         right: 0;
         bottom: 10px;
-        border-top: 3px dashed #127368;
+        border-top: 3px dashed #176545;
       }
 
       .spinner {
@@ -60,7 +59,7 @@ import "@fontsource-variable/figtree";
         bottom: 12px;
         width: 72px;
         height: 47px;
-        background: url("/img/logo-caja-320.webp") center / contain no-repeat;
+        background: url("/img/isotipo.svg") center / contain no-repeat;
         animation: route 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite alternate;
       }
 
@@ -76,17 +75,17 @@ import "@fontsource-variable/figtree";
       }
 
       h1 {
-        font-family: 'Big Shoulders Display Variable', 'Arial Narrow', sans-serif;
+        font-family: 'Montserrat Variable', 'Arial Black', sans-serif;
         font-size: 44px;
         font-weight: 900;
         text-transform: uppercase;
         line-height: 0.98;
         margin-bottom: 12px;
-        text-shadow: 0.045em 0.035em 0 #ec9844;
+        text-shadow: 0.045em 0.035em 0 #f9b41e;
       }
 
       p {
-        color: rgba(2, 49, 51, 0.8);
+        color: rgba(18, 73, 57, 0.8);
         font-size: 16px;
         line-height: 1.5;
       }
@@ -117,11 +116,11 @@ import "@fontsource-variable/figtree";
         min-height: 48px;
         margin-top: 24px;
         padding: 10px 24px;
-        background: #023133;
+        background: #124939;
         border-radius: 6px;
-        color: #fff7e6;
+        color: #ffffff;
         text-decoration: none;
-        font-family: 'Big Shoulders Display Variable', 'Arial Narrow', sans-serif;
+        font-family: 'Montserrat Variable', 'Arial Black', sans-serif;
         font-size: 20px;
         font-weight: 800;
         text-transform: uppercase;
@@ -129,11 +128,11 @@ import "@fontsource-variable/figtree";
       }
 
       .back-link:hover {
-        background: #127368;
+        background: #176545;
       }
 
       .back-link:focus-visible {
-        outline: 3px solid #127368;
+        outline: 3px solid #176545;
         outline-offset: 3px;
       }
     </style>

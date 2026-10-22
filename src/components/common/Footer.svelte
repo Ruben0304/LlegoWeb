@@ -75,7 +75,7 @@
 
     <div class="footer-bottom">
       <p class="copyright">&copy; {currentYear} Llegó. Todos los derechos reservados.</p>
-      <img src="/img/logo-caja-320.webp" width="320" height="210" alt="" class="footer-box" loading="lazy" decoding="async" />
+      <img src="/img/isotipo.svg" width="320" height="212" alt="" class="footer-box" loading="lazy" decoding="async" />
     </div>
   </div>
 </footer>
