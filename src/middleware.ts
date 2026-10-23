@@ -19,10 +19,41 @@ const CABECERAS: Record<string, string> = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 };
 
-export const onRequest = defineMiddleware(async (_context, next) => {
+/** Tipos de texto que vale la pena comprimir. */
+const COMPRIMIBLE = /^(text\/|application\/(json|xml|javascript|graphql-response\+json))/;
+
+/**
+ * Railway sirve comprimidos los archivos estáticos, pero no el HTML que se genera en cada
+ * petición: la portada son ~42 KB que con gzip quedan en ~9. Las páginas que se generan al
+ * compilar (prerender) no se tocan: comprimirlas aquí guardaría gzip en el archivo.
+ */
+function comprimir(request: Request, response: Response): Response {
+  const tipo = response.headers.get('Content-Type') ?? '';
+  const aceptaGzip = /\bgzip\b/.test(request.headers.get('Accept-Encoding') ?? '');
+  if (
+    !response.body ||
+    request.method === 'HEAD' ||
+    !aceptaGzip ||
+    !COMPRIMIBLE.test(tipo) ||
+    response.headers.has('Content-Encoding')
+  ) {
+    return response;
+  }
+  const headers = new Headers(response.headers);
+  headers.set('Content-Encoding', 'gzip');
+  headers.delete('Content-Length');
+  headers.append('Vary', 'Accept-Encoding');
+  return new Response(response.body.pipeThrough(new CompressionStream('gzip')), {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
+export const onRequest = defineMiddleware(async (context, next) => {
   const response = await next();
   for (const [nombre, valor] of Object.entries(CABECERAS)) {
     if (!response.headers.has(nombre)) response.headers.set(nombre, valor);
   }
-  return response;
+  return context.isPrerendered ? response : comprimir(context.request, response);
 });
