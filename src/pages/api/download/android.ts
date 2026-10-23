@@ -76,7 +76,10 @@ export const GET: APIRoute = async (context) => {
   }
 
   try {
-    const response = await fetchWithTimeout(`${backendUrl}/download/android`, {
+    // La app pide el APK de su arquitectura (?abi=arm64-v8a); el backend valida el valor
+    const abi = context.url.searchParams.get('abi');
+    const query = abi ? `?abi=${encodeURIComponent(abi)}` : '';
+    const response = await fetchWithTimeout(`${backendUrl}/download/android${query}`, {
       redirect: 'manual',
       headers: clientIpHeaders(getClientIp(context.request, safeClientAddress(context))),
     });
